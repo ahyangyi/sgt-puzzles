@@ -13,6 +13,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     m_icon("document")
 {
     m_svg.setImagePath("widgets/background");
+    m_svg.setEnabledBorders(Plasma::FrameSvg::AllBorders);
     // this will get us the standard applet background, for free!
     setBackgroundHints(DefaultBackground);
     resize(200, 200);
@@ -43,22 +44,22 @@ void Knotplasm::paintInterface(QPainter *p,
 {
     p->setRenderHint(QPainter::SmoothPixmapTransform);
     p->setRenderHint(QPainter::Antialiasing);
- 
+
     // Now we draw the applet, starting with our svg
-    m_svg.resize((int)contentsRect.width(), (int)contentsRect.height());
-    m_svg.paint(p, (int)contentsRect.left(), (int)contentsRect.top());
+    m_svg.resizeFrame(contentsRect.size());
+    m_svg.paintFrame(p, contentsRect.topLeft());
  
     // We place the icon and text
-    p->drawPixmap(7, 0, m_icon.pixmap((int)contentsRect.width(),(int)contentsRect.width()-14));
+//    p->drawPixmap(7, 0, m_icon.pixmap((int)contentsRect.width(),(int)contentsRect.width()-14));
     p->save();
-    p->setPen(Qt::white);
-    p->drawText(contentsRect,
-                Qt::AlignBottom | Qt::AlignHCenter,
-                "Hello Plasmoid!");
+	    p->setPen(Qt::white);
+	    p->drawText(contentsRect,
+        	        Qt::AlignBottom | Qt::AlignHCenter,
+                	"Hello Plasmoid!");
     p->restore();
 }
  
 // This is the command that links your applet to the .desktop file
-K_EXPORT_PLASMA_APPLET(tutorial1, Knotplasm)
+K_EXPORT_PLASMA_APPLET(Knotplasm, Knotplasm)
  
 #include "Knotplasm.moc"
