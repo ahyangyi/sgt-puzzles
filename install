@@ -1,3 +1,8 @@
+#!/bin/bash
+
+rm -Rf Build
+mkdir Build
+cd Build
 cmake .. -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix`;
 make;
 kdesu make install;
