@@ -4,4 +4,4 @@ kdesu make install;
 kbuildsycoca4;
 kquitapp plasma-desktop;
 sleep 1s;
-plasma-desktop;
+plasma-desktop 1>/dev/null 2>/dev/null;
