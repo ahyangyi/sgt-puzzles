@@ -24,7 +24,7 @@ class Knotplasm : public Plasma::Applet
     void init();
  
     private:
-        Plasma::FrameSvg m_svg;
+        Plasma::FrameSvg m_svg[4][4];
         KIcon m_icon;
 };
  
