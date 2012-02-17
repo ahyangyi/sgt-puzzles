@@ -16,6 +16,7 @@ include_directories(
 set(
     Knotplasm_SRCS
     Knotplasm.cpp Knotwrap.cpp Knotconfig.cpp
+    Knotrenderer-primitive.cpp
     drawing.c dsf.c
     list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c
     galaxies.c

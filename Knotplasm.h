@@ -5,6 +5,8 @@
  
 #include <Plasma/Applet>
 #include <Plasma/Svg>
+
+#include "Knotrenderer.h"
  
 struct frontend;
 class KnotMidEnd;
@@ -19,18 +21,13 @@ class Knotplasm : public Plasma::Applet
         ~Knotplasm();
  
         // Override
-        // paints the applet to screen
+        void createConfigurationInterface(KConfigDialog *parent);
+        void init();
         void paintInterface(QPainter *p,
                 const QStyleOptionGraphicsItem *option,
                 const QRect& contentsRect);
-
-        // Override
-        // add our own configuration pages
-        void createConfigurationInterface(KConfigDialog *parent);
-        
-        // Override
-        // do additional initialization steps
-        void init();
+        QSize sizeHint() const;
+        QSize minimalSizeHint() const;
 
         // Handlers of various drawing events
         void drawText(int x, int y, int fonttype, int fontsize,
@@ -38,7 +35,7 @@ class Knotplasm : public Plasma::Applet
         void drawRect(int x, int y, int w, int h, int colour);
         void drawLine(int x1, int y1, int x2, int y2,
                     int colour);
-        void drawPolygon(int *coords,g int npoints,
+        void drawPolygon(int *coords, int npoints,
             int fillcolour, int outlinecolour);
         void drawCircle(int cx, int cy, int radius,
             int fillcolour, int outlinecolour);
@@ -66,7 +63,10 @@ class Knotplasm : public Plasma::Applet
         KnotMidEnd *m_me;
         
         int m_port_x, m_port_y;
-
+        bool m_drawing;
+        
+        Knotrenderer* m_renderer;
+        
 #ifdef KNOTPLASM_DEBUG
         QString m_debug_text;
         QVector<QPair<QString,qint16> > m_debug_history;

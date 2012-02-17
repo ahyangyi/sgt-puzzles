@@ -10,6 +10,8 @@
 #include <plasma/svg.h>
 #include <plasma/theme.h>
 
+#include "Knotrenderer-primitive.h"
+
 #ifdef KNOTPLASM_DEBUG
 void Knotplasm::kpdebug (QString s)
 {
@@ -39,13 +41,13 @@ void Knotplasm::kpdebug (QString s)
 Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     : Plasma::Applet(parent, args)
     ,m_icon("document")
-#ifdef KNOTPLASM_DEBUG
-    ,m_debug_text("debug")
-#endif
+    ,m_drawing(false)
 {
     m_fe = new frontend();
     m_fe->plasm = this;
     
+    m_renderer = new KnotrendererPrimitive();
+
     static const int BorderSample[4] = {1, 0, 2, 3};
     
     for (int i = 0; i < 4; i ++)
@@ -57,7 +59,6 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
         }
     // this will get us the standard applet background, for free!
     setBackgroundHints(TranslucentBackground);
-    resize(200, 200);
 }
  
  
@@ -72,12 +73,6 @@ Knotplasm::~Knotplasm()
  
 void Knotplasm::init()
 {
- 
-    // A small demonstration of the setFailedToLaunch function
-//    if (m_icon.isNull()) {
-//        setFailedToLaunch(true, "No world to say hello");
-//    }
-    
     m_me = new KnotMidEnd(this);
     m_me->newGame();
     m_port_x = 200;
@@ -92,7 +87,6 @@ void Knotplasm::paintInterface(QPainter *p,
     p->setRenderHint(QPainter::SmoothPixmapTransform);
     p->setRenderHint(QPainter::Antialiasing);
 
-    // Now we draw the applet, starting with our svg
     for (int i = 0; i < 4; i ++)
     {
         for (int j = 0; j < 4; j ++)
@@ -101,6 +95,12 @@ void Knotplasm::paintInterface(QPainter *p,
             m_svg[i][j].paintFrame(p, contentsRect.topLeft() + QPointF(contentsRect.size().width() / 4 * i, contentsRect.size().height() / 4 * j));
         }
     }
+    
+    m_drawing = true;
+    
+    // Force the redraw
+    
+    m_drawing = false;
  
     // We place the icon and text
 //    p->drawPixmap(7, 0, m_icon.pixmap((int)contentsRect.width(),(int)contentsRect.width()-14));
@@ -122,6 +122,16 @@ void Knotplasm::createConfigurationInterface(KConfigDialog *parent)
     
     connect(parent, SIGNAL(applyClicked()), this, SLOT(configAccepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
+}
+
+QSize Knotplasm::sizeHint() const
+{
+    return QSize(200, 200);
+}
+
+QSize Knotplasm::minimalSizeHint() const
+{
+    return QSize(80, 80);
 }
 
 void Knotplasm::drawText(int x, int y, int fonttype, int fontsize,
