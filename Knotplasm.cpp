@@ -5,10 +5,12 @@
 #include <QFontMetrics>
 #include <QSizeF>
 #include <QWidget>
+#include <QGraphicsLinearLayout>
+
 #include <KDE/KConfigDialog>
  
-#include <plasma/svg.h>
-#include <plasma/theme.h>
+#include <Plasma/Svg>
+#include <Plasma/Theme>
 
 #include "Knotrenderer-primitive.h"
 
@@ -23,6 +25,9 @@ void Knotplasm::kpdebug (QString s)
     {
         m_debug_history[m_debug_history.size() - 1].second ++;
     }
+    
+    while (m_debug_history.size() > 16)
+        m_debug_history.pop_front();
     
     m_debug_text = "";
     for (QVector<QPair<QString,qint16> >::iterator it = m_debug_history.end(); it != m_debug_history.begin();)
@@ -45,9 +50,19 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
 {
     m_fe = new frontend();
     m_fe->plasm = this;
-    
-    m_renderer = new KnotrendererPrimitive();
 
+    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical, this);
+    layout->setSpacing(0);
+    m_renderer = new KnotRendererPrimitive();
+    layout->addItem(m_renderer);
+    QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, layout);
+    m_status = new Plasma::Label(this);
+    statusBarLayout->addItem(m_status);
+    m_start = new Plasma::PushButton(this);
+    statusBarLayout->addItem(m_start);
+    layout->addItem(statusBarLayout);
+    setLayout(layout);
+    
     static const int BorderSample[4] = {1, 0, 2, 3};
     
     for (int i = 0; i < 4; i ++)
@@ -75,10 +90,6 @@ void Knotplasm::init()
 {
     m_me = new KnotMidEnd(this);
     m_me->newGame();
-    m_port_x = 200;
-    m_port_y = 200;
-    m_me->size(&m_port_x, &m_port_y);
-    m_me->redraw();
 }
  
 void Knotplasm::paintInterface(QPainter *p,
@@ -97,9 +108,10 @@ void Knotplasm::paintInterface(QPainter *p,
     }
     
     m_drawing = true;
-    
-    // Force the redraw
-    
+    int my_x = contentsRect.width();
+    int my_y = contentsRect.height();
+    m_me->size(&my_x,&my_y);
+    m_me->forceRedraw();
     m_drawing = false;
  
     // We place the icon and text
@@ -137,54 +149,64 @@ QSize Knotplasm::minimalSizeHint() const
 void Knotplasm::drawText(int x, int y, int fonttype, int fontsize,
     int align, int colour, char *text)
 {
+    m_renderer->drawText(x,y,fonttype,fontsize,align,colour,text);
     kpdebug("drawText() called!");
 }
 
 void Knotplasm::drawRect(int x, int y, int w, int h, int colour)
 {
+    m_renderer->drawRect(x,y,w,h,colour);
     kpdebug("drawRect() called!");
 }
 
 void Knotplasm::drawLine(int x1, int y1, int x2, int y2,
             int colour)
 {
+    m_renderer->drawLine(x1,y1,x2,y2,colour);
     kpdebug("drawLine() called!");
 }
 
 void Knotplasm::drawPolygon(int *coords, int npoints,
     int fillcolour, int outlinecolour)
 {
+    m_renderer->drawPolygon(coords,npoints,fillcolour,outlinecolour);
     kpdebug("drawPolygon() called!");
 }
 
 void Knotplasm::drawCircle(int cx, int cy, int radius,
     int fillcolour, int outlinecolour)
 {
+    m_renderer->drawCircle(cx,cy,radius,fillcolour,outlinecolour);
     kpdebug("drawCircle() called!");
 }
 
 void Knotplasm::drawUpdate(int x, int y, int w, int h)
 {
+    m_renderer->drawUpdate(x,y,w,h);
     kpdebug("drawUpdate() called!");
 }
 
 void Knotplasm::clip(int x, int y, int w, int h)
 {
+    m_renderer->clip(x,y,w,h);
     kpdebug("clip() called!");
 }
 
 void Knotplasm::unclip()
 {
+    m_renderer->unclip();
     kpdebug("unclip() called!");
 }
 
 void Knotplasm::startDraw()
 {
+    m_renderer->startDraw();
     kpdebug("startDraw() called!");
 }
 
 void Knotplasm::endDraw()
 {
+    m_renderer->endDraw();
     kpdebug("endDraw() called!");
 }
 

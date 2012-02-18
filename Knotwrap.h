@@ -30,6 +30,7 @@ public:
     void newGame();
     void size(int* portX, int* portY);
     void redraw();
+    void forceRedraw();
 private:
     midend* m_me;
 };

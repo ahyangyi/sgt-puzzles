@@ -3,7 +3,7 @@
 
 #include "Knotrenderer.h"
 
-class KnotrendererPrimitive: public Knotrenderer
+class KnotRendererPrimitive: public KnotRenderer
 {
     virtual void drawText(int x, int y, int fonttype, int fontsize,
         int align, int colour, char *text);
@@ -22,6 +22,8 @@ class KnotrendererPrimitive: public Knotrenderer
     virtual void drawThickLine(float thickness,
         float x1, float y1, float x2, float y2,
         int colour);
+    
+    virtual ~KnotRendererPrimitive();
 };
 
 #endif

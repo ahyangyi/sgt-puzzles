@@ -5,6 +5,8 @@
  
 #include <Plasma/Applet>
 #include <Plasma/Svg>
+#include <Plasma/Label>
+#include <Plasma/PushButton>
 
 #include "Knotrenderer.h"
  
@@ -60,12 +62,14 @@ class Knotplasm : public Plasma::Applet
         KIcon m_icon;
         
         frontend* m_fe;
-        KnotMidEnd *m_me;
+        KnotMidEnd* m_me;
+        
+        KnotRenderer* m_renderer;
+        Plasma::Label* m_status;
+        Plasma::PushButton* m_start;
         
         int m_port_x, m_port_y;
         bool m_drawing;
-        
-        Knotrenderer* m_renderer;
         
 #ifdef KNOTPLASM_DEBUG
         QString m_debug_text;

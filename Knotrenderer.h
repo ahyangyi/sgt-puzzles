@@ -1,7 +1,9 @@
 #ifndef Knotrenderer_HEADER
 #define Knotrenderer_HEADER
 
-class Knotrenderer
+#include <QGraphicsWidget>
+
+class KnotRenderer: public QGraphicsWidget
 {
 public:
     virtual void drawText(int x, int y, int fonttype, int fontsize,
@@ -21,6 +23,8 @@ public:
     virtual void drawThickLine(float thickness,
         float x1, float y1, float x2, float y2,
         int colour) = 0;
+        
+    virtual ~KnotRenderer ();
 };
 
 #endif

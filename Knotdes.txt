@@ -1,0 +1,14 @@
+Knotplasm is a Plasma::Applet which represents the whole Plasmoid.
++-----------+
+|           |
+|           |
+|     A     |
+|           |
+|           |
++---------+-+
+| B       |C|
++---------+-+
+
+Part A: The main playing area. (QGraphicsWidget)
+Part B: The status bar. (Plasma::Label)
+Part C: A "New game" button. (Plasma::PushButton)

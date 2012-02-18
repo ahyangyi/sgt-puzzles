@@ -5,8 +5,8 @@ mkdir Build
 cd Build
 cmake .. -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix`;
 make;
-su -c make install;
+su -c "make install";
 kbuildsycoca4;
 kquitapp plasma-desktop;
-sleep 5s;
+sleep 2s;
 plasma-desktop 1>/dev/null 2>/dev/null;

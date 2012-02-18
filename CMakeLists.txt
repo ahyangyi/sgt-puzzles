@@ -1,4 +1,7 @@
-# Project Needs a name ofcourse
+# A _plasm_oid that enables you to play puzzles as hard as the Gordian _knot_.
+# Well, the name is actually a stupid word coined to start with the letter K.
+# It does not mean anything like "KDE does NOT need PLASMA".
+
 project(Knotplasm)
  
 # Find the required Libaries
@@ -15,11 +18,12 @@ include_directories(
 # We add our source code here
 set(
     Knotplasm_SRCS
-    Knotplasm.cpp Knotwrap.cpp Knotconfig.cpp
+    Knotplasm.cpp Knotconfig.cpp Knotrenderer.cpp
+    Knotwrap.cpp
     Knotrenderer-primitive.cpp
     drawing.c dsf.c
     list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c
-    galaxies.c
+    galaxies.c fifteen.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
 add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)

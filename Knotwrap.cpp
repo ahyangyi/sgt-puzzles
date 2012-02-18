@@ -45,6 +45,11 @@ void KnotMidEnd::redraw()
     midend_redraw(m_me);
 }
 
+void KnotMidEnd::forceRedraw()
+{
+    midend_force_redraw(m_me);
+}
+
 /*
  * Drawing APIs we provide
  */
