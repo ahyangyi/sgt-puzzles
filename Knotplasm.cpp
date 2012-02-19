@@ -13,6 +13,7 @@
 #include <Plasma/Theme>
 
 #include "Knotrenderer-primitive.h"
+#include "Knotrenderer-plasma.h"
 
 #ifdef KNOTPLASM_DEBUG
 void Knotplasm::kpdebug (QString s)
@@ -46,36 +47,28 @@ void Knotplasm::kpdebug (QString s)
 Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     : Plasma::Applet(parent, args)
     ,m_icon("document")
-    ,m_drawing(false)
 {
-    m_fe = new frontend();
-    m_fe->plasm = this;
+    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+    setAspectRatioMode( Plasma::IgnoreAspectRatio );
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-    layout->setSpacing(0);
-    m_renderer = new KnotRendererPrimitive();
+    m_renderer = new KnotRendererPlasma(this);
     layout->addItem(m_renderer);
     QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, layout);
     m_status = new Plasma::Label(this);
+    m_status->setText("This is the status bar.");
+    m_status->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::Label);
     statusBarLayout->addItem(m_status);
     m_start = new Plasma::PushButton(this);
+    m_start->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::PushButton);
+    m_start->setText("New");
     statusBarLayout->addItem(m_start);
     layout->addItem(statusBarLayout);
     setLayout(layout);
-    
-    static const int BorderSample[4] = {1, 0, 2, 3};
-    
-    for (int i = 0; i < 4; i ++)
-        for (int j = 0; j < 4; j ++)
-        {
-            m_svg[i][j].setParent(this);
-            m_svg[i][j].setImagePath("widgets/background");
-            m_svg[i][j].setEnabledBorders(Plasma::FrameSvg::EnabledBorders(BorderSample[i]*4+BorderSample[j]));
-        }
+
     // this will get us the standard applet background, for free!
-    setBackgroundHints(TranslucentBackground);
+    setBackgroundHints(StandardBackground);
 }
- 
  
 Knotplasm::~Knotplasm()
 {
@@ -88,44 +81,24 @@ Knotplasm::~Knotplasm()
  
 void Knotplasm::init()
 {
-    m_me = new KnotMidEnd(this);
+    m_me = new KnotMidend(this);
+    
+    connect(m_renderer, SIGNAL(redrawRequest()), m_me, SLOT(redraw()));
+    connect(m_renderer, SIGNAL(sizeRequest(int*,int*)), m_me, SLOT(size(int*,int*)));
+    connect(m_renderer, SIGNAL(colorRequest(QColor)), m_me, SLOT(color(QColor)));
+    connect(m_me, SIGNAL(drawText(int,int,int,int,int,int,QString)), m_renderer, SLOT(drawText(int,int,int,int,int,int,QString)));
+    connect(m_me, SIGNAL(drawRect(int,int,int,int,int)), m_renderer, SLOT(drawRect(int,int,int,int,int)));
+    connect(m_me, SIGNAL(drawLine(int,int,int,int,int)), m_renderer, SLOT(drawLine(int,int,int,int,int)));
+    connect(m_me, SIGNAL(drawPolygon(QPolygon,int,int)), m_renderer, SLOT(drawPolygon(QPolygon,int,int)));
+    connect(m_me, SIGNAL(drawCircle(int,int,int,int,int)), m_renderer, SLOT(drawCircle(int,int,int,int,int)));
+    
+    connect(m_me, SIGNAL(setColor(QList<QColor>)), m_renderer, SLOT(setColor(QList<QColor>)));
+
+    connect(m_me, SIGNAL(statusBar(QString)), m_status->nativeWidget(), SLOT(setText(QString)));
+    
     m_me->newGame();
 }
  
-void Knotplasm::paintInterface(QPainter *p,
-        const QStyleOptionGraphicsItem *option, const QRect &contentsRect)
-{
-    p->setRenderHint(QPainter::SmoothPixmapTransform);
-    p->setRenderHint(QPainter::Antialiasing);
-
-    for (int i = 0; i < 4; i ++)
-    {
-        for (int j = 0; j < 4; j ++)
-        {
-            m_svg[i][j].resizeFrame(contentsRect.size() / 4);
-            m_svg[i][j].paintFrame(p, contentsRect.topLeft() + QPointF(contentsRect.size().width() / 4 * i, contentsRect.size().height() / 4 * j));
-        }
-    }
-    
-    m_drawing = true;
-    int my_x = contentsRect.width();
-    int my_y = contentsRect.height();
-    m_me->size(&my_x,&my_y);
-    m_me->forceRedraw();
-    m_drawing = false;
- 
-    // We place the icon and text
-//    p->drawPixmap(7, 0, m_icon.pixmap((int)contentsRect.width(),(int)contentsRect.width()-14));
-#ifdef KNOTPLASM_DEBUG
-    p->save();
-    p->setPen(Qt::white);
-    p->drawText(contentsRect,
-        Qt::AlignBottom | Qt::AlignHCenter,
-        m_debug_text);
-    p->restore();
-#endif KNOTPLASM_DEBUG
-}
-
 void Knotplasm::createConfigurationInterface(KConfigDialog *parent)
 {
     QWidget *page = new KnotConfig(parent);
@@ -136,81 +109,61 @@ void Knotplasm::createConfigurationInterface(KConfigDialog *parent)
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
 }
 
-QSize Knotplasm::sizeHint() const
-{
-    return QSize(200, 200);
-}
-
-QSize Knotplasm::minimalSizeHint() const
-{
-    return QSize(80, 80);
-}
-
 void Knotplasm::drawText(int x, int y, int fonttype, int fontsize,
-    int align, int colour, char *text)
+    int align, int colour, const QString& text)
 {
-    m_renderer->drawText(x,y,fonttype,fontsize,align,colour,text);
     kpdebug("drawText() called!");
 }
 
 void Knotplasm::drawRect(int x, int y, int w, int h, int colour)
 {
-    m_renderer->drawRect(x,y,w,h,colour);
     kpdebug("drawRect() called!");
 }
 
 void Knotplasm::drawLine(int x1, int y1, int x2, int y2,
             int colour)
 {
-    m_renderer->drawLine(x1,y1,x2,y2,colour);
     kpdebug("drawLine() called!");
 }
 
-void Knotplasm::drawPolygon(int *coords, int npoints,
+void Knotplasm::drawPolygon(const QPolygon& polygon,
     int fillcolour, int outlinecolour)
 {
-    m_renderer->drawPolygon(coords,npoints,fillcolour,outlinecolour);
     kpdebug("drawPolygon() called!");
 }
 
 void Knotplasm::drawCircle(int cx, int cy, int radius,
     int fillcolour, int outlinecolour)
 {
-    m_renderer->drawCircle(cx,cy,radius,fillcolour,outlinecolour);
     kpdebug("drawCircle() called!");
 }
 
 void Knotplasm::drawUpdate(int x, int y, int w, int h)
 {
-    m_renderer->drawUpdate(x,y,w,h);
     kpdebug("drawUpdate() called!");
 }
 
 void Knotplasm::clip(int x, int y, int w, int h)
 {
-    m_renderer->clip(x,y,w,h);
     kpdebug("clip() called!");
 }
 
 void Knotplasm::unclip()
 {
-    m_renderer->unclip();
     kpdebug("unclip() called!");
 }
 
 void Knotplasm::startDraw()
 {
-    m_renderer->startDraw();
     kpdebug("startDraw() called!");
 }
 
 void Knotplasm::endDraw()
 {
-    m_renderer->endDraw();
     kpdebug("endDraw() called!");
 }
 
-void Knotplasm::statusBar(char *text)
+void Knotplasm::statusBar(const QString& text)
 {
     kpdebug(QString("statusBar() called with %1!").arg(text));
 }

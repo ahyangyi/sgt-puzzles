@@ -20,7 +20,7 @@ set(
     Knotplasm_SRCS
     Knotplasm.cpp Knotconfig.cpp Knotrenderer.cpp
     Knotwrap.cpp
-    Knotrenderer-primitive.cpp
+    Knotrenderer-primitive.cpp Knotrenderer-plasma.cpp
     drawing.c dsf.c
     list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c
     galaxies.c fifteen.c

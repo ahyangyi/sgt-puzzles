@@ -1,6 +1,8 @@
+#include <QDateTime>
+
 #include "Knotplasm.h"
 #include "Knotwrap.h"
-#include <QDateTime>
+#include <Plasma/Theme>
 
 /*
  * Forward declaration
@@ -11,96 +13,115 @@ extern const struct drawing_api knotplasm_drawing;
  * Knotplasm functions interacting with the wrapper:
  */
 
-frontend* Knotplasm::toFrontend() const
+KnotMidend* Knotplasm::midend() const
 {
-    return m_fe;
+    return m_me;
 }
 
-void* Knotplasm::toDrawHandle() const
+struct frontend
 {
-    return (void *)this;
-}
+};
 
 /*
  * A simple C++ wrapper for the middle end
  */
-KnotMidEnd::KnotMidEnd (Knotplasm* parent)
+KnotMidend::KnotMidend (Knotplasm* parent)
 {
-    m_me = midend_new(parent->toFrontend(), gamelist[0], &knotplasm_drawing, parent->toDrawHandle());
+    m_me = midend_new((frontend*)this, gamelist[0], &knotplasm_drawing, (void *) this);
 }
-KnotMidEnd::~KnotMidEnd() {}
+KnotMidend::~KnotMidend() {}
     
-void KnotMidEnd::newGame()
+void KnotMidend::newGame()
 {
     midend_new_game(m_me);
 }
 
-void KnotMidEnd::size(int* portX, int* portY)
+void KnotMidend::size(int* portX, int* portY)
 {
     midend_size(m_me,portX,portY,TRUE);
 }
 
-void KnotMidEnd::redraw()
+void KnotMidend::redraw()
 {
     midend_redraw(m_me);
 }
 
-void KnotMidEnd::forceRedraw()
+void KnotMidend::forceRedraw()
 {
     midend_force_redraw(m_me);
 }
 
+void KnotMidend::color(QColor color)
+{
+    int n_colors;
+    float *f_colors;
+    QList<QColor> colorList;
+    
+    m_color = color;
+
+    f_colors = midend_colours(m_me, &n_colors);
+    
+    for (int i = 0; i < n_colors; i ++)
+        colorList.append(QColor::fromRgbF(f_colors[i*3], f_colors[i*3+1], f_colors[i*3+2]));
+    
+    emit setColor(colorList);
+}
+
 /*
- * Drawing APIs we provide
+ * Drawing APIs we provide to the midend
  */
 
 void knotplasm_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
             int align, int colour, char *text)
 {
-    ((Knotplasm *)handle)->drawText(x,y,fonttype,fontsize,align,colour,text);
+    ((KnotMidend*)handle)-> emit drawText(x,y,fonttype,fontsize,align,colour,QString(text));
 }
+
 void knotplasm_draw_rect(void *handle, int x, int y, int w, int h, int colour)
 {
-    ((Knotplasm *)handle)->drawRect(x,y,w,h,colour);
+    ((KnotMidend *)handle)-> emit drawRect(x,y,w,h,colour);
 }
 void knotplasm_draw_line(void *handle, int x1, int y1, int x2, int y2,
             int colour)
 {
-    ((Knotplasm *)handle)->drawLine(x1,y1,x2,y2,colour);
+    ((KnotMidend *)handle)-> emit drawLine(x1,y1,x2,y2,colour);
 }
 void knotplasm_draw_polygon(void *handle, int *coords, int npoints,
             int fillcolour, int outlinecolour)
 {
-    ((Knotplasm *)handle)->drawPolygon(coords,npoints,fillcolour,outlinecolour);
+    QVector<QPoint> n_coords;
+    for (int i = 0; i < npoints; i ++)
+        n_coords.append(QPoint(coords[i * 2], coords[i * 2 + 1]));
+    ((KnotMidend *)handle)-> emit drawPolygon(QPolygon(n_coords),fillcolour,outlinecolour);
 }
 void knotplasm_draw_circle(void *handle, int cx, int cy, int radius,
         int fillcolour, int outlinecolour)
 {
-    ((Knotplasm *)handle)->drawCircle(cx,cy,radius,fillcolour,outlinecolour);
+    ((KnotMidend *)handle)-> emit drawCircle(cx,cy,radius,fillcolour,outlinecolour);
 }
 void knotplasm_draw_update(void *handle, int x, int y, int w, int h)
 {
-    ((Knotplasm *)handle)->drawUpdate(x,y,w,h);
+//    ((Knotplasm *)handle)->drawUpdate(x,y,w,h);
 }
 void knotplasm_clip(void *handle, int x, int y, int w, int h)
 {
-    ((Knotplasm *)handle)->clip(x,y,w,h);
+//    ((Knotplasm *)handle)->clip(x,y,w,h);
 }
 void knotplasm_unclip(void *handle)
 {
-    ((Knotplasm *)handle)->unclip();
+//    ((Knotplasm *)handle)->unclip();
 }
 void knotplasm_start_draw(void *handle)
 {
-    ((Knotplasm *)handle)->startDraw();
+//    ((Knotplasm *)handle)->startDraw();
 }
 void knotplasm_end_draw(void *handle)
 {
-    ((Knotplasm *)handle)->endDraw();
+//    ((Knotplasm *)handle)->endDraw();
 }
 void knotplasm_status_bar(void *handle, char *text)
 {
-    ((Knotplasm *)handle)->statusBar(text);
+    ((KnotMidend *)handle)->statusBar(QString(text));
 }
 blitter *knotplasm_blitter_new(void *handle, int w, int h)
 {
@@ -127,7 +148,7 @@ void knotplasm_draw_thick_line(void *handle, float thickness,
             float x1, float y1, float x2, float y2,
             int colour)
 {
-    ((Knotplasm *)handle)->drawThickLine(thickness,x1,y1,x2,y2,colour);
+//    ((Knotplasm *)handle)->drawThickLine(thickness,x1,y1,x2,y2,colour);
 }
 
 const struct drawing_api knotplasm_drawing = {
@@ -177,4 +198,9 @@ void fatal(char *fmt, ...)
 
 void frontend_default_colour(frontend *fe, float *output)
 {
+    output[0] = ((KnotMidend*)fe)->m_color.redF();
+    output[1] = ((KnotMidend*)fe)->m_color.greenF();
+    output[2] = ((KnotMidend*)fe)->m_color.blueF();
 }
+
+#include "Knotwrap.moc"
