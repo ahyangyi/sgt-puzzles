@@ -148,7 +148,7 @@ void knotplasm_draw_thick_line(void *handle, float thickness,
             float x1, float y1, float x2, float y2,
             int colour)
 {
-//    ((Knotplasm *)handle)->drawThickLine(thickness,x1,y1,x2,y2,colour);
+    ((KnotMidend *)handle)->drawThickLine(thickness,x1,y1,x2,y2,colour);
 }
 
 const struct drawing_api knotplasm_drawing = {

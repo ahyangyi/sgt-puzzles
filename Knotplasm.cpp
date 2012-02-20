@@ -52,7 +52,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     setAspectRatioMode( Plasma::IgnoreAspectRatio );
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-    m_renderer = new KnotRendererPlasma(this);
+    m_renderer = new KnotRendererPrimitive(this);
     layout->addItem(m_renderer);
     QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, layout);
     m_status = new Plasma::Label(this);

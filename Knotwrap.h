@@ -41,6 +41,9 @@ signals:
         int outlinecolour);
     void drawCircle(int cx, int cy, int radius,
         int fillcolour, int outlinecolour);
+    void drawThickLine(float thickness,
+        float x1, float y1, float x2, float y2,
+        int colour);
     
     void statusBar(const QString& text);
     void setColor(const QList<QColor> colorList);
@@ -59,6 +62,9 @@ friend void knotplasm_draw_polygon(void *handle, int *coords, int npoints,
 friend void knotplasm_draw_circle(void *handle, int cx, int cy, int radius,
         int fillcolour, int outlinecolour);
 friend void frontend_default_colour(frontend *fe, float *output);
+friend void knotplasm_draw_thick_line(void *handle, float thickness,
+            float x1, float y1, float x2, float y2,
+            int colour);
 };
 
 #endif
