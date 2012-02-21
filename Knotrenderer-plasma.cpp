@@ -94,6 +94,19 @@ void KnotRendererPlasma::drawCircle(int cx, int cy, int radius,
     }
 }
 
+void KnotRendererPlasma::drawThickLine(float thickness,
+     float x1, float y1, float x2, float y2,
+     int colour)
+{
+    if (d->m_paint_interface != NULL)
+    {
+        d->m_paint_interface->p->save();
+        d->m_paint_interface->p->setPen(QPen(d->m_color_list[colour], thickness));
+        d->m_paint_interface->p->drawLine(QPointF(x1,y1)+d->m_paint_interface->offset, QPointF(x2,y2)+d->m_paint_interface->offset);
+        d->m_paint_interface->p->restore();
+    }
+}
+
 void KnotRendererPlasma::drawUpdate(int x, int y, int w, int h)
 {
 }
@@ -111,12 +124,6 @@ void KnotRendererPlasma::startDraw()
 }
 
 void KnotRendererPlasma::endDraw()
-{
-}
-
-void KnotRendererPlasma::drawThickLine(float thickness,
-     float x1, float y1, float x2, float y2,
-     int colour)
 {
 }
 

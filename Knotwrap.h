@@ -30,6 +30,9 @@ public slots:
     void redraw();
     void forceRedraw();
     void color(QColor color);
+
+    void pressButton (QPointF pos, Qt::MouseButton btn);
+    void releaseButton (QPointF pos, Qt::MouseButton btn);
     
 signals:
     void drawRect(int x, int y, int w, int h, int colour);

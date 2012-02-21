@@ -15,6 +15,9 @@ public:
             const QRectF& contentsRect) = 0;
 
     virtual ~KnotRenderer ();
+    
+    void mousePressEvent ( QGraphicsSceneMouseEvent * );
+    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
 
 public slots:
     
@@ -46,6 +49,9 @@ signals:
     void forceRedrawRequest ();
     void sizeRequest (int* x, int* y);
     void colorRequest (QColor color);
+    
+    void mousePressed (QPointF pos, Qt::MouseButton btn);
+    void mouseReleased (QPointF pos, Qt::MouseButton btn);
    
 private:
     virtual void paint (QPainter * painter, 

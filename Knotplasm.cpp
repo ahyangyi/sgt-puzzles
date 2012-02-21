@@ -11,6 +11,8 @@
  
 #include <Plasma/Svg>
 #include <Plasma/Theme>
+#include <Plasma/Extender>
+#include <Plasma/ExtenderItem>
 
 #include "Knotrenderer-primitive.h"
 #include "Knotrenderer-plasma.h"
@@ -56,11 +58,10 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     layout->addItem(m_renderer);
     QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, layout);
     m_status = new Plasma::Label(this);
-    m_status->setText("This is the status bar.");
     m_status->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::Label);
     statusBarLayout->addItem(m_status);
     m_start = new Plasma::PushButton(this);
-    m_start->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::PushButton);
+    m_start->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::PushButton);
     m_start->setText("New");
     statusBarLayout->addItem(m_start);
     layout->addItem(statusBarLayout);
@@ -91,12 +92,20 @@ void Knotplasm::init()
     connect(m_me, SIGNAL(drawLine(int,int,int,int,int)), m_renderer, SLOT(drawLine(int,int,int,int,int)));
     connect(m_me, SIGNAL(drawPolygon(QPolygon,int,int)), m_renderer, SLOT(drawPolygon(QPolygon,int,int)));
     connect(m_me, SIGNAL(drawCircle(int,int,int,int,int)), m_renderer, SLOT(drawCircle(int,int,int,int,int)));
+    connect(m_me, SIGNAL(drawThickLine(float,float,float,float,float,int)), m_renderer, SLOT(drawThickLine(float,float,float,float,float,int)));
     
     connect(m_me, SIGNAL(setColor(QList<QColor>)), m_renderer, SLOT(setColor(QList<QColor>)));
 
     connect(m_me, SIGNAL(statusBar(QString)), m_status->nativeWidget(), SLOT(setText(QString)));
     
     m_me->newGame();
+
+    if (!extender()->hasItem("networkmonitoreth0")) {
+        Plasma::ExtenderItem *item = new Plasma::ExtenderItem(extender());
+        //name can be used to later access this item through extender()->item(name):
+        item->setName("networkmonitoreth0");
+        initExtenderItem(item);
+    }   
 }
  
 void Knotplasm::createConfigurationInterface(KConfigDialog *parent)

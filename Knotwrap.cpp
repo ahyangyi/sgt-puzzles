@@ -67,6 +67,32 @@ void KnotMidend::color(QColor color)
     emit setColor(colorList);
 }
 
+void KnotMidend::pressButton(QPointF pos, Qt::MouseButton btn)
+{
+    int x = (int)(pos.x+0.495);
+    int y = (int)(pos.y+0.495);
+    
+    if (btn==Qt::LeftButton)
+        midend_process_key(m_me, x, y, LEFT_BUTTON);
+    if (btn==Qt::MiddleButton)
+        midend_process_key(m_me, x, y, MIDDLE_BUTTON);
+    if (btn==Qt::RightButton)
+        midend_process_key(m_me, x, y, RIGHT_BUTTON);
+}
+
+void KnotMidend::releaseButton(QPointF pos, Qt::MouseButton btn)
+{
+    int x = (int)(pos.x+0.495);
+    int y = (int)(pos.y+0.495);
+    
+    if (btn==Qt::LeftButton)
+        midend_process_key(m_me, x, y, LEFT_RELEASE);
+    if (btn==Qt::MiddleButton)
+        midend_process_key(m_me, x, y, MIDDLE_RELEASE);
+    if (btn==Qt::RightButton)
+        midend_process_key(m_me, x, y, RIGHT_RELEASE);
+}
+
 /*
  * Drawing APIs we provide to the midend
  */
