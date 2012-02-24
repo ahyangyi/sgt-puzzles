@@ -18,8 +18,14 @@ public:
     
     void mousePressEvent ( QGraphicsSceneMouseEvent * );
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
+    
+    bool event ( QEvent * event );
 
 public slots:
+    // Responding to desktop events
+    virtual void geometryChangedHandler () = 0;
+    virtual void themeChangedHandler () = 0;
+    virtual void initialize () = 0;
     
     // Real SGT APIs
     virtual void drawText(int x, int y, int fonttype, int fontsize,
