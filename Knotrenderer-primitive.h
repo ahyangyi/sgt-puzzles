@@ -42,6 +42,8 @@ public slots:
     virtual void notStarted();
     virtual void setColor(QList<QColor> colorList);
     
+protected:
+    virtual void setPainter(int fillColour, int outlineColour, int outlineWidth);
 private:
     class Private;
     

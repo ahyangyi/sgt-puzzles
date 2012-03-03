@@ -1,9 +1,10 @@
+#include <QGraphicsSceneMouseEvent>
+#include <QWidget>
+#include <QPen>
 #include <QPainter>
+#include <Plasma/Theme>
 
 #include "Knotrenderer-primitive.h"
-#include <QGraphicsSceneMouseEvent>
-#include <Plasma/Theme>
-#include <QWidget>
 
 struct PaintInterfaceData
 {
@@ -33,12 +34,27 @@ KnotRendererPrimitive::~KnotRendererPrimitive()
     delete d;
 }
 
+void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int outlineWidth)
+{
+    QPen pen = d->m_paint_interface->p->pen();
+    pen.setWidth(outlineWidth);
+    pen.setColor(d->m_color_list[outlineColour]);
+    d->m_paint_interface->p->setPen(pen);
+    
+/*
+ *   QBrush brush = d->m_paint_interface->p->brush();
+ *   brush.setColor(d->m_color_list[fillColour]);
+ *   d->m_paint_interface->p->setBrush(brush);
+ */
+    d->m_paint_interface->p->setBrush(QBrush(d->m_color_list[fillColour]));
+}
+
 void KnotRendererPrimitive::drawText(int x, int y, int fonttype, int fontsize,
      int align, int colour, const QString& text)
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->drawText(QPointF(x,y)+getOffset(), text);
+        d->m_paint_interface->p->drawText(QPointF(x,y), text);
     }
 }
 
@@ -46,9 +62,8 @@ void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->setPen(QPen());
-        d->m_paint_interface->p->setBrush(QBrush(d->m_color_list[colour]));
-        d->m_paint_interface->p->drawRect(QRectF(x,y,w,h).translated(getOffset()));
+        setPainter(colour, colour, 0);
+        d->m_paint_interface->p->drawRect(QRectF(x,y,w,h));
     }
 }
 
@@ -57,8 +72,8 @@ void KnotRendererPrimitive::drawLine(int x1, int y1, int x2, int y2,
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->setPen(QPen(d->m_color_list[colour]));
-        d->m_paint_interface->p->drawLine(QPointF(x1,y1)+getOffset(), QPointF(x2,y2)+getOffset());
+        setPainter(colour, colour, 0);
+        d->m_paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
     }
 }
 
@@ -67,9 +82,8 @@ void KnotRendererPrimitive::drawPolygon(const QPolygon& polygon,
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->setPen(QPen(d->m_color_list[outlinecolour]));
-        d->m_paint_interface->p->setBrush(QBrush(d->m_color_list[fillcolour]));
-        d->m_paint_interface->p->drawPolygon(QPolygonF(polygon).translated(getOffset()));
+        setPainter(fillcolour, outlinecolour, 0);
+        d->m_paint_interface->p->drawPolygon(polygon);
     }
 }
 
@@ -78,9 +92,8 @@ void KnotRendererPrimitive::drawCircle(int cx, int cy, int radius,
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->setPen(QPen(d->m_color_list[outlinecolour]));
-        d->m_paint_interface->p->setBrush(QBrush(d->m_color_list[fillcolour]));
-        d->m_paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2).translated(getOffset()));
+        setPainter(fillcolour, outlinecolour, 0);
+        d->m_paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2));
     }
 }
 
@@ -90,10 +103,8 @@ void KnotRendererPrimitive::drawThickLine(float thickness,
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->save();
-        d->m_paint_interface->p->setPen(QPen(d->m_color_list[colour], thickness));
-        d->m_paint_interface->p->drawLine(QPointF(x1,y1)+getOffset(), QPointF(x2,y2)+getOffset());
-        d->m_paint_interface->p->restore();
+        setPainter(colour, colour, thickness);
+        d->m_paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
     }
 }
 
@@ -132,10 +143,14 @@ void KnotRendererPrimitive::paintInterface(QPainter *p,
     const QStyleOptionGraphicsItem *option,
     const QRectF& contentsRect)
 {
-    initialize();
+//    initialize();
     
     d->m_paint_interface = new PaintInterfaceData(p, option);
+ 
+    p->save();
+    p->translate(getOffset());
     emit forceRedrawRequest();
+    p->restore();
 
     delete d->m_paint_interface;
     d->m_paint_interface = NULL;

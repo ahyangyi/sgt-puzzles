@@ -11,16 +11,13 @@ KnotRenderer::KnotRenderer(QGraphicsItem* parent, Qt::WindowFlags wFlags): QGrap
     setPreferredSize(256,256); //Magical numbers. I guess it is a reasonable size for most screens.
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     updateGeometry();
+    
+    connect(this,SIGNAL(geometryChanged()),this,SLOT(geometryChangedHandler()));
 }
 
 KnotRenderer::~KnotRenderer()
 {
 
-}
-
-void KnotRenderer::geometryChanged()
-{
-    geometryChangedHandler();
 }
 
 bool KnotRenderer::event(QEvent* event)
@@ -33,12 +30,14 @@ bool KnotRenderer::event(QEvent* event)
 void KnotRenderer::mousePressEvent(QGraphicsSceneMouseEvent* e)
 {
     emit mousePressed((e->pos()-getOffset()).toPoint(), e->button());
+    e->accept();
     this->update();
 }
 
 void KnotRenderer::mouseReleaseEvent(QGraphicsSceneMouseEvent* e)
 {
     emit mouseReleased((e->pos()-getOffset()).toPoint(), e->button());
+    e->accept();
     this->update();
 }
 

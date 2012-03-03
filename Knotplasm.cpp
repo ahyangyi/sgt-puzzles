@@ -6,6 +6,7 @@
 #include <QSizeF>
 #include <QWidget>
 #include <QGraphicsLinearLayout>
+#include <QGraphicsSceneContextMenuEvent>
 
 #include <KDE/KConfigDialog>
  
@@ -116,6 +117,13 @@ void Knotplasm::createConfigurationInterface(KConfigDialog *parent)
     connect(parent, SIGNAL(applyClicked()), this, SLOT(configAccepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
 }
+
+void Knotplasm::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    event->accept();
+//    QGraphicsItem::contextMenuEvent(event);
+}
+
 
 void Knotplasm::drawText(int x, int y, int fonttype, int fontsize,
     int align, int colour, const QString& text)

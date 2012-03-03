@@ -28,6 +28,8 @@ class Knotplasm : public Plasma::Applet
 
         // Interact with wrappers
         KnotMidend* midend() const;
+        
+        virtual void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
     
     public slots:
         // Handlers of various drawing events

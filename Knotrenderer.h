@@ -22,9 +22,6 @@ public:
     bool event ( QEvent * event );
 
 public slots:
-    // Overloading slots
-    virtual void geometryChanged ();
-    
     // Responding to desktop events
     virtual void geometryChangedHandler ();
     virtual void themeChangedHandler ();
