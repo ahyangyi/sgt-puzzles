@@ -67,10 +67,10 @@ void KnotMidend::color(QColor color)
     emit setColor(colorList);
 }
 
-void KnotMidend::pressButton(QPointF pos, Qt::MouseButton btn)
+void KnotMidend::pressButton(QPoint pos, Qt::MouseButton btn)
 {
-    int x = (int)(pos.x+0.495);
-    int y = (int)(pos.y+0.495);
+    int x = pos.x();
+    int y = pos.y();
     
     if (btn==Qt::LeftButton)
         midend_process_key(m_me, x, y, LEFT_BUTTON);
@@ -80,10 +80,10 @@ void KnotMidend::pressButton(QPointF pos, Qt::MouseButton btn)
         midend_process_key(m_me, x, y, RIGHT_BUTTON);
 }
 
-void KnotMidend::releaseButton(QPointF pos, Qt::MouseButton btn)
+void KnotMidend::releaseButton(QPoint pos, Qt::MouseButton btn)
 {
-    int x = (int)(pos.x+0.495);
-    int y = (int)(pos.y+0.495);
+    int x = pos.x();
+    int y = pos.y();
     
     if (btn==Qt::LeftButton)
         midend_process_key(m_me, x, y, LEFT_RELEASE);

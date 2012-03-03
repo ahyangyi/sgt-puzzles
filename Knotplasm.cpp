@@ -64,6 +64,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     m_start->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::PushButton);
     m_start->setText("New");
     statusBarLayout->addItem(m_start);
+    statusBarLayout->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
     layout->addItem(statusBarLayout);
     setLayout(layout);
 
@@ -83,8 +84,10 @@ Knotplasm::~Knotplasm()
 void Knotplasm::init()
 {
     m_me = new KnotMidend(this);
+    m_me->newGame();
     
     connect(m_renderer, SIGNAL(redrawRequest()), m_me, SLOT(redraw()));
+    connect(m_renderer, SIGNAL(forceRedrawRequest()), m_me, SLOT(forceRedraw()));
     connect(m_renderer, SIGNAL(sizeRequest(int*,int*)), m_me, SLOT(size(int*,int*)));
     connect(m_renderer, SIGNAL(colorRequest(QColor)), m_me, SLOT(color(QColor)));
     connect(m_me, SIGNAL(drawText(int,int,int,int,int,int,QString)), m_renderer, SLOT(drawText(int,int,int,int,int,int,QString)));
@@ -98,14 +101,10 @@ void Knotplasm::init()
 
     connect(m_me, SIGNAL(statusBar(QString)), m_status->nativeWidget(), SLOT(setText(QString)));
     
-    m_me->newGame();
-
-    if (!extender()->hasItem("networkmonitoreth0")) {
-        Plasma::ExtenderItem *item = new Plasma::ExtenderItem(extender());
-        //name can be used to later access this item through extender()->item(name):
-        item->setName("networkmonitoreth0");
-        initExtenderItem(item);
-    }   
+    connect(m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
+    connect(m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
+    
+    m_renderer->initialize();
 }
  
 void Knotplasm::createConfigurationInterface(KConfigDialog *parent)

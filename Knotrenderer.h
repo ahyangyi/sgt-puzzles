@@ -16,16 +16,19 @@ public:
 
     virtual ~KnotRenderer ();
     
-    void mousePressEvent ( QGraphicsSceneMouseEvent * );
-    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
+    virtual void mousePressEvent ( QGraphicsSceneMouseEvent * );
+    virtual void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
     
     bool event ( QEvent * event );
 
 public slots:
+    // Overloading slots
+    virtual void geometryChanged ();
+    
     // Responding to desktop events
-    virtual void geometryChangedHandler () = 0;
-    virtual void themeChangedHandler () = 0;
-    virtual void initialize () = 0;
+    virtual void geometryChangedHandler ();
+    virtual void themeChangedHandler ();
+    virtual void initialize ();
     
     // Real SGT APIs
     virtual void drawText(int x, int y, int fonttype, int fontsize,
@@ -56,13 +59,19 @@ signals:
     void sizeRequest (int* x, int* y);
     void colorRequest (QColor color);
     
-    void mousePressed (QPointF pos, Qt::MouseButton btn);
-    void mouseReleased (QPointF pos, Qt::MouseButton btn);
-   
+    void mousePressed (QPoint pos, Qt::MouseButton btn);
+    void mouseReleased (QPoint pos, Qt::MouseButton btn);
+
+protected:
+    virtual QPointF getOffset();
+    virtual void setOffset(const QPointF& offset);
+    
 private:
     virtual void paint (QPainter * painter, 
         const QStyleOptionGraphicsItem * option,
         QWidget * widget = 0);
+
+    QPointF m_offset;
 };
 
 #endif
