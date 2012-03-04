@@ -16,8 +16,9 @@ public:
 
     virtual ~KnotRenderer ();
     
-    virtual void mousePressEvent ( QGraphicsSceneMouseEvent * );
-    virtual void mouseReleaseEvent ( QGraphicsSceneMouseEvent * );
+    virtual void mousePressEvent ( QGraphicsSceneMouseEvent * e);
+    virtual void mouseReleaseEvent ( QGraphicsSceneMouseEvent * e);
+    virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * e);
     
     bool event ( QEvent * event );
 
@@ -28,7 +29,7 @@ public slots:
     virtual void initialize ();
     
     // Real SGT APIs
-    virtual void drawText(int x, int y, int fonttype, int fontsize,
+    virtual void drawText(int x, int y, bool monospace, int fontsize,
         int align, int colour, const QString& text) = 0;
     virtual void drawRect(int x, int y, int w, int h, int colour) = 0;
     virtual void drawLine(int x1, int y1, int x2, int y2,
@@ -56,8 +57,9 @@ signals:
     void sizeRequest (int* x, int* y);
     void colorRequest (QColor color);
     
-    void mousePressed (QPoint pos, Qt::MouseButton btn);
-    void mouseReleased (QPoint pos, Qt::MouseButton btn);
+    void mousePressed (QPoint pos, Qt::MouseButtons btn);
+    void mouseDragged (QPoint pos, Qt::MouseButtons btn);
+    void mouseReleased (QPoint pos, Qt::MouseButtons btn);
 
 protected:
     virtual QPointF getOffset();

@@ -23,7 +23,7 @@ set(
     Knotrenderer-primitive.cpp Knotrenderer-plasma.cpp
     drawing.c dsf.c
     list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c
-    galaxies.c fifteen.c
+    blackbox.c bridges.c galaxies.c fifteen.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
 add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)

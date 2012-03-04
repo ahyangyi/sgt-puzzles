@@ -27,7 +27,7 @@ struct frontend
  */
 KnotMidend::KnotMidend (Knotplasm* parent)
 {
-    m_me = midend_new((frontend*)this, gamelist[0], &knotplasm_drawing, (void *) this);
+    m_me = midend_new((frontend*)this, gamelist[2], &knotplasm_drawing, (void *) this);
 }
 KnotMidend::~KnotMidend() {}
     
@@ -67,30 +67,43 @@ void KnotMidend::color(QColor color)
     emit setColor(colorList);
 }
 
-void KnotMidend::pressButton(QPoint pos, Qt::MouseButton btn)
+void KnotMidend::pressButton(QPoint pos, Qt::MouseButtons btn)
 {
     int x = pos.x();
     int y = pos.y();
     
-    if (btn==Qt::LeftButton)
+    if (btn&Qt::LeftButton)
         midend_process_key(m_me, x, y, LEFT_BUTTON);
-    if (btn==Qt::MiddleButton)
+    if (btn&Qt::MiddleButton)
         midend_process_key(m_me, x, y, MIDDLE_BUTTON);
-    if (btn==Qt::RightButton)
+    if (btn&Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_BUTTON);
 }
 
-void KnotMidend::releaseButton(QPoint pos, Qt::MouseButton btn)
+void KnotMidend::releaseButton(QPoint pos, Qt::MouseButtons btn)
 {
     int x = pos.x();
     int y = pos.y();
     
-    if (btn==Qt::LeftButton)
+    if (btn&Qt::LeftButton)
         midend_process_key(m_me, x, y, LEFT_RELEASE);
-    if (btn==Qt::MiddleButton)
+    if (btn&Qt::MiddleButton)
         midend_process_key(m_me, x, y, MIDDLE_RELEASE);
-    if (btn==Qt::RightButton)
+    if (btn&Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_RELEASE);
+}
+
+void KnotMidend::dragButton(QPoint pos, Qt::MouseButtons btn)
+{
+    int x = pos.x();
+    int y = pos.y();
+    
+    if (btn&Qt::LeftButton)
+        midend_process_key(m_me, x, y, LEFT_DRAG);
+    else if (btn&Qt::MiddleButton)
+        midend_process_key(m_me, x, y, MIDDLE_DRAG);
+    else if (btn&Qt::RightButton)
+        midend_process_key(m_me, x, y, RIGHT_DRAG);
 }
 
 /*
@@ -100,17 +113,17 @@ void KnotMidend::releaseButton(QPoint pos, Qt::MouseButton btn)
 void knotplasm_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
             int align, int colour, char *text)
 {
-    ((KnotMidend*)handle)-> emit drawText(x,y,fonttype,fontsize,align,colour,QString(text));
+    emit ((KnotMidend*)handle)-> drawText(x,y,fonttype==FONT_FIXED,fontsize,align,colour,QString(text));
 }
 
 void knotplasm_draw_rect(void *handle, int x, int y, int w, int h, int colour)
 {
-    ((KnotMidend *)handle)-> emit drawRect(x,y,w,h,colour);
+    emit ((KnotMidend *)handle)-> drawRect(x,y,w,h,colour);
 }
 void knotplasm_draw_line(void *handle, int x1, int y1, int x2, int y2,
             int colour)
 {
-    ((KnotMidend *)handle)-> emit drawLine(x1,y1,x2,y2,colour);
+    emit ((KnotMidend *)handle)-> drawLine(x1,y1,x2,y2,colour);
 }
 void knotplasm_draw_polygon(void *handle, int *coords, int npoints,
             int fillcolour, int outlinecolour)
@@ -118,12 +131,12 @@ void knotplasm_draw_polygon(void *handle, int *coords, int npoints,
     QVector<QPoint> n_coords;
     for (int i = 0; i < npoints; i ++)
         n_coords.append(QPoint(coords[i * 2], coords[i * 2 + 1]));
-    ((KnotMidend *)handle)-> emit drawPolygon(QPolygon(n_coords),fillcolour,outlinecolour);
+    emit ((KnotMidend *)handle)-> drawPolygon(QPolygon(n_coords),fillcolour,outlinecolour);
 }
 void knotplasm_draw_circle(void *handle, int cx, int cy, int radius,
         int fillcolour, int outlinecolour)
 {
-    ((KnotMidend *)handle)-> emit drawCircle(cx,cy,radius,fillcolour,outlinecolour);
+    emit ((KnotMidend *)handle)-> drawCircle(cx,cy,radius,fillcolour,outlinecolour);
 }
 void knotplasm_draw_update(void *handle, int x, int y, int w, int h)
 {
@@ -131,11 +144,11 @@ void knotplasm_draw_update(void *handle, int x, int y, int w, int h)
 }
 void knotplasm_clip(void *handle, int x, int y, int w, int h)
 {
-//    ((Knotplasm *)handle)->clip(x,y,w,h);
+    emit ((KnotMidend *)handle)->clip(x,y,w,h);
 }
 void knotplasm_unclip(void *handle)
 {
-//    ((Knotplasm *)handle)->unclip();
+    emit ((KnotMidend *)handle)->unclip();
 }
 void knotplasm_start_draw(void *handle)
 {

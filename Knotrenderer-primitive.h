@@ -18,9 +18,11 @@ public:
             const QStyleOptionGraphicsItem *option,
             const QRectF& contentsRect);
 
+    virtual void themeChangedHandler ();
+
 public slots:
     // Real SGT APIs
-    virtual void drawText(int x, int y, int fonttype, int fontsize,
+    virtual void drawText(int x, int y, bool monospace, int fontsize,
         int align, int colour, const QString& text);
     virtual void drawRect(int x, int y, int w, int h, int colour);
     virtual void drawLine(int x1, int y1, int x2, int y2,

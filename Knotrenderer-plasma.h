@@ -1,3 +1,4 @@
+
 #ifndef Knotrenderer_plasma_HEADER
 #define Knotrenderer_plasma_HEADER
 

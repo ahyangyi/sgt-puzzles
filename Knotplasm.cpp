@@ -91,19 +91,22 @@ void Knotplasm::init()
     connect(m_renderer, SIGNAL(forceRedrawRequest()), m_me, SLOT(forceRedraw()));
     connect(m_renderer, SIGNAL(sizeRequest(int*,int*)), m_me, SLOT(size(int*,int*)));
     connect(m_renderer, SIGNAL(colorRequest(QColor)), m_me, SLOT(color(QColor)));
-    connect(m_me, SIGNAL(drawText(int,int,int,int,int,int,QString)), m_renderer, SLOT(drawText(int,int,int,int,int,int,QString)));
+    connect(m_me, SIGNAL(drawText(int,int,bool,int,int,int,QString)), m_renderer, SLOT(drawText(int,int,bool,int,int,int,QString)));
     connect(m_me, SIGNAL(drawRect(int,int,int,int,int)), m_renderer, SLOT(drawRect(int,int,int,int,int)));
     connect(m_me, SIGNAL(drawLine(int,int,int,int,int)), m_renderer, SLOT(drawLine(int,int,int,int,int)));
     connect(m_me, SIGNAL(drawPolygon(QPolygon,int,int)), m_renderer, SLOT(drawPolygon(QPolygon,int,int)));
     connect(m_me, SIGNAL(drawCircle(int,int,int,int,int)), m_renderer, SLOT(drawCircle(int,int,int,int,int)));
     connect(m_me, SIGNAL(drawThickLine(float,float,float,float,float,int)), m_renderer, SLOT(drawThickLine(float,float,float,float,float,int)));
-    
+    connect(m_me, SIGNAL(clip(int,int,int,int)), m_renderer, SLOT(clip(int,int,int,int)));
+    connect(m_me, SIGNAL(unclip()), m_renderer, SLOT(unclip()));
+   
     connect(m_me, SIGNAL(setColor(QList<QColor>)), m_renderer, SLOT(setColor(QList<QColor>)));
 
     connect(m_me, SIGNAL(statusBar(QString)), m_status->nativeWidget(), SLOT(setText(QString)));
-    
-    connect(m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
-    connect(m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
+      
+    connect(m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButtons)), m_me, SLOT(pressButton(QPoint,Qt::MouseButtons)));
+    connect(m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButtons)), m_me, SLOT(releaseButton(QPoint,Qt::MouseButtons)));
+    connect(m_renderer, SIGNAL(mouseDragged(QPoint,Qt::MouseButtons)), m_me, SLOT(dragButton(QPoint,Qt::MouseButtons)));
     
     m_renderer->initialize();
 }
@@ -122,73 +125,6 @@ void Knotplasm::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
     event->accept();
 //    QGraphicsItem::contextMenuEvent(event);
-}
-
-
-void Knotplasm::drawText(int x, int y, int fonttype, int fontsize,
-    int align, int colour, const QString& text)
-{
-    kpdebug("drawText() called!");
-}
-
-void Knotplasm::drawRect(int x, int y, int w, int h, int colour)
-{
-    kpdebug("drawRect() called!");
-}
-
-void Knotplasm::drawLine(int x1, int y1, int x2, int y2,
-            int colour)
-{
-    kpdebug("drawLine() called!");
-}
-
-void Knotplasm::drawPolygon(const QPolygon& polygon,
-    int fillcolour, int outlinecolour)
-{
-    kpdebug("drawPolygon() called!");
-}
-
-void Knotplasm::drawCircle(int cx, int cy, int radius,
-    int fillcolour, int outlinecolour)
-{
-    kpdebug("drawCircle() called!");
-}
-
-void Knotplasm::drawUpdate(int x, int y, int w, int h)
-{
-    kpdebug("drawUpdate() called!");
-}
-
-void Knotplasm::clip(int x, int y, int w, int h)
-{
-    kpdebug("clip() called!");
-}
-
-void Knotplasm::unclip()
-{
-    kpdebug("unclip() called!");
-}
-
-void Knotplasm::startDraw()
-{
-    kpdebug("startDraw() called!");
-}
-
-void Knotplasm::endDraw()
-{
-    kpdebug("endDraw() called!");
-}
-
-void Knotplasm::statusBar(const QString& text)
-{
-    kpdebug(QString("statusBar() called with %1!").arg(text));
-}
-
-void Knotplasm::drawThickLine(float thickness,
-    float x1, float y1, float x2, float y2,
-    int colour)
-{
-    kpdebug("drawThickLine() called!");
 }
 
 // This is the command that links your applet to the .desktop file

@@ -31,12 +31,13 @@ public slots:
     void forceRedraw();
     void color(QColor color);
 
-    void pressButton (QPoint pos, Qt::MouseButton btn);
-    void releaseButton (QPoint pos, Qt::MouseButton btn);
+    void pressButton (QPoint pos, Qt::MouseButtons btn);
+    void releaseButton (QPoint pos, Qt::MouseButtons btn);
+    void dragButton (QPoint pos, Qt::MouseButtons btn);
     
 signals:
     void drawRect(int x, int y, int w, int h, int colour);
-    void drawText(int x, int y, int fonttype, int fontsize,
+    void drawText(int x, int y, bool monospace, int fontsize,
         int align, int colour, const QString& text);
     void drawLine(int x1, int y1, int x2, int y2,
         int colour);
@@ -47,6 +48,8 @@ signals:
     void drawThickLine(float thickness,
         float x1, float y1, float x2, float y2,
         int colour);
+    void clip (int x, int y, int w, int h);
+    void unclip ();
     
     void statusBar(const QString& text);
     void setColor(const QList<QColor> colorList);
@@ -68,6 +71,9 @@ friend void frontend_default_colour(frontend *fe, float *output);
 friend void knotplasm_draw_thick_line(void *handle, float thickness,
             float x1, float y1, float x2, float y2,
             int colour);
+friend void knotplasm_clip(void *handle, int x, int y, int w, int h);
+friend void knotplasm_unclip(void *handle);
+
 };
 
 #endif

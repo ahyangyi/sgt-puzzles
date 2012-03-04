@@ -2,6 +2,7 @@
 #include <QWidget>
 #include <QPen>
 #include <QPainter>
+#include <QFont>
 #include <Plasma/Theme>
 
 #include "Knotrenderer-primitive.h"
@@ -34,6 +35,21 @@ KnotRendererPrimitive::~KnotRendererPrimitive()
     delete d;
 }
 
+void KnotRendererPrimitive::themeChangedHandler()
+{
+    /*
+     * We exlude colors that are too dark (but light colors are probably OK)
+     * lighter() multiplies a factor to the value, so it's not good enough to deal with potential pure black
+     * Force the value to be at least 0.2 seems to make more sense
+     */
+    
+    QColor color = Plasma::Theme::defaultTheme()->color(Plasma::Theme::ViewBackgroundColor);
+    if (color.valueF() < 0.2)
+        color.setHsvF(color.hueF(), color.saturationF(), 0.2);
+    
+    emit colorRequest(color);
+}
+
 void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int outlineWidth)
 {
     QPen pen = d->m_paint_interface->p->pen();
@@ -41,20 +57,82 @@ void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int ou
     pen.setColor(d->m_color_list[outlineColour]);
     d->m_paint_interface->p->setPen(pen);
     
-/*
- *   QBrush brush = d->m_paint_interface->p->brush();
- *   brush.setColor(d->m_color_list[fillColour]);
- *   d->m_paint_interface->p->setBrush(brush);
- */
-    d->m_paint_interface->p->setBrush(QBrush(d->m_color_list[fillColour]));
+
+    QBrush brush = d->m_paint_interface->p->brush();
+    if (fillColour == -1)
+    {
+        brush.setStyle(Qt::NoBrush);
+    }
+    else
+    {
+        brush.setStyle(Qt::SolidPattern);
+        brush.setColor(d->m_color_list[fillColour]);
+    }
+    d->m_paint_interface->p->setBrush(brush);
 }
 
-void KnotRendererPrimitive::drawText(int x, int y, int fonttype, int fontsize,
+void KnotRendererPrimitive::drawText(int x, int y, bool monospace, int fontsize,
      int align, int colour, const QString& text)
 {
     if (d->m_paint_interface != NULL)
     {
-        d->m_paint_interface->p->drawText(QPointF(x,y), text);
+        setPainter(colour, colour, 0);
+        d->m_paint_interface->p->setFont(QFont(monospace? "monospace" : "sans", fontsize));
+        /*
+         * We transform the sane syntax of SGT to the less sane syntax of QPainter
+         * By generating an arbitrary large rectangle that will surely contain everything
+         */
+        qreal largeDimension = qMax(contentsRect().width() * 2 + 100, contentsRect().height() * 2 + 100);
+        QRectF rect;
+        int flag;
+        
+#define ALIGN_VNORMAL 0x000
+#define ALIGN_VCENTRE 0x100
+
+#define ALIGN_HLEFT   0x000
+#define ALIGN_HCENTRE 0x001
+#define ALIGN_HRIGHT  0x002
+
+        if (align & ALIGN_HLEFT)
+        {
+            rect = QRectF(
+                x,
+                y - largeDimension / 2,
+                largeDimension,
+                largeDimension
+               );
+            flag = Qt::AlignLeft|Qt::AlignVCenter; 
+        }
+        if (align & ALIGN_HCENTRE)
+        {
+            rect = QRectF(
+                x - largeDimension / 2,
+                y - largeDimension / 2,
+                largeDimension,
+                largeDimension
+               );
+            flag = Qt::AlignHCenter|Qt::AlignVCenter; 
+        }
+        if (align & ALIGN_HRIGHT)
+        {
+            rect = QRectF(
+                x - largeDimension,
+                y - largeDimension / 2,
+                largeDimension,
+                largeDimension
+               );
+            flag = Qt::AlignRight|Qt::AlignVCenter; 
+        }
+        
+        if (align & ALIGN_VCENTRE)
+        {
+            d->m_paint_interface->p->drawText(rect, flag, text);
+        }
+        else
+        {
+            rect = d->m_paint_interface->p->boundingRect(rect, flag, text);
+            d->m_paint_interface->p->drawText(rect.left(), y, text);
+        }
     }
 }
 
@@ -114,10 +192,19 @@ void KnotRendererPrimitive::drawUpdate(int x, int y, int w, int h)
 
 void KnotRendererPrimitive::clip(int x, int y, int w, int h)
 {
+    if (d->m_paint_interface != NULL)
+    {
+        d->m_paint_interface->p->setClipRect(QRectF(x,y,w,h));
+        d->m_paint_interface->p->setClipping(true);
+    }
 }
 
 void KnotRendererPrimitive::unclip()
 {
+    if (d->m_paint_interface != NULL)
+    {
+        d->m_paint_interface->p->setClipping(false);
+    }
 }
 
 void KnotRendererPrimitive::startDraw()
@@ -143,7 +230,10 @@ void KnotRendererPrimitive::paintInterface(QPainter *p,
     const QStyleOptionGraphicsItem *option,
     const QRectF& contentsRect)
 {
-//    initialize();
+    /*
+     * Cannot find a themeChanged event. Just change color every time we paint.
+     */
+    emit themeChangedHandler();
     
     d->m_paint_interface = new PaintInterfaceData(p, option);
  
