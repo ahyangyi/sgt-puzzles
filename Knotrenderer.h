@@ -57,9 +57,9 @@ signals:
     void sizeRequest (int* x, int* y);
     void colorRequest (QColor color);
     
-    void mousePressed (QPoint pos, Qt::MouseButtons btn);
+    void mousePressed (QPoint pos, Qt::MouseButton btn);
+    void mouseReleased (QPoint pos, Qt::MouseButton btn);
     void mouseDragged (QPoint pos, Qt::MouseButtons btn);
-    void mouseReleased (QPoint pos, Qt::MouseButtons btn);
 
 protected:
     virtual QPointF getOffset();

@@ -27,7 +27,7 @@ struct frontend
  */
 KnotMidend::KnotMidend (Knotplasm* parent)
 {
-    m_me = midend_new((frontend*)this, gamelist[2], &knotplasm_drawing, (void *) this);
+    m_me = midend_new((frontend*)this, gamelist[1], &knotplasm_drawing, (void *) this);
 }
 KnotMidend::~KnotMidend() {}
     
@@ -67,29 +67,29 @@ void KnotMidend::color(QColor color)
     emit setColor(colorList);
 }
 
-void KnotMidend::pressButton(QPoint pos, Qt::MouseButtons btn)
+void KnotMidend::pressButton(QPoint pos, Qt::MouseButton btn)
 {
     int x = pos.x();
     int y = pos.y();
     
-    if (btn&Qt::LeftButton)
+    if (btn==Qt::LeftButton)
         midend_process_key(m_me, x, y, LEFT_BUTTON);
-    if (btn&Qt::MiddleButton)
+    if (btn==Qt::MiddleButton)
         midend_process_key(m_me, x, y, MIDDLE_BUTTON);
-    if (btn&Qt::RightButton)
+    if (btn==Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_BUTTON);
 }
 
-void KnotMidend::releaseButton(QPoint pos, Qt::MouseButtons btn)
+void KnotMidend::releaseButton(QPoint pos, Qt::MouseButton btn)
 {
     int x = pos.x();
     int y = pos.y();
     
-    if (btn&Qt::LeftButton)
+    if (btn==Qt::LeftButton)
         midend_process_key(m_me, x, y, LEFT_RELEASE);
-    if (btn&Qt::MiddleButton)
+    if (btn==Qt::MiddleButton)
         midend_process_key(m_me, x, y, MIDDLE_RELEASE);
-    if (btn&Qt::RightButton)
+    if (btn==Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_RELEASE);
 }
 

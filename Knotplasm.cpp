@@ -104,8 +104,8 @@ void Knotplasm::init()
 
     connect(m_me, SIGNAL(statusBar(QString)), m_status->nativeWidget(), SLOT(setText(QString)));
       
-    connect(m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButtons)), m_me, SLOT(pressButton(QPoint,Qt::MouseButtons)));
-    connect(m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButtons)), m_me, SLOT(releaseButton(QPoint,Qt::MouseButtons)));
+    connect(m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
+    connect(m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
     connect(m_renderer, SIGNAL(mouseDragged(QPoint,Qt::MouseButtons)), m_me, SLOT(dragButton(QPoint,Qt::MouseButtons)));
     
     m_renderer->initialize();

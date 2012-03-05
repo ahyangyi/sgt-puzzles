@@ -1,6 +1,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
+#include <QButtonGroup>
 
 #include <KDE/Plasma/Theme>
 
@@ -29,18 +30,18 @@ bool KnotRenderer::event(QEvent* event)
 
 void KnotRenderer::mousePressEvent(QGraphicsSceneMouseEvent* e)
 {
-    emit mousePressed((e->pos()-getOffset()).toPoint(), e->buttons());
-    e->accept();
+    emit mousePressed((e->pos()-getOffset()).toPoint(), e->button());
     this->update();
     QGraphicsItem::mousePressEvent(e);
+    e->accept();
 }
 
 void KnotRenderer::mouseReleaseEvent(QGraphicsSceneMouseEvent* e)
 {
-    emit mouseReleased((e->pos()-getOffset()).toPoint(), e->buttons());
-    e->accept();
+    emit mouseReleased((e->pos()-getOffset()).toPoint(), e->button());
     this->update();
     QGraphicsItem::mouseReleaseEvent(e);
+    e->accept();
 }
 
 void KnotRenderer::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
@@ -48,11 +49,14 @@ void KnotRenderer::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
     if (e->buttons() & (Qt::LeftButton | Qt::MiddleButton | Qt::RightButton))
     {
         emit mouseDragged((e->pos()-getOffset()).toPoint(), e->buttons());
-        e->accept();
         this->update();
     }
 
     QGraphicsItem::mouseMoveEvent(e);
+    if (e->buttons() & (Qt::LeftButton | Qt::MiddleButton | Qt::RightButton))
+    {
+        e->accept();
+    }
 }
 
 
