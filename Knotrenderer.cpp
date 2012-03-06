@@ -30,31 +30,27 @@ bool KnotRenderer::event(QEvent* event)
 
 void KnotRenderer::mousePressEvent(QGraphicsSceneMouseEvent* e)
 {
+    QGraphicsItem::mousePressEvent(e);
     emit mousePressed((e->pos()-getOffset()).toPoint(), e->button());
     this->update();
-    QGraphicsItem::mousePressEvent(e);
     e->accept();
 }
 
 void KnotRenderer::mouseReleaseEvent(QGraphicsSceneMouseEvent* e)
 {
+    QGraphicsItem::mouseReleaseEvent(e);
     emit mouseReleased((e->pos()-getOffset()).toPoint(), e->button());
     this->update();
-    QGraphicsItem::mouseReleaseEvent(e);
     e->accept();
 }
 
 void KnotRenderer::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
 {
+    QGraphicsItem::mouseMoveEvent(e);
     if (e->buttons() & (Qt::LeftButton | Qt::MiddleButton | Qt::RightButton))
     {
         emit mouseDragged((e->pos()-getOffset()).toPoint(), e->buttons());
         this->update();
-    }
-
-    QGraphicsItem::mouseMoveEvent(e);
-    if (e->buttons() & (Qt::LeftButton | Qt::MiddleButton | Qt::RightButton))
-    {
         e->accept();
     }
 }
