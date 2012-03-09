@@ -1,16 +1,8 @@
 #ifndef Knotplasm_HEADER
 #define Knotplasm_HEADER
 
-#include <KIcon>
- 
 #include <Plasma/Applet>
-#include <Plasma/Svg>
-#include <Plasma/Label>
-#include <Plasma/PushButton>
-
-#include "Knotrenderer.h"
  
-struct frontend;
 class KnotMidend;
 
 // Define our plasma Applet
@@ -34,19 +26,9 @@ class Knotplasm : public Plasma::Applet
     protected:
         
     private:
-        KIcon m_icon;
+        class Private;
         
-        KnotMidend* m_me;
-        
-        KnotRenderer* m_renderer;
-        Plasma::Label* m_status;
-        Plasma::PushButton* m_start;
-        
-#ifdef KNOTPLASM_DEBUG
-        QString m_debug_text;
-        QVector<QPair<QString,qint16> > m_debug_history;
-        void kpdebug (QString s);
-#endif
+        Private* d;
 };
 
 #endif

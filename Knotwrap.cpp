@@ -13,11 +13,6 @@ extern const struct drawing_api knotplasm_drawing;
  * Knotplasm functions interacting with the wrapper:
  */
 
-KnotMidend* Knotplasm::midend() const
-{
-    return m_me;
-}
-
 struct frontend
 {
 };
@@ -104,6 +99,11 @@ void KnotMidend::dragButton(QPoint pos, Qt::MouseButtons btn)
         midend_process_key(m_me, x, y, MIDDLE_DRAG);
     else if (btn&Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_DRAG);
+}
+
+void KnotMidend::tickTimer(qreal tplus)
+{
+    midend_timer (this->m_me, (float)tplus);
 }
 
 /*
@@ -225,10 +225,12 @@ void get_random_seed(void **randseed, int *randseedsize)
 
 void activate_timer(frontend *fe)
 {
+    emit ((KnotMidend *)fe)->activateTimer();
 }
 
 void deactivate_timer(frontend *fe)
 {
+    emit ((KnotMidend *)fe)->deactivateTimer();
 }
 
 void fatal(char *fmt, ...)

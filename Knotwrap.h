@@ -35,6 +35,8 @@ public slots:
     void releaseButton (QPoint pos, Qt::MouseButton btn);
     void dragButton (QPoint pos, Qt::MouseButtons btn);
     
+    void tickTimer (qreal tplus);
+    
 signals:
     void drawRect(int x, int y, int w, int h, int colour);
     void drawText(int x, int y, bool monospace, int fontsize,
@@ -50,6 +52,9 @@ signals:
         int colour);
     void clip (int x, int y, int w, int h);
     void unclip ();
+    
+    void activateTimer ();
+    void deactivateTimer ();
     
     void statusBar(const QString& text);
     void setColor(const QList<QColor> colorList);
@@ -74,6 +79,8 @@ friend void knotplasm_draw_thick_line(void *handle, float thickness,
 friend void knotplasm_clip(void *handle, int x, int y, int w, int h);
 friend void knotplasm_unclip(void *handle);
 
+friend void activate_timer(frontend *fe);
+friend void deactivate_timer(frontend *fe);
 };
 
 #endif
