@@ -32,7 +32,6 @@ void KnotRenderer::mousePressEvent(QGraphicsSceneMouseEvent* e)
 {
     QGraphicsItem::mousePressEvent(e);
     emit mousePressed((e->pos()-getOffset()).toPoint(), e->button());
-    this->update();
     e->accept();
 }
 
@@ -40,7 +39,6 @@ void KnotRenderer::mouseReleaseEvent(QGraphicsSceneMouseEvent* e)
 {
     QGraphicsItem::mouseReleaseEvent(e);
     emit mouseReleased((e->pos()-getOffset()).toPoint(), e->button());
-    this->update();
     e->accept();
 }
 
@@ -50,7 +48,6 @@ void KnotRenderer::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
     if (e->buttons() & (Qt::LeftButton | Qt::MiddleButton | Qt::RightButton))
     {
         emit mouseDragged((e->pos()-getOffset()).toPoint(), e->buttons());
-        this->update();
         e->accept();
     }
 }

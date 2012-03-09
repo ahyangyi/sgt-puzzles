@@ -53,6 +53,8 @@ signals:
     void clip (int x, int y, int w, int h);
     void unclip ();
     
+    void drawUpdate (int x, int y, int w, int h);
+    
     void activateTimer ();
     void deactivateTimer ();
     
@@ -81,6 +83,8 @@ friend void knotplasm_unclip(void *handle);
 
 friend void activate_timer(frontend *fe);
 friend void deactivate_timer(frontend *fe);
+
+friend void knotplasm_draw_update(void *handle, int x, int y, int w, int h);
 };
 
 #endif

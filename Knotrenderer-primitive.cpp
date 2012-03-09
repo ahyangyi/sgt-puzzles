@@ -188,6 +188,13 @@ void KnotRendererPrimitive::drawThickLine(float thickness,
 
 void KnotRendererPrimitive::drawUpdate(int x, int y, int w, int h)
 {
+    if (d->m_paint_interface != NULL)
+    {
+    }
+    else
+    {
+        update();
+    }
 }
 
 void KnotRendererPrimitive::clip(int x, int y, int w, int h)
@@ -209,6 +216,9 @@ void KnotRendererPrimitive::unclip()
 
 void KnotRendererPrimitive::startDraw()
 {
+    if (d->m_paint_interface != NULL)
+    {
+    }
 }
 
 void KnotRendererPrimitive::endDraw()

@@ -140,7 +140,7 @@ void knotplasm_draw_circle(void *handle, int cx, int cy, int radius,
 }
 void knotplasm_draw_update(void *handle, int x, int y, int w, int h)
 {
-//    ((Knotplasm *)handle)->drawUpdate(x,y,w,h);
+    emit ((KnotMidend *)handle)->drawUpdate(x,y,w,h);
 }
 void knotplasm_clip(void *handle, int x, int y, int w, int h)
 {
