@@ -117,6 +117,27 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
         myKey = CURSOR_SELECT;
     if (key == Qt::Key_Space)
         myKey = CURSOR_SELECT2;
+
+    if (key == Qt::Key_0)
+        myKey = MOD_NUM_KEYPAD | '0';
+    if (key == Qt::Key_1)
+        myKey = MOD_NUM_KEYPAD | '1';
+    if (key == Qt::Key_2)
+        myKey = MOD_NUM_KEYPAD | '2';
+    if (key == Qt::Key_3)
+        myKey = MOD_NUM_KEYPAD | '3';
+    if (key == Qt::Key_4)
+        myKey = MOD_NUM_KEYPAD | '4';
+    if (key == Qt::Key_5)
+        myKey = MOD_NUM_KEYPAD | '5';
+    if (key == Qt::Key_6)
+        myKey = MOD_NUM_KEYPAD | '6';
+    if (key == Qt::Key_7)
+        myKey = MOD_NUM_KEYPAD | '7';
+    if (key == Qt::Key_8)
+        myKey = MOD_NUM_KEYPAD | '8';
+    if (key == Qt::Key_9)
+        myKey = MOD_NUM_KEYPAD | '9';
     
     if (myKey)
     {

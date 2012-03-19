@@ -22,6 +22,7 @@ class Knotplasm : public Plasma::Applet
         KnotMidend* midend() const;
         
         virtual void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+        virtual void mousePressEvent ( QGraphicsSceneMouseEvent * e);
     
     protected:
         

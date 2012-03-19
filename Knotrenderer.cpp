@@ -60,7 +60,10 @@ void KnotRenderer::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
 void KnotRenderer::keyPressEvent(QKeyEvent* e)
 {
     QGraphicsItem::keyPressEvent(e);
-    if (e->key() == Qt::Key_Up || e->key() == Qt::Key_Down || e->key() == Qt::Key_Left || e->key() == Qt::Key_Right || e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter)
+    if (e->key() == Qt::Key_Up || e->key() == Qt::Key_Down || e->key() == Qt::Key_Left || e->key() == Qt::Key_Right || e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter ||
+        e->key() == Qt::Key_0 || e->key() == Qt::Key_1 || e->key() == Qt::Key_2 ||  e->key() == Qt::Key_3 || e->key() == Qt::Key_4 ||  
+        e->key() == Qt::Key_5 || e->key() == Qt::Key_6 || e->key() == Qt::Key_7 ||  e->key() == Qt::Key_8 || e->key() == Qt::Key_9
+    )
     {
         emit keyPressed(e->key(), e->modifiers());
         e->accept();

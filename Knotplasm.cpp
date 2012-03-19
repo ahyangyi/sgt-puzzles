@@ -167,6 +167,11 @@ void Knotplasm::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 //    QGraphicsItem::contextMenuEvent(event);
 }
 
+void Knotplasm::mousePressEvent(QGraphicsSceneMouseEvent* e)
+{
+    d->m_renderer->setFocus();
+}
+
 // This is the command that links your applet to the .desktop file
 K_EXPORT_PLASMA_APPLET(Knotplasm, Knotplasm)
  
