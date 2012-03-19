@@ -20,6 +20,8 @@ public:
     virtual void mouseReleaseEvent ( QGraphicsSceneMouseEvent * e);
     virtual void mouseMoveEvent ( QGraphicsSceneMouseEvent * e);
     
+    virtual void keyPressEvent ( QKeyEvent * e );
+    
     bool event ( QEvent * event );
 
 public slots:
@@ -60,6 +62,8 @@ signals:
     void mousePressed (QPoint pos, Qt::MouseButton btn);
     void mouseReleased (QPoint pos, Qt::MouseButton btn);
     void mouseDragged (QPoint pos, Qt::MouseButtons btn);
+    
+    void keyPressed (int key, Qt::KeyboardModifiers modifier);
 
 protected:
     virtual QPointF getOffset();

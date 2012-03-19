@@ -22,7 +22,7 @@ struct frontend
  */
 KnotMidend::KnotMidend (Knotplasm* parent)
 {
-    m_me = midend_new((frontend*)this, gamelist[1], &knotplasm_drawing, (void *) this);
+    m_me = midend_new((frontend*)this, gamelist[2], &knotplasm_drawing, (void *) this);
 }
 KnotMidend::~KnotMidend() {}
     
@@ -99,6 +99,29 @@ void KnotMidend::dragButton(QPoint pos, Qt::MouseButtons btn)
         midend_process_key(m_me, x, y, MIDDLE_DRAG);
     else if (btn&Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_DRAG);
+}
+
+void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
+{
+    int myKey = 0;
+    
+    if (key == Qt::Key_Up)
+        myKey = CURSOR_UP;
+    if (key == Qt::Key_Down)
+        myKey = CURSOR_DOWN;
+    if (key == Qt::Key_Left)
+        myKey = CURSOR_LEFT;
+    if (key == Qt::Key_Right)
+        myKey = CURSOR_RIGHT;
+    if (key == Qt::Key_Enter)
+        myKey = CURSOR_SELECT;
+    if (key == Qt::Key_Space)
+        myKey = CURSOR_SELECT2;
+    
+    if (myKey)
+    {
+        midend_process_key(m_me, 0, 0, myKey);
+    }
 }
 
 void KnotMidend::tickTimer(qreal tplus)

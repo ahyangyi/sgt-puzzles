@@ -35,6 +35,8 @@ public slots:
     void releaseButton (QPoint pos, Qt::MouseButton btn);
     void dragButton (QPoint pos, Qt::MouseButtons btn);
     
+    void pressKey (int key, Qt::KeyboardModifiers modifier);
+    
     void tickTimer (qreal tplus);
     
 signals:

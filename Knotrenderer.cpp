@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QButtonGroup>
+#include <QKeyEvent>
 
 #include <KDE/Plasma/Theme>
 
@@ -12,6 +13,7 @@ KnotRenderer::KnotRenderer(QGraphicsItem* parent, Qt::WindowFlags wFlags): QGrap
     setPreferredSize(256,256); //Magical numbers. I guess it is a reasonable size for most screens.
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     updateGeometry();
+    setFlag(ItemIsFocusable, true);
     
     connect(this,SIGNAL(geometryChanged()),this,SLOT(geometryChangedHandler()));
 }
@@ -30,15 +32,18 @@ bool KnotRenderer::event(QEvent* event)
 
 void KnotRenderer::mousePressEvent(QGraphicsSceneMouseEvent* e)
 {
+    setFocus();
     QGraphicsItem::mousePressEvent(e);
-    emit mousePressed((e->pos()-getOffset()).toPoint(), e->button());
+    if (contentsRect().contains(e->pos()))
+        emit mousePressed((e->pos()-getOffset()).toPoint(), e->button());
     e->accept();
 }
 
 void KnotRenderer::mouseReleaseEvent(QGraphicsSceneMouseEvent* e)
 {
     QGraphicsItem::mouseReleaseEvent(e);
-    emit mouseReleased((e->pos()-getOffset()).toPoint(), e->button());
+    if (contentsRect().contains(e->pos()))
+        emit mouseReleased((e->pos()-getOffset()).toPoint(), e->button());
     e->accept();
 }
 
@@ -52,6 +57,15 @@ void KnotRenderer::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
     }
 }
 
+void KnotRenderer::keyPressEvent(QKeyEvent* e)
+{
+    QGraphicsItem::keyPressEvent(e);
+    if (e->key() == Qt::Key_Up || e->key() == Qt::Key_Down || e->key() == Qt::Key_Left || e->key() == Qt::Key_Right || e->key() == Qt::Key_Space || e->key() == Qt::Key_Enter)
+    {
+        emit keyPressed(e->key(), e->modifiers());
+        e->accept();
+    }
+}
 
 void KnotRenderer::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
