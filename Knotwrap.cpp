@@ -141,6 +141,10 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
     
     if (myKey)
     {
+        if (modifier & Qt::Key_Control)
+            myKey |= MOD_CTRL;
+        if (modifier & Qt::Key_Shift)
+            myKey |= MOD_SHFT;
         midend_process_key(m_me, 0, 0, myKey);
     }
 }
