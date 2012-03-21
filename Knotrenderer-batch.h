@@ -1,5 +1,5 @@
-#ifndef Knotrenderer_primitive_HEADER
-#define Knotrenderer_primitive_HEADER
+#ifndef Knotrenderer_batch_HEADER
+#define Knotrenderer_batch_HEADER
 
 #include <Plasma/FrameSvg>
 
@@ -7,12 +7,12 @@
 
 struct PaintInterfaceData;
 
-class KnotRendererPrimitive: public KnotRenderer
+class KnotRendererBatch: public KnotRenderer
 {
     Q_OBJECT
 public:
-    KnotRendererPrimitive (QGraphicsItem * parent = 0, Qt::WindowFlags wFlags = 0);
-    virtual ~KnotRendererPrimitive();
+    KnotRendererBatch (QGraphicsItem * parent = 0, Qt::WindowFlags wFlags = 0);
+    virtual ~KnotRendererBatch();
 
     virtual void paintInterface(QPainter *p,
             const QStyleOptionGraphicsItem *option,

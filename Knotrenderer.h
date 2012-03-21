@@ -41,6 +41,7 @@ public slots:
     virtual void drawCircle(int cx, int cy, int radius,
         int fillcolour, int outlinecolour) = 0;
     virtual void drawUpdate(int x, int y, int w, int h) = 0;
+    virtual void updateAll () = 0;
     virtual void clip(int x, int y, int w, int h) = 0;
     virtual void unclip() = 0;
     virtual void startDraw() = 0;

@@ -9,27 +9,26 @@ class KnotMidend;
 class Knotplasm : public Plasma::Applet
 {
     Q_OBJECT
-    public:
-        // Basic Create/Destroy
-        Knotplasm(QObject *parent, const QVariantList &args);
-        ~Knotplasm();
- 
-        // Override
-        void createConfigurationInterface(KConfigDialog *parent);
-        void init();
 
-        // Interact with wrappers
-        KnotMidend* midend() const;
-        
-        virtual void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
-        virtual void mousePressEvent ( QGraphicsSceneMouseEvent * e);
+public:
+    // Basic Create/Destroy
+    Knotplasm(QObject *parent, const QVariantList &args);
+    ~Knotplasm();
+
+    // Override
+    void createConfigurationInterface(KConfigDialog *parent);
+    void init();
+
+    // Interact with wrappers
+    KnotMidend* midend() const;
     
-    protected:
-        
-    private:
-        class Private;
-        
-        Private* d;
+    virtual void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+    virtual void mousePressEvent ( QGraphicsSceneMouseEvent * e);
+    
+private:
+    class Private;
+    
+    Private* d;
 };
 
 #endif

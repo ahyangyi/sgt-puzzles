@@ -97,7 +97,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     
     d->m_timer=new KnotTimer(this);
     d->m_timer->setInterval(16);
-
+    
     // this will get us the standard applet background, for free!
     setBackgroundHints(StandardBackground);
 }
@@ -116,6 +116,9 @@ void Knotplasm::init()
     d->m_me = new KnotMidend(this);
     d->m_me->newGame();
     
+    connect(d->m_start, SIGNAL(clicked()), d->m_me, SLOT(newGame()));
+    connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(updateAll()));
+    
     connect(d->m_renderer, SIGNAL(redrawRequest()), d->m_me, SLOT(redraw()));
     connect(d->m_renderer, SIGNAL(forceRedrawRequest()), d->m_me, SLOT(forceRedraw()));
     connect(d->m_renderer, SIGNAL(sizeRequest(int*,int*)), d->m_me, SLOT(size(int*,int*)));
@@ -133,7 +136,7 @@ void Knotplasm::init()
     connect(d->m_me, SIGNAL(setColor(QList<QColor>)), d->m_renderer, SLOT(setColor(QList<QColor>)));
 
     connect(d->m_me, SIGNAL(statusBar(QString)), d->m_status->nativeWidget(), SLOT(setText(QString)));
-      
+    
     connect(d->m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), d->m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
     connect(d->m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), d->m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
     connect(d->m_renderer, SIGNAL(mouseDragged(QPoint,Qt::MouseButtons)), d->m_me, SLOT(dragButton(QPoint,Qt::MouseButtons)));
@@ -145,7 +148,7 @@ void Knotplasm::init()
     
     d->m_renderer->initialize();
 }
- 
+
 KnotMidend* Knotplasm::midend() const
 {
     return d->m_me;

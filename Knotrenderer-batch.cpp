@@ -5,7 +5,7 @@
 #include <QFont>
 #include <Plasma/Theme>
 
-#include "Knotrenderer-primitive.h"
+#include "Knotrenderer-batch.h"
 
 struct PaintInterfaceData
 {
@@ -17,25 +17,25 @@ struct PaintInterfaceData
         p(n_p), option(n_option){}
 };
 
-class KnotRendererPrimitive::Private
+class KnotRendererBatch::Private
 {
 public:
     PaintInterfaceData* m_paint_interface;
     QList<QColor> m_color_list;
 };
 
-KnotRendererPrimitive::KnotRendererPrimitive(QGraphicsItem* parent, Qt::WindowFlags wFlags):KnotRenderer(parent, wFlags)
+KnotRendererBatch::KnotRendererBatch(QGraphicsItem* parent, Qt::WindowFlags wFlags):KnotRenderer(parent, wFlags)
     ,d(new Private)
 {
     d->m_paint_interface = NULL;
 }
 
-KnotRendererPrimitive::~KnotRendererPrimitive()
+KnotRendererBatch::~KnotRendererBatch()
 {
     delete d;
 }
 
-void KnotRendererPrimitive::themeChangedHandler()
+void KnotRendererBatch::themeChangedHandler()
 {
     /*
      * We exlude colors that are too dark (but light colors are probably OK)
@@ -50,7 +50,7 @@ void KnotRendererPrimitive::themeChangedHandler()
     emit colorRequest(color);
 }
 
-void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int outlineWidth)
+void KnotRendererBatch::setPainter(int fillColour, int outlineColour, int outlineWidth)
 {
     QPen pen = d->m_paint_interface->p->pen();
     pen.setWidth(outlineWidth);
@@ -71,7 +71,7 @@ void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int ou
     d->m_paint_interface->p->setBrush(brush);
 }
 
-void KnotRendererPrimitive::drawText(int x, int y, bool monospace, int fontsize,
+void KnotRendererBatch::drawText(int x, int y, bool monospace, int fontsize,
      int align, int colour, const QString& text)
 {
     if (d->m_paint_interface != NULL)
@@ -136,7 +136,7 @@ void KnotRendererPrimitive::drawText(int x, int y, bool monospace, int fontsize,
     }
 }
 
-void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
+void KnotRendererBatch::drawRect(int x, int y, int w, int h, int colour)
 {
     if (d->m_paint_interface != NULL)
     {
@@ -145,7 +145,7 @@ void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
     }
 }
 
-void KnotRendererPrimitive::drawLine(int x1, int y1, int x2, int y2,
+void KnotRendererBatch::drawLine(int x1, int y1, int x2, int y2,
      int colour)
 {
     if (d->m_paint_interface != NULL)
@@ -155,7 +155,7 @@ void KnotRendererPrimitive::drawLine(int x1, int y1, int x2, int y2,
     }
 }
 
-void KnotRendererPrimitive::drawPolygon(const QPolygon& polygon,
+void KnotRendererBatch::drawPolygon(const QPolygon& polygon,
      int fillcolour, int outlinecolour)
 {
     if (d->m_paint_interface != NULL)
@@ -165,7 +165,7 @@ void KnotRendererPrimitive::drawPolygon(const QPolygon& polygon,
     }
 }
 
-void KnotRendererPrimitive::drawCircle(int cx, int cy, int radius,
+void KnotRendererBatch::drawCircle(int cx, int cy, int radius,
      int fillcolour, int outlinecolour)
 {
     if (d->m_paint_interface != NULL)
@@ -175,7 +175,7 @@ void KnotRendererPrimitive::drawCircle(int cx, int cy, int radius,
     }
 }
 
-void KnotRendererPrimitive::drawThickLine(float thickness,
+void KnotRendererBatch::drawThickLine(float thickness,
      float x1, float y1, float x2, float y2,
      int colour)
 {
@@ -186,7 +186,7 @@ void KnotRendererPrimitive::drawThickLine(float thickness,
     }
 }
 
-void KnotRendererPrimitive::drawUpdate(int x, int y, int w, int h)
+void KnotRendererBatch::drawUpdate(int x, int y, int w, int h)
 {
     if (d->m_paint_interface != NULL)
     {
@@ -197,12 +197,12 @@ void KnotRendererPrimitive::drawUpdate(int x, int y, int w, int h)
     }
 }
 
-void KnotRendererPrimitive::updateAll()
+void KnotRendererBatch::updateAll()
 {
     update ();
 }
 
-void KnotRendererPrimitive::clip(int x, int y, int w, int h)
+void KnotRendererBatch::clip(int x, int y, int w, int h)
 {
     if (d->m_paint_interface != NULL)
     {
@@ -211,7 +211,7 @@ void KnotRendererPrimitive::clip(int x, int y, int w, int h)
     }
 }
 
-void KnotRendererPrimitive::unclip()
+void KnotRendererBatch::unclip()
 {
     if (d->m_paint_interface != NULL)
     {
@@ -219,29 +219,29 @@ void KnotRendererPrimitive::unclip()
     }
 }
 
-void KnotRendererPrimitive::startDraw()
+void KnotRendererBatch::startDraw()
 {
     if (d->m_paint_interface != NULL)
     {
     }
 }
 
-void KnotRendererPrimitive::endDraw()
+void KnotRendererBatch::endDraw()
 {
 }
 
-void KnotRendererPrimitive::notStarted()
+void KnotRendererBatch::notStarted()
 {
 
 }
 
-void KnotRendererPrimitive::setColor(QList< QColor > colorList)
+void KnotRendererBatch::setColor(QList< QColor > colorList)
 {
     d->m_color_list = colorList;
 }
 
 
-void KnotRendererPrimitive::paintInterface(QPainter *p,
+void KnotRendererBatch::paintInterface(QPainter *p,
     const QStyleOptionGraphicsItem *option,
     const QRectF& contentsRect)
 {
@@ -261,4 +261,4 @@ void KnotRendererPrimitive::paintInterface(QPainter *p,
     d->m_paint_interface = NULL;
 }
 
-#include "Knotrenderer-primitive.moc"
+#include "Knotrenderer-batch.moc"

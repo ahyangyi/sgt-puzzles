@@ -22,7 +22,7 @@ struct frontend
  */
 KnotMidend::KnotMidend (Knotplasm* parent)
 {
-    m_me = midend_new((frontend*)this, gamelist[2], &knotplasm_drawing, (void *) this);
+    m_me = midend_new((frontend*)this, gamelist[3], &knotplasm_drawing, (void *) this);
 }
 KnotMidend::~KnotMidend() {}
     
