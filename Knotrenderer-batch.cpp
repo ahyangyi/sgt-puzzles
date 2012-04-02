@@ -76,63 +76,7 @@ void KnotRendererBatch::drawText(int x, int y, bool monospace, int fontsize,
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(colour, colour, 0);
-        d->m_paint_interface->p->setFont(QFont(monospace? "monospace" : "sans", fontsize));
-        /*
-         * We transform the sane syntax of SGT to the less sane syntax of QPainter
-         * By generating an arbitrary large rectangle that will surely contain everything
-         */
-        qreal largeDimension = qMax(contentsRect().width() * 2 + 100, contentsRect().height() * 2 + 100);
-        QRectF rect;
-        int flag;
-        
-#define ALIGN_VNORMAL 0x000
-#define ALIGN_VCENTRE 0x100
-
-#define ALIGN_HLEFT   0x000
-#define ALIGN_HCENTRE 0x001
-#define ALIGN_HRIGHT  0x002
-
-        if (align & ALIGN_HLEFT)
-        {
-            rect = QRectF(
-                x,
-                y - largeDimension / 2,
-                largeDimension,
-                largeDimension
-               );
-            flag = Qt::AlignLeft|Qt::AlignVCenter; 
-        }
-        if (align & ALIGN_HCENTRE)
-        {
-            rect = QRectF(
-                x - largeDimension / 2,
-                y - largeDimension / 2,
-                largeDimension,
-                largeDimension
-               );
-            flag = Qt::AlignHCenter|Qt::AlignVCenter; 
-        }
-        if (align & ALIGN_HRIGHT)
-        {
-            rect = QRectF(
-                x - largeDimension,
-                y - largeDimension / 2,
-                largeDimension,
-                largeDimension
-               );
-            flag = Qt::AlignRight|Qt::AlignVCenter; 
-        }
-        
-        if (align & ALIGN_VCENTRE)
-        {
-            d->m_paint_interface->p->drawText(rect, flag, text);
-        }
-        else
-        {
-            rect = d->m_paint_interface->p->boundingRect(rect, flag, text);
-            d->m_paint_interface->p->drawText(rect.left(), y, text);
-        }
+        m_batch.append(new KnotBatchTextAction(x,y,monospace,fontsize,align,colour,text));
     }
 }
 
@@ -140,8 +84,7 @@ void KnotRendererBatch::drawRect(int x, int y, int w, int h, int colour)
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(colour, colour, 0);
-        d->m_paint_interface->p->drawRect(QRectF(x,y,w,h));
+        m_batch.append(new KnotBatchRectAction(x,y,w,h,colour));
     }
 }
 
@@ -150,8 +93,7 @@ void KnotRendererBatch::drawLine(int x1, int y1, int x2, int y2,
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(colour, colour, 0);
-        d->m_paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
+        m_batch.append(new KnotBatchLineAction(x1,y1,x2,y2,colour));
     }
 }
 
@@ -160,8 +102,7 @@ void KnotRendererBatch::drawPolygon(const QPolygon& polygon,
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(fillcolour, outlinecolour, 0);
-        d->m_paint_interface->p->drawPolygon(polygon);
+        m_batch.append(new KnotBatchPolyAction(polygon,fillcolour,outlinecolour));
     }
 }
 
@@ -170,8 +111,7 @@ void KnotRendererBatch::drawCircle(int cx, int cy, int radius,
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(fillcolour, outlinecolour, 0);
-        d->m_paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2));
+        m_batch.append(new KnotBatchCircleAction(cx,cy,radius,fillcolour,outlinecolour));
     }
 }
 
@@ -181,8 +121,7 @@ void KnotRendererBatch::drawThickLine(float thickness,
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(colour, colour, thickness);
-        d->m_paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
+        m_batch.append(new KnotBatchThickAction(thickness,x1,y1,x2,y2,colour));
     }
 }
 
@@ -248,17 +187,26 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     /*
      * Cannot find a themeChanged event. Just change color every time we paint.
      */
-    emit themeChangedHandler();
-    
     d->m_paint_interface = new PaintInterfaceData(p, option);
  
     p->save();
     p->translate(getOffset());
     emit forceRedrawRequest();
     p->restore();
+    
+    processBatch();
 
     delete d->m_paint_interface;
     d->m_paint_interface = NULL;
+}
+
+void KnotRendererBatch::processBatch()
+{
+    for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
+    {
+        if (it->getType() == "rect")
+            
+    }
 }
 
 #include "Knotrenderer-batch.moc"

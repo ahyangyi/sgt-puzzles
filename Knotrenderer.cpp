@@ -16,6 +16,7 @@ KnotRenderer::KnotRenderer(QGraphicsItem* parent, Qt::WindowFlags wFlags): QGrap
     setFlag(ItemIsFocusable, true);
     
     connect(this,SIGNAL(geometryChanged()),this,SLOT(geometryChangedHandler()));
+    connect(Plasma::Theme::defaultTheme(),SIGNAL(themeChanged()),this,SLOT(themeChangedHandler()));
 }
 
 KnotRenderer::~KnotRenderer()

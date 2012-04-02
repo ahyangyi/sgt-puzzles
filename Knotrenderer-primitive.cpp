@@ -248,8 +248,6 @@ void KnotRendererPrimitive::paintInterface(QPainter *p,
     /*
      * Cannot find a themeChanged event. Just change color every time we paint.
      */
-    emit themeChangedHandler();
-    
     d->m_paint_interface = new PaintInterfaceData(p, option);
  
     p->save();
