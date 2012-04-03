@@ -47,104 +47,122 @@ public slots:
     virtual void setColor(QList<QColor> colorList);
     
 protected:
-    virtual void setPainter(int fillColour, int outlineColour, int outlineWidth);
-    virtual void processBatch();
+    virtual void preprocessBatch(QList<QColor> colorList);
     
+    struct PaintInterfaceData
+    {
+        QPainter *p;
+        const QStyleOptionGraphicsItem *option;
+        
+        PaintInterfaceData () {}
+        PaintInterfaceData (QPainter *n_p, const QStyleOptionGraphicsItem *n_option):
+            p(n_p), option(n_option){}
+            
+        void set(int fillColour, int outlineColour, int outlineWidth, const QList<QColor> colorList);
+    };
+
+    struct PaintInterfaceData* m_paint_interface;
+    
+    struct KnotBatchAction
+    {
+        virtual QString getType () = 0;
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
+    };
+
+    struct KnotBatchTextAction : public KnotBatchAction
+    {
+        int x, y, fontsize, align, colour;
+        bool monospace;
+        QString text;
+        
+        KnotBatchTextAction(int n_x, int n_y, bool n_monospace, int n_fontsize,
+            int n_align, int n_colour, const QString& n_text): 
+            x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), text(n_text){}
+
+        virtual QString getType () {return "text";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchRectAction : public KnotBatchAction
+    {
+        int x, y, w, h, colour;
+        
+        KnotBatchRectAction(int n_x, int n_y, int n_w, int n_h, int n_colour):
+            x(n_x), y(n_y), w(n_w), h(n_h), colour(n_colour){}
+
+        virtual QString getType () {return "rect";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchLineAction : public KnotBatchAction
+    {
+        int x1, y1, x2, y2, colour;
+        
+        KnotBatchLineAction(int n_x1, int n_y1, int n_x2, int n_y2,
+                    int n_colour): x1(n_x1), y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
+
+        virtual QString getType () {return "line";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchPolyAction : public KnotBatchAction
+    {
+        int fillColour, outlineColour;
+        QPolygon polygon;
+        
+        KnotBatchPolyAction(const QPolygon& n_polygon,
+            int n_fillcolour, int n_outlinecolour): 
+            polygon(n_polygon), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
+
+        virtual QString getType () {return "poly";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchCircleAction : public KnotBatchAction
+    {
+        int cx, cy, radius, fillColour, outlineColour;
+        
+        KnotBatchCircleAction(int n_cx, int n_cy, int n_radius,
+            int n_fillcolour, int n_outlinecolour):
+            cx(n_cx), cy(n_cy), radius(n_radius), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
+
+        virtual QString getType () {return "circle";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchClipAction : public KnotBatchAction
+    {
+        int x, y, w, h;
+
+        KnotBatchClipAction(int n_x, int n_y, int n_w, int n_h):
+            x(n_x), y(n_y), w(n_w), h(n_w){}
+
+        virtual QString getType () {return "clip";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchUnclipAction : public KnotBatchAction
+    {
+        virtual QString getType () {return "unclip";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotBatchThickAction : public KnotBatchAction
+    {
+        float thickness, x1, y1, x2, y2;
+        int colour;
+        
+        KnotBatchThickAction (float n_thickness,
+            float n_x1, float n_y1, float n_x2, float n_y2,
+            int n_colour): thickness(n_thickness), x1(n_x1),
+            y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
+
+        virtual QString getType () {return "thick";}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
     QList<KnotBatchAction*> m_batch;
-    
-private:
-    class Private;
-    
-    Private* d;
-};
-
-struct KnotBatchAction
-{
-    virtual QString getType () {return "buggy";}
-};
-
-struct KnotBatchTextAction : public KnotBatchAction
-{
-    int x, y, fontsize, align, colour;
-    bool monospace;
-    QString text;
-    
-    KnotBatchTextAction(int n_x, int n_y, bool n_monospace, int n_fontsize,
-        int n_align, int n_colour, const QString& n_text): 
-        x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), text(n_text){}
-
-    virtual QString getType () {return "text";}
-};
-
-struct KnotBatchRectAction : public KnotBatchAction
-{
-    int x, y, w, h, colour;
-    
-     KnotBatchRectAction(int n_x, int n_y, int n_w, int n_h, int n_colour):
-        x(n_x), y(n_y), w(n_w), h(n_h), colour(n_colour){}
-
-    virtual QString getType () {return "rect";}
-};
-
-struct KnotBatchLineAction : public KnotBatchAction
-{
-    int x1, y1, x2, y2, colour;
-    
-    KnotBatchLineAction(int n_x1, int n_y1, int n_x2, int n_y2,
-                int n_colour): x1(n_x1), y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
-
-    virtual QString getType () {return "line";}
-};
-
-struct KnotBatchPolyAction : public KnotBatchAction
-{
-    int fillColour, outlineColour;
-    QPolygon polygon;
-    
-    KnotBatchPolyAction(const QPolygon& n_polygon,
-        int n_fillcolour, int n_outlinecolour): 
-        polygon(n_polygon), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
-
-    virtual QString getType () {return "poly";}
-};
-
-struct KnotBatchCircleAction : public KnotBatchAction
-{
-    int cx, cy, radius, fillColour, outlineColour;
-    
-    KnotBatchCircleAction(int n_cx, int n_cy, int n_radius,
-        int n_fillcolour, int n_outlinecolour):
-        cx(n_cx), cy(n_cy), radius(n_radius), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
-
-    virtual QString getType () {return "circle";}
-};
-
-struct KnotBatchClipAction : public KnotBatchAction
-{
-    int x, y, w, h;
-
-    KnotBatchClipAction(int n_x, int n_y, int n_w, int n_h):
-        x(n_x), y(n_y), w(n_w), h(n_w){}
-
-    virtual QString getType () {return "clip";}
-};
-
-struct KnotBatchUnclipAction : public KnotBatchAction
-{
-    virtual QString getType () {return "unclip";}
-};
-
-struct KnotBatchThickAction : public KnotBatchAction
-{
-    float thickness, x1, y1, x2, y2;
-    int colour;
-    
-    KnotBatchThickAction (float n_thickness,
-        float n_x1, float n_y1, float n_x2, float n_y2,
-        int n_colour): thickness(n_thickness), x1(n_x1),
-        y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
-
-    virtual QString getType () {return "thick";}
+    QList<QColor> m_color_list;
 };
 
 #endif
