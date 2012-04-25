@@ -67,6 +67,8 @@ protected:
     {
         virtual QString getType () = 0;
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
+        
+        virtual ~KnotBatchAction () {}
     };
 
     struct KnotBatchTextAction : public KnotBatchAction

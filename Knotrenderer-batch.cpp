@@ -184,7 +184,8 @@ void KnotRendererBatch::PaintInterfaceData::set(int fillColour, int outlineColou
 {
     QPen pen = p->pen();
     pen.setWidth(outlineWidth);
-    pen.setColor(colorList[outlineColour]);
+    if (outlineColour != -1)
+        pen.setColor(colorList[outlineColour]);
     p->setPen(pen);
     
 

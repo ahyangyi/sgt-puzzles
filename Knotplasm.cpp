@@ -81,7 +81,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     setAspectRatioMode( Plasma::IgnoreAspectRatio );
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-    d->m_renderer = new KnotRendererPlasma(this);
+    d->m_renderer = new KnotRendererPrimitive(this);
     layout->addItem(d->m_renderer);
     QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, layout);
     d->m_status = new Plasma::Label(this);
@@ -99,7 +99,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     d->m_timer->setInterval(16);
     
     // this will get us the standard applet background, for free!
-    setBackgroundHints(StandardBackground);
+    setBackgroundHints(TranslucentBackground);
 }
  
 Knotplasm::~Knotplasm()
@@ -166,8 +166,11 @@ void Knotplasm::createConfigurationInterface(KConfigDialog *parent)
 
 void Knotplasm::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
-    event->accept();
-//    QGraphicsItem::contextMenuEvent(event);
+    if (event->reason()==QGraphicsSceneContextMenuEvent::Mouse &&
+        d->m_renderer->contains(mapToItem(d->m_renderer, event->pos())))
+        event->accept();
+    else
+        QGraphicsItem::contextMenuEvent(event);
 }
 
 void Knotplasm::mousePressEvent(QGraphicsSceneMouseEvent* e)

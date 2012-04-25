@@ -1,6 +1,7 @@
 #include <QPainter>
 
 #include "Knotrenderer-plasma.h"
+#include "QDebug"
 #include <Plasma/Theme>
 
 class KnotRendererPlasma::Private
@@ -34,6 +35,9 @@ void KnotRendererPlasma::preprocessBatch(QList<QColor> colorList)
     /*
      * Remove-background
      */
+    
+//    qDebug() << "preprocessBatch()" << endl;
+    
     for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
     {
         {
