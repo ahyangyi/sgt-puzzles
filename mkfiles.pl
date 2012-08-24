@@ -287,7 +287,7 @@ sub mfval($) {
     # Returns true if the argument is a known makefile type. Otherwise,
     # prints a warning and returns false;
     if (grep { $type eq $_ }
-	("vc","vcproj","cygwin","borland","lcc","gtk","mpw","nestedvm","osx","wce")) {
+	("vc","vcproj","cygwin","borland","lcc","gtk","mpw","nestedvm","osx","wce","gnustep")) {
 	    return 1;
 	}
     warn "$.:unknown makefile type '$type'\n";
@@ -528,7 +528,7 @@ if (defined $makefiles{'cygwin'}) {
       }
     }
     print "\n";
-    print $makefile_extra{'cygwin'};
+    print $makefile_extra{'cygwin'} || "";
     print "\nclean:\n".
     "\trm -f *.o *.exe *.res.o *.map\n".
     "\n";
@@ -628,7 +628,7 @@ if (defined $makefiles{'borland'}) {
       }
     }
     print "\n";
-    print $makefile_extra{'borland'};
+    print $makefile_extra{'borland'} || "";
     print "\nclean:\n".
     "\t-del *.obj\n".
     "\t-del *.exe\n".
@@ -704,7 +704,7 @@ if (defined $makefiles{'vc'}) {
 	}
     }
     print "\n";
-    print $makefile_extra{'vc'};
+    print $makefile_extra{'vc'} || "";
     print "\nclean: tidy\n".
       "\t-del *.exe\n\n".
       "tidy:\n".
@@ -812,7 +812,7 @@ if (defined $makefiles{'wce'}) {
 	}
     }
     print "\n";
-    print $makefile_extra{'wce'};
+    print $makefile_extra{'wce'} || "";
     print "\nclean: tidy\n".
       "\t-del *.exe\n\n".
       "tidy:\n".
@@ -1118,8 +1118,8 @@ if (defined $makefiles{'gtk'}) {
     &splitline("CFLAGS := -O2 -Wall -Werror -ansi -pedantic -g " .
 	       (join " ", map {"-I$dirpfx$_"} @srcdirs) .
 	       " `\$(GTK_CONFIG) --cflags` \$(CFLAGS)")."\n".
-    "XLIBS = `\$(GTK_CONFIG) --libs`\n".
-    "ULIBS =#\n".
+    "XLIBS = `\$(GTK_CONFIG) --libs` -lm\n".
+    "ULIBS = -lm#\n".
     "INSTALL=install\n",
     "INSTALL_PROGRAM=\$(INSTALL)\n",
     "INSTALL_DATA=\$(INSTALL)\n",
@@ -1130,12 +1130,13 @@ if (defined $makefiles{'gtk'}) {
     "mandir=\$(prefix)/man\n",
     "man1dir=\$(mandir)/man1\n",
     "\n";
-    print &splitline("all:" . join "", map { " $_" } &progrealnames("X:U"));
+    print &splitline("all:" . join "", map { " \$(BINPREFIX)$_" }
+                     &progrealnames("X:U"));
     print "\n\n";
     foreach $p (&prognames("X:U")) {
       ($prog, $type) = split ",", $p;
       $objstr = &objects($p, "X.o", undef, undef);
-      print &splitline($prog . ": " . $objstr), "\n";
+      print &splitline("\$(BINPREFIX)" . $prog . ": " . $objstr), "\n";
       $libstr = &objects($p, undef, undef, "-lX");
       print &splitline("\t\$(CC) -o \$@ $objstr $libstr \$(XLFLAGS) \$(${type}LIBS)", 69),
 	  "\n\n";
@@ -1148,9 +1149,9 @@ if (defined $makefiles{'gtk'}) {
 	  " -c \$< -o \$\@\n";
     }
     print "\n";
-    print $makefile_extra{'gtk'};
+    print $makefile_extra{'gtk'} || "";
     print "\nclean:\n".
-    "\trm -f *.o". (join "", map { " $_" } &progrealnames("X:U")) . "\n";
+    "\trm -f *.o". (join "", map { " \$(BINPREFIX)$_" } &progrealnames("X:U")) . "\n";
     select STDOUT; close OUT;
 }
 
@@ -1346,7 +1347,7 @@ if (defined $makefiles{'lcc'}) {
       }
     }
     print "\n";
-    print $makefile_extra{'lcc'};
+    print $makefile_extra{'lcc'} || "";
     print "\nclean:\n".
     "\t-del *.obj\n".
     "\t-del *.exe\n".
@@ -1402,7 +1403,7 @@ if (defined $makefiles{'nestedvm'}) {
 	  " -c \$< -o \$\@\n";
     }
     print "\n";
-    print $makefile_extra{'nestedvm'};
+    print $makefile_extra{'nestedvm'} || "";
     print "\nclean:\n".
     "\trm -rf *.o *.mips *.class *.html *.jar org applet.manifest\n";
     select STDOUT; close OUT;
@@ -1411,7 +1412,7 @@ if (defined $makefiles{'nestedvm'}) {
 if (defined $makefiles{'osx'}) {
     $mftyp = 'osx';
     $dirpfx = &dirpfx($makefiles{'osx'}, "/");
-    @osxarchs = ('ppc', 'i386');
+    @osxarchs = ('i386');
 
     ##-- Mac OS X makefile
     open OUT, ">$makefiles{'osx'}"; select OUT;
@@ -1430,9 +1431,9 @@ if (defined $makefiles{'osx'}) {
 	       (join " ", map {"-I$dirpfx$_"} @srcdirs))."\n".
     "LDFLAGS = -framework Cocoa\n".
     &splitline("all:" . join "", map { " $_" } &progrealnames("MX:U")) .
-    "\n" .
-    $makefile_extra{'osx'} .
-    "\n".
+    "\n";
+    print $makefile_extra{'osx'} || "";
+    print "\n".
     ".SUFFIXES: .o .c .m\n".
     "\n";
     print "\n\n";
@@ -1460,7 +1461,7 @@ if (defined $makefiles{'osx'}) {
       foreach $arch (@osxarchs) {
 	$objstr = &objects($p, "X.${arch}.o", undef, undef);
 	print &splitline("${prog}.${arch}.bin: " . $objstr), "\n";
-	print &splitline("\t\$(CC) -arch ${arch} -mmacosx-version-min=10.3 \$(LDFLAGS) -o \$@ " .
+	print &splitline("\t\$(CC) -arch ${arch} -mmacosx-version-min=10.4 \$(LDFLAGS) -o \$@ " .
                        $objstr . " $libstr", 69), "\n\n";
 	$archbins .= " ${prog}.${arch}.bin";
       }
@@ -1475,7 +1476,7 @@ if (defined $makefiles{'osx'}) {
       foreach $arch (@osxarchs) {
 	$objstr = &objects($p, "X.${arch}.o", undef, undef);
 	print &splitline("${prog}.${arch}: " . $objstr), "\n";
-	print &splitline("\t\$(CC) -arch ${arch} -mmacosx-version-min=10.3 \$(ULDFLAGS) -o \$@ " .
+	print &splitline("\t\$(CC) -arch ${arch} -mmacosx-version-min=10.4 \$(ULDFLAGS) -o \$@ " .
                        $objstr . " $libstr", 69), "\n\n";
 	$archbins .= " ${prog}.${arch}";
       }
@@ -1488,16 +1489,103 @@ if (defined $makefiles{'osx'}) {
             "\n";
         $deflist = join "", map { " -D$_" } @{$d->{defs}};
         if ($d->{deps}->[0] =~ /\.m$/) {
-	  print "\t\$(CC) -arch $arch -mmacosx-version-min=10.3 -x objective-c \$(COMPAT) \$(FWHACK) \$(CFLAGS)".
+	  print "\t\$(CC) -arch $arch -mmacosx-version-min=10.4 -x objective-c \$(COMPAT) \$(FWHACK) \$(CFLAGS)".
 	      " \$(XFLAGS)$deflist -c \$< -o \$\@\n";
         } else {
-	  print "\t\$(CC) -arch $arch -mmacosx-version-min=10.3 \$(COMPAT) \$(FWHACK) \$(CFLAGS) \$(XFLAGS)$deflist" .
+	  print "\t\$(CC) -arch $arch -mmacosx-version-min=10.4 \$(COMPAT) \$(FWHACK) \$(CFLAGS) \$(XFLAGS)$deflist" .
 	      " -c \$< -o \$\@\n";
         }
       }
     }
     print "\nclean:\n".
     "\trm -f *.o *.dmg". (join "", map { my $a=$_; (" $a", map { " ${a}.$_" } @osxarchs) } &progrealnames("U")) . "\n".
+    "\trm -rf *.app\n";
+    select STDOUT; close OUT;
+}
+
+if (defined $makefiles{'gnustep'}) {
+    $mftyp = 'gnustep';
+    $dirpfx = &dirpfx($makefiles{'gnustep'}, "/");
+
+    ##-- GNUstep makefile (use with 'gs_make -f Makefile.gnustep')
+
+    # This is a pretty evil way to do things. In an ideal world, I'd
+    # use the approved GNUstep makefile mechanism which just defines a
+    # variable or two saying what source files go into what binary and
+    # then includes application.make. Unfortunately, that has the
+    # automake-ish limitation that it doesn't let you choose different
+    # command lines for each object, so I can't arrange for all those
+    # files with -DTHIS and -DTHAT to Just Work.
+    #
+    # A simple if ugly fix would be to have mkfiles.pl construct a
+    # directory full of stub C files of the form '#define thing',
+    # '#include "real_source_file"', and then reference those in this
+    # makefile. That would also make it easy to build a proper
+    # automake makefile.
+    open OUT, ">$makefiles{'gnustep'}"; select OUT;
+    print
+    "# Makefile for $project_name under GNUstep.\n".
+    "#\n# This file was created by `mkfiles.pl' from the `Recipe' file.\n".
+    "# DO NOT EDIT THIS FILE DIRECTLY; edit Recipe or mkfiles.pl instead.\n";
+    # gcc command line option is -D not /D
+    ($_ = $help) =~ s/=\/D/=-D/gs;
+    print $_;
+    print
+    "NEEDS_GUI=yes\n".
+    "include \$(GNUSTEP_MAKEFILES)/common.make\n".
+    "include \$(GNUSTEP_MAKEFILES)/rules.make\n".
+    "include \$(GNUSTEP_MAKEFILES)/Instance/rules.make\n".
+    "\n".
+    &splitline("all::" . join "", map { " $_" } &progrealnames("MX:U")) .
+    "\n";
+    print $makefile_extra{'gnustep'} || "";
+    print "\n".
+    ".SUFFIXES: .o .c .m\n".
+    "\n";
+    print "\n\n";
+    foreach $p (&prognames("MX")) {
+      ($prog, $type) = split ",", $p;
+      $icon = &special($p, ".icns");
+      $infoplist = &special($p, "info.plist");
+      print "${prog}.app:\n\tmkdir -p \$\@\n";
+      $targets = "${prog}.app ${prog}.app/$prog";
+      if (defined $icon) {
+	print "${prog}.app/Resources: ${prog}.app\n\tmkdir -p \$\@\n";
+	print "${prog}.app/Resources/${prog}.icns: ${prog}.app/Resources $icon\n\tcp $icon \$\@\n";
+	$targets .= " ${prog}.app/Resources/${prog}.icns";
+      }
+      if (defined $infoplist) {
+	print "${prog}.app/Info.plist: ${prog}.app $infoplist\n\tcp $infoplist \$\@\n";
+	$targets .= " ${prog}.app/Info.plist";
+      }
+      $targets .= " \$(${prog}_extra)";
+      print &splitline("${prog}: $targets", 69) . "\n\n";
+      $libstr = &objects($p, undef, undef, "-lX");
+      $objstr = &objects($p, "X.o", undef, undef);
+      print &splitline("${prog}.app/$prog: " . $objstr), "\n";
+      print &splitline("\t\$(CC) \$(ALL_LDFLAGS) -o \$@ " . $objstr . " \$(ALL_LIB_DIRS) $libstr \$(ALL_LIBS)", 69), "\n\n";
+    }
+    foreach $p (&prognames("U")) {
+      ($prog, $type) = split ",", $p;
+      $libstr = &objects($p, undef, undef, "-lX");
+      $objstr = &objects($p, "X.o", undef, undef);
+      print &splitline("${prog}: " . $objstr), "\n";
+      print &splitline("\t\$(CC) \$(ULDFLAGS) -o \$@ " . $objstr . " $libstr", 69), "\n\n";
+    }
+    foreach $d (&deps("X.o", undef, $dirpfx, "/")) {
+      print &splitline(sprintf("%s: %s", $d->{obj}, join " ", @{$d->{deps}})),
+      "\n";
+      $deflist = join "", map { " -D$_" } @{$d->{defs}};
+      if ($d->{deps}->[0] =~ /\.m$/) {
+        print "\t\$(CC) -DGNUSTEP \$(ALL_OBJCFLAGS) \$(COMPAT) \$(FWHACK) \$(OBJCFLAGS)".
+                " \$(XFLAGS)$deflist -c \$< -o \$\@\n";
+      } else {
+        print "\t\$(CC) \$(ALL_CFLAGS) \$(COMPAT) \$(FWHACK) \$(CFLAGS) \$(XFLAGS)$deflist" .
+              " -c \$< -o \$\@\n";
+      }
+    }
+    print "\nclean::\n".
+    "\trm -f *.o ". (join " ", &progrealnames("U")) . "\n".
     "\trm -rf *.app\n";
     select STDOUT; close OUT;
 }

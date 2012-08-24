@@ -13,6 +13,7 @@
 !makefile wce Makefile.wce
 !makefile cygwin Makefile.cyg
 !makefile osx Makefile.osx
+!makefile gnustep Makefile.gnustep
 !makefile nestedvm Makefile.nestedvm
 
 !srcdir icons/
@@ -176,7 +177,7 @@ version2.def: FORCE
 !begin gtk
 install:
 	for i in $(GAMES); do \
-		$(INSTALL_PROGRAM) -m 755 $$i $(DESTDIR)$(gamesdir)/$$i \
+		$(INSTALL_PROGRAM) -m 755 $(BINPREFIX)$$i $(DESTDIR)$(gamesdir)/$(BINPREFIX)$$i \
 		|| exit 1; \
 	done
 !end

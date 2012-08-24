@@ -298,7 +298,7 @@ For example: if you run Cube (see \k{cube}), select \q{Octahedron}
 from the \q{Type} menu, and then go to the game ID selection, you
 will see a string of the form \cq{o2x2#338686542711620}. Take only
 the part before the hash (\cq{o2x2}), and start Cube with that text
-on the command line: \cq{cube o2x2}.
+on the command line: \cq{PREFIX-cube o2x2}.
 
 If you copy the \e{entire} game ID on to the command line, the game
 will start up in the specific game that was described. This is
@@ -364,7 +364,7 @@ seeds; see \k{common-id}), in the same format produced by
 
 For example:
 
-\c net --generate 12 --print 2x3 7x7w | lpr
+\c PREFIX-net --generate 12 --print 2x3 7x7w | lpr
 
 will generate two pages of printed Net puzzles (each of which will
 have a 7\by\.7 wrapping grid), and pipe the output to the \c{lpr}
@@ -390,7 +390,7 @@ seeds; see \k{common-id}), in the same format produced by
 
 For example:
 
-\c net --generate 12 --save game --save-suffix .sav
+\c PREFIX-net --generate 12 --save game --save-suffix .sav
 
 will generate twelve Net saved-game files with the names
 \cw{game0.sav} to \cw{game11.sav}.
@@ -2926,7 +2926,7 @@ that the loop must satisfy.
 A black circle in a square indicates that that square is a corner, but
 neither of the squares adjacent to it in the loop is also a corner.
 
-A while circle indicates that the square is a straight edge, but \e{at
+A white circle indicates that the square is a straight edge, but \e{at
 least one} of the squares adjacent to it in the loop is a corner.
 
 (In both cases, the clue only constrains the two squares adjacent
@@ -2957,6 +2957,12 @@ indicating that you are sure the loop does not go through that edge.
 (For instance, if you have decided which of the squares adjacent to a
 white clue has to be a corner, but don't yet know which way the corner
 turns, you might mark the one way it \e{can't} go with a cross.)
+
+Alternatively, use the cursor keys to move the cursor.  Use the Enter
+key to begin and end keyboard `drag' operations.  Use the Space key to
+cancel the drag.  Use Ctrl-arrowkey and Shift-arrowkey to simulate a
+left or right click, respectively, on the edge in the given direction
+relative to the cursor, i.e. to draw a segment or a cross.
 
 (All the actions described in \k{common-actions} are also available.)
 

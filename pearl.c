@@ -5,10 +5,17 @@
 /*
  * TODO:
  *
- *  - Keyboard-control cursor. (Would probably have to address both
- *    square centres, for laying multiple edges at a time in a
- *    drag-like style, and grid edges for marking particular line
- *    segments as no-go.)
+ *  - The current keyboard cursor mechanism works well on ordinary PC
+ *    keyboards, but for platforms with only arrow keys and a select
+ *    button or two, we may at some point need a simpler one which can
+ *    handle 'x' markings without needing shift keys. For instance, a
+ *    cursor with twice the grid resolution, so that it can range
+ *    across face centres, edge centres and vertices; 'clicks' on face
+ *    centres begin a drag as currently, clicks on edges toggle
+ *    markings, and clicks on vertices are ignored (but it would be
+ *    too confusing not to let the cursor rest on them). But I'm
+ *    pretty sure that would be less pleasant to play on a full
+ *    keyboard, so probably a #ifdef would be the thing.
  *
  *  - Generation is still pretty slow, due to difficulty coming up in
  *    the first place with a loop that makes a soluble puzzle even
@@ -83,6 +90,7 @@
 
 enum {
     COL_BACKGROUND, COL_HIGHLIGHT, COL_LOWLIGHT,
+    COL_CURSOR_BACKGROUND = COL_LOWLIGHT,
     COL_BLACK, COL_WHITE,
     COL_ERROR, COL_GRID, COL_FLASH,
     COL_DRAGON, COL_DRAGOFF,
@@ -1153,8 +1161,16 @@ void pearl_loopgen(int w, int h, char *lines, random_state *rs)
 static int new_clues(game_params *params, random_state *rs,
                      char *clues, char *grid)
 {
-    int w = params->w, h = params->h;
+    int w = params->w, h = params->h, diff = params->difficulty;
     int ngen = 0, x, y, d, ret, i;
+
+
+    /*
+     * Difficulty exception: 5x5 Tricky is not generable (the
+     * generator will spin forever trying) and so we fudge it to Easy.
+     */
+    if (w == 5 && h == 5 && diff > DIFF_EASY)
+        diff = DIFF_EASY;
 
     while (1) {
         ngen++;
@@ -1237,7 +1253,7 @@ static int new_clues(game_params *params, random_state *rs,
             /*
              * See if we can solve the puzzle just like this.
              */
-            ret = pearl_solve(w, h, clues, grid, params->difficulty, FALSE);
+            ret = pearl_solve(w, h, clues, grid, diff, FALSE);
             assert(ret > 0);	       /* shouldn't be inconsistent! */
             if (ret != 1)
                 continue;		       /* go round and try again */
@@ -1245,8 +1261,8 @@ static int new_clues(game_params *params, random_state *rs,
             /*
              * Check this puzzle isn't too easy.
              */
-            if (params->difficulty > DIFF_EASY) {
-                ret = pearl_solve(w, h, clues, grid, params->difficulty-1, FALSE);
+            if (diff > DIFF_EASY) {
+                ret = pearl_solve(w, h, clues, grid, diff-1, FALSE);
                 assert(ret > 0);
                 if (ret == 1)
                     continue; /* too easy: try again */
@@ -1313,7 +1329,7 @@ static int new_clues(game_params *params, random_state *rs,
                 clue = clues[y*w+x];
                 clues[y*w+x] = 0;	       /* try removing this clue */
 
-                ret = pearl_solve(w, h, clues, grid, params->difficulty, FALSE);
+                ret = pearl_solve(w, h, clues, grid, diff, FALSE);
                 assert(ret > 0);
                 if (ret != 1)
                     clues[y*w+x] = clue;   /* oops, put it back again */
@@ -1720,6 +1736,9 @@ struct game_ui {
     int ndragcoords;       /* number of entries in dragcoords.
                             * 0 = click but no drag yet. -1 = no drag at all */
     int clickx, clicky;    /* pixel position of initial click */
+
+    int curx, cury;        /* grid position of keyboard cursor */
+    int cursor_active;     /* TRUE iff cursor is shown */
 };
 
 static game_ui *new_ui(game_state *state)
@@ -1729,6 +1748,8 @@ static game_ui *new_ui(game_state *state)
 
     ui->ndragcoords = -1;
     ui->dragcoords = snewn(sz, int);
+    ui->cursor_active = FALSE;
+    ui->curx = ui->cury = 0;
 
     return ui;
 }
@@ -1762,6 +1783,7 @@ static void game_changed_state(game_ui *ui, game_state *oldstate,
 #define BORDER_WIDTH (max(TILE_SIZE / 32, 1))
 
 #define COORD(x) ( (x) * TILE_SIZE + BORDER )
+#define CENTERED_COORD(x) ( COORD(x) + TILE_SIZE/2 )
 #define FROMCOORD(x) ( ((x) < BORDER) ? -1 : ( ((x) - BORDER) / TILE_SIZE) )
 
 #define DS_ESHIFT 4     /* R/U/L/D shift, for error flags */
@@ -1770,6 +1792,7 @@ static void game_changed_state(game_ui *ui, game_state *oldstate,
 
 #define DS_ERROR_CLUE (1 << 20)
 #define DS_FLASH (1 << 21)
+#define DS_CURSOR (1 << 22)
 
 enum { GUI_MASYU, GUI_LOOPY };
 
@@ -1912,14 +1935,44 @@ static void interpret_ui_drag(game_state *state, game_ui *ui, int *clearing,
     }
 }
 
+static char *mark_in_direction(game_state *state, int x, int y, int dir,
+			       int ismark, char *buf)
+{
+    int w = state->shared->w /*, h = state->shared->h, sz = state->shared->sz */;
+    int x2 = x + DX(dir);
+    int y2 = y + DY(dir);
+    int dir2 = F(dir);
+    char ch = ismark ? 'M' : 'F';
+
+    if (!INGRID(state, x, y) || !INGRID(state, x2, y2)) return "";
+    /* disallow laying a mark over a line, or vice versa. */
+    if (ismark) {
+	if ((state->lines[y*w+x] & dir) || (state->lines[y2*w+x2] & dir2))
+	    return "";
+    } else {
+	if ((state->marks[y*w+x] & dir) || (state->marks[y2*w+x2] & dir2))
+	    return "";
+    }
+    
+    sprintf(buf, "%c%d,%d,%d;%c%d,%d,%d", ch, dir, x, y, ch, dir2, x2, y2);
+    return dupstr(buf);
+}
+
+#define KEY_DIRECTION(btn) (\
+    (btn) == CURSOR_DOWN ? D : (btn) == CURSOR_UP ? U :\
+    (btn) == CURSOR_LEFT ? L : R)
+
 static char *interpret_move(game_state *state, game_ui *ui, game_drawstate *ds,
 			    int x, int y, int button)
 {
-    int w = state->shared->w /*, h = state->shared->h, sz = state->shared->sz */;
+    int w = state->shared->w, h = state->shared->h /*, sz = state->shared->sz */;
     int gx = FROMCOORD(x), gy = FROMCOORD(y), i;
+    int release = FALSE;
     char tmpbuf[80];
 
     if (IS_MOUSE_DOWN(button)) {
+	ui->cursor_active = FALSE;
+
         if (!INGRID(state, gx, gy)) {
             ui->ndragcoords = -1;
             return NULL;
@@ -1937,7 +1990,44 @@ static char *interpret_move(game_state *state, game_ui *ui, game_drawstate *ds,
         return "";
     }
 
-    if (IS_MOUSE_RELEASE(button)) {
+    if (IS_MOUSE_RELEASE(button)) release = TRUE;
+
+    if (IS_CURSOR_MOVE(button & ~MOD_MASK)) {
+	if (!ui->cursor_active) {
+	    ui->cursor_active = TRUE;
+	} else if (button & (MOD_SHFT | MOD_CTRL)) {
+	    if (ui->ndragcoords > 0) return NULL;
+	    ui->ndragcoords = -1;
+	    return mark_in_direction(state, ui->curx, ui->cury,
+				     KEY_DIRECTION(button & ~MOD_MASK),
+				     (button & MOD_SHFT), tmpbuf);
+	} else {
+	    move_cursor(button, &ui->curx, &ui->cury, w, h, FALSE);
+	    if (ui->ndragcoords >= 0)
+		update_ui_drag(state, ui, ui->curx, ui->cury);
+	}
+	return "";
+    }
+
+    if (IS_CURSOR_SELECT(button & ~MOD_MASK)) {
+	if (!ui->cursor_active) {
+	    ui->cursor_active = TRUE;
+	    return "";
+	} else if (button == CURSOR_SELECT) {
+	    if (ui->ndragcoords == -1) {
+		ui->ndragcoords = 0;
+		ui->dragcoords[0] = ui->cury * w + ui->curx;
+		ui->clickx = CENTERED_COORD(ui->curx);
+		ui->clicky = CENTERED_COORD(ui->cury);
+		return "";
+	    } else release = TRUE;
+	} else if (button == CURSOR_SELECT2 && ui->ndragcoords >= 0) {
+	    ui->ndragcoords = -1;
+	    return "";
+	}
+    }
+
+    if (release) {
         if (ui->ndragcoords > 0) {
             /* End of a drag: process the cached line data. */
             int buflen = 0, bufsize = 256, tmplen;
@@ -1971,8 +2061,6 @@ static char *interpret_move(game_state *state, game_ui *ui, game_drawstate *ds,
             /* Click (or tiny drag). Work out which edge we were
              * closest to. */
             int cx, cy;
-            int gx2, gy2, l1, l2, ismark = (button == RIGHT_RELEASE);
-            char movec = ismark ? 'M' : 'F';
 
             ui->ndragcoords = -1;
 
@@ -1986,8 +2074,8 @@ static char *interpret_move(game_state *state, game_ui *ui, game_drawstate *ds,
 
             gx = FROMCOORD(x);
             gy = FROMCOORD(y);
-            cx = COORD(gx) + TILE_SIZE/2;
-            cy = COORD(gy) + TILE_SIZE/2;
+            cx = CENTERED_COORD(gx);
+            cy = CENTERED_COORD(gy);
 
             if (!INGRID(state, gx, gy)) return "";
 
@@ -1996,38 +2084,22 @@ static char *interpret_move(game_state *state, game_ui *ui, game_drawstate *ds,
 
                 return "";
             } else {
+		int direction;
                 if (abs(x-cx) < abs(y-cy)) {
                     /* Closest to top/bottom edge. */
-                    l1 = (y < cy) ? U : D;
+                    direction = (y < cy) ? U : D;
                 } else {
                     /* Closest to left/right edge. */
-                    l1 = (x < cx) ? L : R;
+                    direction = (x < cx) ? L : R;
                 }
-                gx2 = gx + DX(l1); gy2 = gy + DY(l1);
-                l2 = F(l1);
-
-                if (!INGRID(state, gx, gy) || !INGRID(state, gx2, gy2)) return "";
-
-                /* disallow laying a mark over a line, or vice versa. */
-                if (ismark) {
-                    if ((state->lines[gy*w+gx] & l1) || (state->lines[gy2*w+gx2] & l2))
-                        return "";
-                } else {
-                    if ((state->marks[gy*w+gx] & l1) || (state->marks[gy2*w+gx2] & l2))
-                        return "";
-                }
-
-                sprintf(tmpbuf, "%c%d,%d,%d;%c%d,%d,%d",
-                        movec, l1, gx, gy, movec, l2, gx2, gy2);
-                return dupstr(tmpbuf);
+		return mark_in_direction(state, gx, gy, direction,
+					 (button == RIGHT_RELEASE), tmpbuf);
             }
         }
     }
 
     if (button == 'H' || button == 'h')
         return dupstr("H");
-
-    /* TODO cursor */
 
     return NULL;
 }
@@ -2231,7 +2303,10 @@ static void draw_square(drawing *dr, game_drawstate *ds, game_ui *ui,
     clip(dr, ox, oy, TILE_SIZE, TILE_SIZE);
 
     /* Clear the square. */
-    draw_rect(dr, ox, oy, TILE_SIZE, TILE_SIZE, COL_BACKGROUND);
+    draw_rect(dr, ox, oy, TILE_SIZE, TILE_SIZE,
+	      (lflags & DS_CURSOR) ?
+	      COL_CURSOR_BACKGROUND : COL_BACKGROUND);
+	      
 
     if (get_gui_style() == GUI_LOOPY) {
         /* Draw small dot, underneath any lines. */
@@ -2279,7 +2354,7 @@ static void draw_square(drawing *dr, game_drawstate *ds, game_ui *ui,
     /* Draw a clue, if present */
     if (clue != NOCLUE) {
         int c = (lflags & DS_FLASH) ? COL_FLASH :
-                (clue == CORNER) ? COL_BLACK : COL_WHITE;
+                (clue == STRAIGHT) ? COL_WHITE : COL_BLACK;
 
         if (lflags & DS_ERROR_CLUE) /* draw a bigger 'error' clue circle. */
             draw_circle(dr, cx, cy, TILE_SIZE*3/8, COL_ERROR, COL_ERROR);
@@ -2354,6 +2429,9 @@ static void game_redraw(drawing *dr, game_drawstate *ds, game_state *oldstate,
                 f |= DS_ERROR_CLUE;
 
             f |= flashing;
+
+	    if (ui->cursor_active && x == ui->curx && y == ui->cury)
+		f |= DS_CURSOR;
 
             if (f != ds->lflags[y*w+x] || force) {
                 ds->lflags[y*w+x] = f;
