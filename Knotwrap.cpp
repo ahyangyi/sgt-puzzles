@@ -200,15 +200,15 @@ void knotplasm_unclip(void *handle)
 }
 void knotplasm_start_draw(void *handle)
 {
-//    ((Knotplasm *)handle)->startDraw();
+//    emit ((KnotMidend *)handle)->startDraw();
 }
 void knotplasm_end_draw(void *handle)
 {
-//    ((Knotplasm *)handle)->endDraw();
+//    emit ((KnotMidend *)handle)->endDraw();
 }
 void knotplasm_status_bar(void *handle, char *text)
 {
-    ((KnotMidend *)handle)->statusBar(QString(text));
+    emit ((KnotMidend *)handle)->statusBar(QString(text));
 }
 blitter *knotplasm_blitter_new(void *handle, int w, int h)
 {

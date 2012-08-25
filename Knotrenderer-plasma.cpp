@@ -1,7 +1,7 @@
 #include <QPainter>
 
 #include "Knotrenderer-plasma.h"
-#include "QDebug"
+#include "Knotdebug.h"
 #include <Plasma/Theme>
 
 class KnotRendererPlasma::Private
@@ -25,29 +25,25 @@ KnotRendererPlasma::~KnotRendererPlasma()
 
 }
 
-void KnotRendererPlasma::themeChangedHandler()
-{
-    emit colorRequest (QColor::fromRgb(23,14,81));
-}
-
 void KnotRendererPlasma::preprocessBatch(QList<QColor> colorList)
 {
+    knotDebugClear();
+    for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
+        knotDebugAppend((*it)->toString());
+    knotDebugFlush();
+
+    preprocessGalaxies(colorList);
+}
+
+void KnotRendererPlasma::preprocessGalaxies(QList< QColor > colorList)
+{
     /*
-     * Remove-background
+     * Step 1: throw away the big background rectangle.
      */
     
-//    qDebug() << "preprocessBatch()" << endl;
-    
-    for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
-    {
-        {
-            KnotBatchRectAction* rectAction;
-            if ((rectAction = dynamic_cast<KnotBatchRectAction*>(*it)) != NULL && rectAction->colour != -1 && Private::isMagical (colorList[rectAction->colour]) > 0)
-            {
-                rectAction->colour = -1;
-            }
-        }
-    }
+    if (this->m_batch.size() == 0)
+        return;
+    this->m_batch.erase(this->m_batch.begin());
 }
 
 #include "Knotrenderer-plasma.moc"

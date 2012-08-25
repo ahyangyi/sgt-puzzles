@@ -2,7 +2,7 @@
 
 cd Build
 make;
-kdesu -c "make install";
+su -c "make install";
 kbuildsycoca4;
 kquitapp plasma-desktop;
 sleep 2s;

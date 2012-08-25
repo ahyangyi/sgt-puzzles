@@ -179,6 +179,7 @@ void KnotRendererPrimitive::drawThickLine(float thickness,
      float x1, float y1, float x2, float y2,
      int colour)
 {
+    
     if (d->m_paint_interface != NULL)
     {
         setPainter(colour, colour, thickness);

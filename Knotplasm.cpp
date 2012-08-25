@@ -19,11 +19,15 @@
 #include <Plasma/Theme>
 #include <Plasma/Extender>
 #include <Plasma/ExtenderItem>
+#include <Plasma/ScrollWidget>
 
 #include "Knotrenderer.h"
 #include "Knotrenderer-primitive.h"
 #include "Knotrenderer-plasma.h"
+#include "Knotrenderer-batch.h"
 #include "Knottimer.h"
+
+#include "Knotdebug.h"
 
 class Knotplasm::Private
 {
@@ -36,31 +40,37 @@ public:
     Plasma::Label* m_status;
     Plasma::PushButton* m_start;
     KnotTimer* m_timer;
-    
-#ifdef KNOTPLASM_DEBUG
-    QString m_debug_text;
-    QVector<QPair<QString,qint16> > m_debug_history;
-    void kpdebug (QString s);
-#endif
 };
 
 #ifdef KNOTPLASM_DEBUG
-void Knotplasm::Private::kpdebug (QString s)
+static Plasma::Label* __debug_label = NULL;
+static Plasma::ScrollWidget* __debug_area = NULL;
+
+static QVector<QPair<QString,qint16> > __debug_history;
+#endif
+
+#ifdef KNOTPLASM_DEBUG
+void knotDebugClear ()
 {
-    if (m_debug_history.empty() || s != m_debug_history.at(m_debug_history.size() - 1).first)
+    __debug_history.clear();
+}
+
+void knotDebugAppend (QString s)
+{
+    if (__debug_history.empty() || s != __debug_history.at(__debug_history.size() - 1).first)
     {
-        m_debug_history.push_back(qMakePair(s, (qint16)1));
+        __debug_history.push_back(qMakePair(s, (qint16)1));
     }
     else
     {
-        m_debug_history[m_debug_history.size() - 1].second ++;
+        __debug_history[__debug_history.size() - 1].second ++;
     }
-    
-    while (m_debug_history.size() > 16)
-        m_debug_history.pop_front();
-    
-    m_debug_text = "";
-    for (QVector<QPair<QString,qint16> >::iterator it = m_debug_history.end(); it != m_debug_history.begin();)
+}
+
+void knotDebugFlush ()
+{
+    QString m_debug_text = "";
+    for (QVector<QPair<QString,qint16> >::iterator it = __debug_history.end(); it != __debug_history.begin();)
     {
         --it;
         if (it->second==1)
@@ -68,9 +78,9 @@ void Knotplasm::Private::kpdebug (QString s)
         else
             m_debug_text = QString("%1 (x%2)\n").arg(it->first).arg(it->second) + m_debug_text;
     }
+    
+    __debug_label->setText(m_debug_text);
 }
-#else
-#define kpdebug(...)
 #endif
 
 Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
@@ -80,26 +90,65 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     setAspectRatioMode( Plasma::IgnoreAspectRatio );
 
-    QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-    d->m_renderer = new KnotRendererPrimitive(this);
-    layout->addItem(d->m_renderer);
-    QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, layout);
-    d->m_status = new Plasma::Label(this);
-    d->m_status->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::Label);
-    statusBarLayout->addItem(d->m_status);
-    d->m_start = new Plasma::PushButton(this);
-    d->m_start->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::PushButton);
-    d->m_start->setText("New");
-    statusBarLayout->addItem(d->m_start);
-    statusBarLayout->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
-    layout->addItem(statusBarLayout);
-    setLayout(layout);
+    QGraphicsLinearLayout* mainLayout = new QGraphicsLinearLayout(Qt::Vertical, this);
+    
+    {
+        /* Vertical component 1: the gaming area */
+        d->m_renderer = new KnotRendererPlasma(this);
+        mainLayout->addItem(d->m_renderer);
+    }
+        
+    {
+        /* Vertical component 2: the status bar */
+        QGraphicsLinearLayout* statusBarLayout = new QGraphicsLinearLayout(Qt::Horizontal, mainLayout);
+        
+        {
+            /* Status information */
+            d->m_status = new Plasma::Label(this);
+            d->m_status->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::Label);
+            statusBarLayout->addItem(d->m_status);
+        }
+        
+        {
+            /* "New game" button */
+            d->m_start = new Plasma::PushButton(this);
+            d->m_start->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::PushButton);
+            d->m_start->setText("New");
+            statusBarLayout->addItem(d->m_start);
+        }
+        
+        statusBarLayout->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+        mainLayout->addItem(statusBarLayout);
+    }
+    
+#ifdef KNOTPLASM_DEBUG
+    {
+        /* Vertical component 3: the silly debug info area*/
+        
+        if (__debug_area == NULL)
+        {
+            __debug_area = new Plasma::ScrollWidget(this);
+            __debug_label = new Plasma::Label(this);
+            __debug_area->setWidget(__debug_label);
+
+            __debug_label->setText("Test!");
+            __debug_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::DefaultType);
+            __debug_area->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::LineEdit);
+            
+            __debug_area->setPreferredHeight(120);
+
+            mainLayout->addItem(__debug_area);
+        }
+    }
+#endif
+    
+    setLayout(mainLayout);
     
     d->m_timer=new KnotTimer(this);
     d->m_timer->setInterval(16);
     
-    // this will get us the standard applet background, for free!
-    setBackgroundHints(TranslucentBackground);
+    setBackgroundHints(StandardBackground);
+//    setBackgroundHints(TranslucentBackground);
 }
  
 Knotplasm::~Knotplasm()
@@ -178,7 +227,6 @@ void Knotplasm::mousePressEvent(QGraphicsSceneMouseEvent* e)
     d->m_renderer->setFocus();
 }
 
-// This is the command that links your applet to the .desktop file
 K_EXPORT_PLASMA_APPLET(Knotplasm, Knotplasm)
  
 #include "Knotplasm.moc"

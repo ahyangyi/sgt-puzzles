@@ -5,7 +5,10 @@
 #include <QFont>
 #include <Plasma/Theme>
 
+#include <cstdio>
+
 #include "Knotrenderer-batch.h"
+#include "Knotdebug.h"
 
 KnotRendererBatch::KnotRendererBatch(QGraphicsItem* parent, Qt::WindowFlags wFlags):KnotRenderer(parent, wFlags)
     , m_paint_interface(NULL)
@@ -105,8 +108,7 @@ void KnotRendererBatch::clip(int x, int y, int w, int h)
 {
     if (m_paint_interface != NULL)
     {
-        m_paint_interface->p->setClipRect(QRectF(x,y,w,h));
-        m_paint_interface->p->setClipping(true);
+        m_batch.append(new KnotBatchClipAction(x,y,w,h));
     }
 }
 
@@ -114,7 +116,7 @@ void KnotRendererBatch::unclip()
 {
     if (m_paint_interface != NULL)
     {
-        m_paint_interface->p->setClipping(false);
+        m_batch.append(new KnotBatchUnclipAction());
     }
 }
 
@@ -144,15 +146,15 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     const QStyleOptionGraphicsItem *option,
     const QRectF& contentsRect)
 {
+    p->save();
+    p->translate(getOffset());
+
     /*
      * Cannot find a themeChanged event. Just change color every time we paint.
      */
     m_paint_interface = new PaintInterfaceData(p, option);
  
-    p->save();
-    p->translate(getOffset());
     emit forceRedrawRequest();
-    p->restore();
     
     /*
      * Preprocess the batch
@@ -174,10 +176,15 @@ void KnotRendererBatch::paintInterface(QPainter *p,
 
     delete m_paint_interface;
     m_paint_interface = NULL;
+
+    p->restore();
 }
 
 void KnotRendererBatch::preprocessBatch(QList<QColor> colorList)
 {
+    /*
+     * Intentionally left blank
+     */
 }
 
 void KnotRendererBatch::PaintInterfaceData::set(int fillColour, int outlineColour, int outlineWidth, const QList< QColor > colorList)
@@ -271,32 +278,37 @@ void KnotRendererBatch::KnotBatchRectAction::apply(KnotRendererBatch::PaintInter
 
 void KnotRendererBatch::KnotBatchLineAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-
+    paint_interface->set(colour, colour, 0, color_list);
+    paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
 }
 
 void KnotRendererBatch::KnotBatchCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-
+    paint_interface->set(fillColour, outlineColour, 0, color_list);
+    paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2));
 }
 
 void KnotRendererBatch::KnotBatchPolyAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-
+    paint_interface->set(fillColour, outlineColour, 0, color_list);
+    paint_interface->p->drawPolygon(polygon);
 }
 
 void KnotRendererBatch::KnotBatchClipAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-
+    paint_interface->p->setClipRect(QRectF(x,y,w,h));
+    paint_interface->p->setClipping(true);
 }
 
 void KnotRendererBatch::KnotBatchUnclipAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-
+    paint_interface->p->setClipping(false);
 }
 
 void KnotRendererBatch::KnotBatchThickAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-
+    paint_interface->set(colour, colour, thickness, color_list);
+    paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
 }
 
 
