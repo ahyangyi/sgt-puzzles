@@ -21,13 +21,12 @@ set(
     Knotplasm.cpp Knotconfig.cpp Knotrenderer.cpp Knottimer.cpp
     Knotwrap.cpp
     Knotrenderer-primitive.cpp Knotrenderer-batch.cpp Knotrenderer-plasma.cpp
-    drawing.c dsf.c
-    list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c
-    blackbox.c bridges.c cube.c galaxies.c fifteen.c
+    divvy.c drawing.c dsf.c list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c 
+    blackbox.c bridges.c cube.c galaxies.c fifteen.c solo.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
-# add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)
-add_definitions (-DCOMBINED)
+add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)
+# add_definitions (-DCOMBINED)
 
 # set(galaxies_SRC drawing dsf galaxies malloc midend misc no-icon printing ps random version)
 # add_library(galaxies STATIC ${galaxies_SRC})

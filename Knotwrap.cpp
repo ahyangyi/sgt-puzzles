@@ -22,7 +22,7 @@ struct frontend
  */
 KnotMidend::KnotMidend (Knotplasm* parent)
 {
-    m_me = midend_new((frontend*)this, gamelist[3], &knotplasm_drawing, (void *) this);
+    m_me = midend_new((frontend*)this, gamelist[5], &knotplasm_drawing, (void *) this);
 }
 KnotMidend::~KnotMidend() {}
     
@@ -200,11 +200,11 @@ void knotplasm_unclip(void *handle)
 }
 void knotplasm_start_draw(void *handle)
 {
-//    emit ((KnotMidend *)handle)->startDraw();
+    emit ((KnotMidend *)handle)->startDraw();
 }
 void knotplasm_end_draw(void *handle)
 {
-//    emit ((KnotMidend *)handle)->endDraw();
+    emit ((KnotMidend *)handle)->endDraw();
 }
 void knotplasm_status_bar(void *handle, char *text)
 {

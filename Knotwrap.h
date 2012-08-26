@@ -62,6 +62,10 @@ signals:
     
     void statusBar(const QString& text);
     void setColor(const QList<QColor> colorList);
+    
+    void startDraw();
+    void endDraw();
+    
 private:
     midend* m_me;
     QColor m_color;
@@ -87,6 +91,9 @@ friend void activate_timer(frontend *fe);
 friend void deactivate_timer(frontend *fe);
 
 friend void knotplasm_draw_update(void *handle, int x, int y, int w, int h);
+
+friend void knotplasm_start_draw(void *handle);
+friend void knotplasm_end_draw(void *handle);
 };
 
 #endif

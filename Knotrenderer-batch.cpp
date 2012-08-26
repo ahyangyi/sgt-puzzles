@@ -129,11 +129,16 @@ void KnotRendererBatch::startDraw()
 
 void KnotRendererBatch::endDraw()
 {
+    if (m_paint_interface != NULL)
+    {
+    }
 }
 
 void KnotRendererBatch::notStarted()
 {
-
+    if (m_paint_interface != NULL)
+    {
+    }
 }
 
 void KnotRendererBatch::setColor(QList< QColor > colorList)
@@ -195,7 +200,6 @@ void KnotRendererBatch::PaintInterfaceData::set(int fillColour, int outlineColou
         pen.setColor(colorList[outlineColour]);
     p->setPen(pen);
     
-
     QBrush brush = p->brush();
     if (fillColour == -1)
     {
@@ -217,7 +221,7 @@ void KnotRendererBatch::KnotBatchTextAction::apply(KnotRendererBatch::PaintInter
      * We transform the sane syntax of SGT to the less sane syntax of QPainter
      * By generating an arbitrary large rectangle that will surely contain everything
      */
-    qreal largeDimension = 1e5;
+    qreal largeDimension = 5e4;
     QRectF rect;
     int flag;
     

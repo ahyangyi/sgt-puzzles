@@ -83,7 +83,7 @@ protected:
             x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), text(n_text){}
 
         virtual QString getType () {return "text";}
-        virtual QString toString () {return QString("textAction \"%1\" at %2 %3").arg(text).arg(x).arg(y);}
+        virtual QString toString () {return QString("text \"%1\" at %2 %3, size %4, align %5").arg(text).arg(x).arg(y).arg(fontsize).arg(align,4,16,QChar('0'));}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -143,7 +143,7 @@ protected:
         int x, y, w, h;
 
         KnotBatchClipAction(int n_x, int n_y, int n_w, int n_h):
-            x(n_x), y(n_y), w(n_w), h(n_w){}
+            x(n_x), y(n_y), w(n_w), h(n_h){}
 
         virtual QString getType () {return "clip";}
         virtual QString toString () {return QString("clip %1 %2 %3 %4").arg(x).arg(y).arg(w).arg(h);}

@@ -131,7 +131,6 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
             __debug_label = new Plasma::Label(this);
             __debug_area->setWidget(__debug_label);
 
-            __debug_label->setText("Test!");
             __debug_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::DefaultType);
             __debug_area->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::LineEdit);
             
@@ -180,6 +179,8 @@ void Knotplasm::init()
     connect(d->m_me, SIGNAL(drawThickLine(float,float,float,float,float,int)), d->m_renderer, SLOT(drawThickLine(float,float,float,float,float,int)));
     connect(d->m_me, SIGNAL(clip(int,int,int,int)), d->m_renderer, SLOT(clip(int,int,int,int)));
     connect(d->m_me, SIGNAL(unclip()), d->m_renderer, SLOT(unclip()));
+    connect(d->m_me, SIGNAL(startDraw()), d->m_renderer, SLOT(startDraw()));
+    connect(d->m_me, SIGNAL(endDraw()), d->m_renderer, SLOT(endDraw()));
     connect(d->m_me, SIGNAL(drawUpdate(int,int,int,int)), d->m_renderer, SLOT(drawUpdate(int,int,int,int)));
    
     connect(d->m_me, SIGNAL(setColor(QList<QColor>)), d->m_renderer, SLOT(setColor(QList<QColor>)));
