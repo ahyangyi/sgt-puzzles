@@ -20,15 +20,23 @@ struct frontend
 /*
  * A simple C++ wrapper for the middle end
  */
-KnotMidend::KnotMidend (Knotplasm* parent)
+KnotMidend::KnotMidend (Knotplasm* parent, int game)
 {
-    m_me = midend_new((frontend*)this, gamelist[5], &knotplasm_drawing, (void *) this);
+    if (game < 0 || game >= gamecount)
+        game = 0;
+    m_game_id = game;
+    m_me = midend_new((frontend*)this, gamelist[game], &knotplasm_drawing, (void *) this);
 }
 KnotMidend::~KnotMidend() {}
     
 void KnotMidend::newGame()
 {
     midend_new_game(m_me);
+}
+
+int KnotMidend::game()
+{
+    return m_game_id;
 }
 
 void KnotMidend::size(int* portX, int* portY)

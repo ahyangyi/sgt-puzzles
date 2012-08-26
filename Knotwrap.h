@@ -21,8 +21,10 @@ class KnotMidend : public QObject
 {
     Q_OBJECT
 public:
-    KnotMidend(Knotplasm* parent);
+    KnotMidend(Knotplasm* parent, int game);
     virtual ~KnotMidend();
+    
+    int game ();
     
 public slots:
     void newGame();
@@ -68,6 +70,7 @@ signals:
     
 private:
     midend* m_me;
+    int m_game_id;
     QColor m_color;
 
 friend void knotplasm_draw_rect(void *handle, int x, int y, int w, int h, int colour);

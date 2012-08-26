@@ -25,8 +25,8 @@ set(
     blackbox.c bridges.c cube.c galaxies.c fifteen.c solo.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
-add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)
-# add_definitions (-DCOMBINED)
+# add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)
+add_definitions (-DCOMBINED)
 
 # set(galaxies_SRC drawing dsf galaxies malloc midend misc no-icon printing ps random version)
 # add_library(galaxies STATIC ${galaxies_SRC})

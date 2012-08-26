@@ -3,6 +3,7 @@ Name=Knotplasm
 Comment=The plasmoid frontend for Simon Tatham's Portable Puzzle Collection
 Type=Service
 ServiceTypes=Plasma/Applet
+Icon=fifteenPuzzle
  
 X-KDE-Library=Knotplasm
 X-KDE-PluginInfo-Name=Knotplasm

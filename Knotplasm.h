@@ -24,6 +24,12 @@ public:
     
     virtual void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
     virtual void mousePressEvent ( QGraphicsSceneMouseEvent * e);
+
+protected slots:
+    virtual void configAccepted ();
+
+public slots:
+    virtual void configChanged ();
     
 private:
     class Private;

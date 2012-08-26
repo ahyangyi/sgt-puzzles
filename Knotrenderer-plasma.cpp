@@ -27,9 +27,9 @@ KnotRendererPlasma::~KnotRendererPlasma()
 
 void KnotRendererPlasma::preprocessBatch(QList<QColor> colorList)
 {
-    knotDebugClear();
+    knotDebugClear("Batch");
     for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
-        knotDebugAppend((*it)->toString());
+        knotDebugAppend("Batch", (*it)->toString());
     knotDebugFlush();
 
     preprocessGalaxies(colorList);
