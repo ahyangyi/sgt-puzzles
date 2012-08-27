@@ -2,6 +2,8 @@
 #define Knotwrap_HEADER
 #include <QObject>
 #include <QPoint>
+#include <QPair>
+#include "Knotconfig.h"
 
 extern "C"
 {
@@ -17,14 +19,25 @@ extern "C"
     void frontend_default_colour(frontend *fe, float *output);
 }
 
+struct KnotGameParams
+{
+    game_params * m_params;
+    
+    KnotGameParams ();
+    KnotGameParams (game_params *params);
+};
+
 class KnotMidend : public QObject
 {
     Q_OBJECT
 public:
-    KnotMidend(Knotplasm* parent, int game);
+    KnotMidend(QObject* parent, int game);
     virtual ~KnotMidend();
     
-    int game ();
+    int gameId ();
+    QList<QPair<QString, KnotGameParams> > presetList ();
+    bool canConfig ();
+    void setParam (KnotGameParams params);
     
 public slots:
     void newGame();

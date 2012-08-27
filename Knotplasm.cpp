@@ -5,6 +5,7 @@
 #include <QFontMetrics>
 #include <QSizeF>
 #include <QWidget>
+#include <QString>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QTimer>
@@ -117,7 +118,8 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
         {
             /* Status information */
             d->m_status = new Plasma::Label(this);
-            d->m_status->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::Label);
+            d->m_status->setPreferredWidth(32);
+            d->m_status->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
             statusBarLayout->addItem(d->m_status);
         }
         
@@ -209,12 +211,13 @@ void Knotplasm::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 void Knotplasm::configAccepted()
 {
-    KConfigGroup cg = config();
-    
-    knotDebugAppend("Config", QString("ConfigAccepted/Game: %1").arg(d->m_game_page->game()));
-    cg.writeEntry("Game", d->m_game_page->game());
-    
-    emit (configNeedsSaving());
+    if (d->m_game_page->saveConfig())
+        emit (configNeedsSaving());
+}
+
+void Knotplasm::setStatus(QString s)
+{
+    d->m_status->setText(s);
 }
 
 void Knotplasm::configChanged()
@@ -222,21 +225,25 @@ void Knotplasm::configChanged()
     KConfigGroup cg = config();
 
     Plasma::Applet::configChanged();
+    
+    int gameId = KnotConfig::getGameId(cg);
+    int presetId = KnotConfig::getPresetId(cg);
 
-    if (d->m_me != NULL && d->m_me->game() == cg.readEntry("Game", 0))
-    {
-        // The game is not changed
-    }
-    else
+    if (true)
     {
         if (d->m_me != NULL)
             delete d->m_me;
-        d->m_me = new KnotMidend(this, cg.readEntry("Game", 0));
-        knotDebugAppend("Config", QString("Create game id: %1").arg(cg.readEntry("Game", 0)));
+        d->m_me = new KnotMidend(this, gameId);
+        knotDebugAppend("Config", QString("Create game id: %1").arg(gameId));
         knotDebugFlush();
+    
+        d->m_me->setParam(d->m_me->presetList()[presetId].second);
+        
         d->m_me->newGame();
         
         connect(d->m_start, SIGNAL(clicked()), d->m_me, SLOT(newGame()));
+        connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(geometryChangedHandler()));          /* This is needed because newGaming with different params need an additional call to size()*/
+        connect(d->m_start, SIGNAL(clicked()), this, SLOT(grabFocus()));          /* This is needed because newGaming with different params need an additional call to size()*/
         
         connect(d->m_renderer, SIGNAL(redrawRequest()), d->m_me, SLOT(redraw()));
         connect(d->m_renderer, SIGNAL(forceRedrawRequest()), d->m_me, SLOT(forceRedraw()));
@@ -256,7 +263,7 @@ void Knotplasm::configChanged()
     
         connect(d->m_me, SIGNAL(setColor(QList<QColor>)), d->m_renderer, SLOT(setColor(QList<QColor>)));
 
-        connect(d->m_me, SIGNAL(statusBar(QString)), d->m_status->nativeWidget(), SLOT(setText(QString)));
+        connect(d->m_me, SIGNAL(statusBar(QString)), this, SLOT(setStatus(QString)));
         
         connect(d->m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), d->m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
         connect(d->m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), d->m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
@@ -266,14 +273,25 @@ void Knotplasm::configChanged()
         connect(d->m_me, SIGNAL(activateTimer()), d->m_timer, SLOT(start()));
         connect(d->m_me, SIGNAL(deactivateTimer()), d->m_timer, SLOT(stop()));
         connect(d->m_timer, SIGNAL(tick(qreal)), d->m_me, SLOT(tickTimer(qreal)));
-        
+
+        setStatus("");
         d->m_renderer->initialize();
+        grabFocus();
     }
+    else
+    {
+        d->m_me->setParam(d->m_me->presetList()[presetId].second);
+    }
+}
+
+void Knotplasm::grabFocus()
+{
+    d->m_renderer->setFocus();
 }
 
 void Knotplasm::mousePressEvent(QGraphicsSceneMouseEvent* e)
 {
-    d->m_renderer->setFocus();
+    grabFocus();
 }
 
 K_EXPORT_PLASMA_APPLET(Knotplasm, Knotplasm)

@@ -80,7 +80,7 @@ protected:
         
         KnotBatchTextAction(int n_x, int n_y, bool n_monospace, int n_fontsize,
             int n_align, int n_colour, const QString& n_text): 
-            x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), text(n_text){}
+            x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), monospace(n_monospace), text(n_text){}
 
         virtual QString getType () {return "text";}
         virtual QString toString () {return QString("text \"%1\" at %2 %3, size %4, align %5").arg(text).arg(x).arg(y).arg(fontsize).arg(align,4,16,QChar('0'));}
@@ -113,8 +113,8 @@ protected:
 
     struct KnotBatchPolyAction : public KnotBatchAction
     {
-        int fillColour, outlineColour;
         QPolygon polygon;
+        int fillColour, outlineColour;
         
         KnotBatchPolyAction(const QPolygon& n_polygon,
             int n_fillcolour, int n_outlinecolour): 

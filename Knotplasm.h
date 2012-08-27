@@ -27,6 +27,8 @@ public:
 
 protected slots:
     virtual void configAccepted ();
+    virtual void setStatus (QString s);
+    virtual void grabFocus ();
 
 public slots:
     virtual void configChanged ();

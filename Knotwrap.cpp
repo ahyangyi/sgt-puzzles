@@ -1,5 +1,10 @@
 #include <QDateTime>
 
+extern "C"
+{
+#include "puzzles.h"
+}
+
 #include "Knotplasm.h"
 #include "Knotwrap.h"
 #include <Plasma/Theme>
@@ -18,9 +23,22 @@ struct frontend
 };
 
 /*
+ * KnotGameParams
+ */
+KnotGameParams::KnotGameParams()
+{
+
+}
+
+KnotGameParams::KnotGameParams(game_params* params)
+{
+    m_params = params;
+}
+
+/*
  * A simple C++ wrapper for the middle end
  */
-KnotMidend::KnotMidend (Knotplasm* parent, int game)
+KnotMidend::KnotMidend (QObject* parent, int game)
 {
     if (game < 0 || game >= gamecount)
         game = 0;
@@ -34,7 +52,7 @@ void KnotMidend::newGame()
     midend_new_game(m_me);
 }
 
-int KnotMidend::game()
+int KnotMidend::gameId()
 {
     return m_game_id;
 }
@@ -123,8 +141,6 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
         myKey = CURSOR_RIGHT;
     if (key == Qt::Key_Enter)
         myKey = CURSOR_SELECT;
-    if (key == Qt::Key_Space)
-        myKey = CURSOR_SELECT2;
 
     if (key == Qt::Key_0)
         myKey = MOD_NUM_KEYPAD | '0';
@@ -147,6 +163,9 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
     if (key == Qt::Key_9)
         myKey = MOD_NUM_KEYPAD | '9';
     
+    if (key >= Qt::Key_Space && key <= 0xff)
+        myKey = key;
+
     if (myKey)
     {
         if (modifier & Qt::Key_Control)
@@ -160,6 +179,32 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
 void KnotMidend::tickTimer(qreal tplus)
 {
     midend_timer (this->m_me, (float)tplus);
+}
+
+QList< QPair< QString, KnotGameParams > > KnotMidend::presetList()
+{
+    QList< QPair< QString, KnotGameParams > > re;
+    int n = midend_num_presets (this->m_me);
+    char *str;
+    game_params *params;
+    
+    for (int i = 0; i < n; i ++)
+    {
+        midend_fetch_preset(this->m_me, i, &str, &params);
+        re.push_back(qMakePair(QString(str), KnotGameParams(params)));
+    }
+    
+    return re;
+}
+
+bool KnotMidend::canConfig()
+{
+    return gamelist[this->m_game_id]->can_configure;
+}
+
+void KnotMidend::setParam(KnotGameParams params)
+{
+    midend_set_params(this->m_me, params.m_params);
 }
 
 /*

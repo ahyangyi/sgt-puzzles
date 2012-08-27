@@ -32,7 +32,7 @@ set(
     singles.c sixteen.c slant.c solo.c tents.c towers.c twiddle.c unequal.c untangle.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
-# add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)
+# add_definitions (-DKNOTPLASM_DEBUG)
 add_definitions (-DCOMBINED)
 
 # set(galaxies_SRC drawing dsf galaxies malloc midend misc no-icon printing ps random version)
