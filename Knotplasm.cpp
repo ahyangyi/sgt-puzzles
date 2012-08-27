@@ -72,7 +72,7 @@ void knotDebugAppend (QString category, QString s)
     }
     else
     {
-        __debug_history[category][__debug_history.size() - 1].second ++;
+        __debug_history[category][__debug_history[category].size() - 1].second ++;
     }
 }
 
@@ -234,8 +234,6 @@ void Knotplasm::configChanged()
         if (d->m_me != NULL)
             delete d->m_me;
         d->m_me = new KnotMidend(this, gameId);
-        knotDebugAppend("Config", QString("Create game id: %1").arg(gameId));
-        knotDebugFlush();
     
         d->m_me->setParam(d->m_me->presetList()[presetId].second);
         

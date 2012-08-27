@@ -7,6 +7,7 @@ extern "C"
 
 #include "Knotplasm.h"
 #include "Knotwrap.h"
+#include "Knotdebug.h"
 #include <Plasma/Theme>
 
 /*
@@ -139,8 +140,8 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
         myKey = CURSOR_LEFT;
     if (key == Qt::Key_Right)
         myKey = CURSOR_RIGHT;
-    if (key == Qt::Key_Enter)
-        myKey = CURSOR_SELECT;
+    if (key == Qt::Key_Return)
+        myKey = '\n';
 
     if (key == Qt::Key_0)
         myKey = MOD_NUM_KEYPAD | '0';
@@ -162,6 +163,9 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
         myKey = MOD_NUM_KEYPAD | '8';
     if (key == Qt::Key_9)
         myKey = MOD_NUM_KEYPAD | '9';
+    
+    if (key == Qt::Key_Backspace || key == Qt::Key_Delete)
+        myKey = '\177';
     
     if (key >= Qt::Key_Space && key <= 0xff)
         myKey = key;

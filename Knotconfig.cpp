@@ -16,6 +16,8 @@ struct KnotGameConfig::Private
     
     QGridLayout *m_mainLayout;
     KConfigGroup m_cg;
+    
+    int m_preset_custom_id;
 };
 
 int KnotConfig::getGameId(KConfigGroup cg)
@@ -28,16 +30,12 @@ int KnotConfig::getPresetId(KConfigGroup cg)
     int gameId = getGameId(cg);
     int presetId = cg.readEntry(QString("Preset_%1").arg(gameId), 0);
     
-    knotDebugAppend ("KnotConfig::getPresetId", QString("gameid is %1, presetid is %2").arg(gameId).arg(presetId));
-    
     return presetId;
 }
 
 int KnotConfig::getPresetId(KConfigGroup cg, int gameId)
 {
     int presetId = cg.readEntry(QString("Preset_%1").arg(gameId), 0);
-    
-    knotDebugAppend ("KnotConfig::getPresetId", QString("gameid is %1, presetid is %2").arg(gameId).arg(presetId));
     
     return presetId;
 }
@@ -104,6 +102,9 @@ bool KnotGameConfig::saveConfig()
 {
     int gameId = d->m_game->currentIndex();
     int presetId = d->m_preset->currentIndex();
+
+    if (d->m_preset_custom_id == presetId)
+        presetId = -1;
     
     d->m_cg.writeEntry("Game", gameId);
     d->m_cg.writeEntry(QString("Preset_%1").arg(gameId), presetId);
@@ -119,9 +120,20 @@ void KnotGameConfig::gameChanged(int id)
     QList<QPair<QString, KnotGameParams> > list = me->presetList();
     for (QList<QPair<QString, KnotGameParams> >::iterator it = list.begin(); it != list.end(); ++ it)
         d->m_preset->addItem(it->first);
+    
+    if (me->canConfig())
+    {
+        d->m_preset->addItem(i18n("Custom"));
+        d->m_preset_custom_id = list.size();
+    }
+    else
+        d->m_preset_custom_id = -1;
 
     int presetId = KnotConfig::getPresetId(d->m_cg, id);
-    d->m_preset->setCurrentIndex(presetId);
+    if (presetId == -1)
+        d->m_preset->setCurrentIndex(d->m_preset_custom_id);
+    else
+        d->m_preset->setCurrentIndex(presetId);
     
     delete me;
 }
