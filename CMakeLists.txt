@@ -21,8 +21,15 @@ set(
     Knotplasm.cpp Knotconfig.cpp Knotrenderer.cpp Knottimer.cpp
     Knotwrap.cpp
     Knotrenderer-primitive.cpp Knotrenderer-batch.cpp Knotrenderer-plasma.cpp
-    divvy.c drawing.c dsf.c list.c malloc.c midend.c misc.c no-icon.c printing.c ps.c random.c version.c 
-    blackbox.c bridges.c cube.c galaxies.c fifteen.c solo.c
+# sgt libraries
+    combi.c divvy.c drawing.c dsf.c grid.c latin.c laydomino.c list.c loopgen.c malloc.c
+    maxflow.c midend.c misc.c no-icon.c penrose.c printing.c ps.c random.c tdq.c tree234.c
+    version.c 
+# games
+    blackbox.c bridges.c cube.c dominosa.c galaxies.c fifteen.c filling.c flip.c
+    galaxies.c guess.c inertia.c keen.c lightup.c loopy.c magnets.c map.c mines.c
+    net.c netslide.c pattern.c pearl.c pegs.c range.c rect.c samegame.c signpost.c
+    singles.c sixteen.c slant.c solo.c tents.c towers.c twiddle.c unequal.c untangle.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
 # add_definitions (-DCOMBINED -DKNOTPLASM_DEBUG)
