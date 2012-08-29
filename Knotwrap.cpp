@@ -1,4 +1,5 @@
 #include <QDateTime>
+#include <QString>
 
 extern "C"
 {
@@ -34,6 +35,78 @@ KnotGameParams::KnotGameParams()
 KnotGameParams::KnotGameParams(game_params* params)
 {
     m_params = params;
+}
+
+/*
+ * KnotGameParamList
+ */
+
+class KnotGameParamItem::Private
+{
+public:
+    static KnotGameParamItem::ConfigItemType adaptConfigType (int type)
+    {
+        switch (type)
+        {
+            case C_STRING:
+                return KnotGameParamItem::CONFIG_STRING;
+            case C_BOOLEAN:
+                return KnotGameParamItem::CONFIG_BOOLEAN;
+            case C_CHOICES:
+                return KnotGameParamItem::CONFIG_CHOICES;
+        }
+        
+        return KnotGameParamItem::CONFIG_ERROR;
+    }
+    
+    static QStringList adaptConfigChoices (int type, char *sval)
+    {
+        if (type == C_CHOICES)
+        {
+            return QString(sval + 1).split(*sval);
+        }
+        return QStringList();
+    }
+};
+
+KnotGameParamItem::KnotGameParamItem(): type(CONFIG_ERROR)
+{
+
+}
+
+KnotGameParamItem::KnotGameParamItem(const config_item& config): type(Private::adaptConfigType(config.type)), name(config.name), choices(Private::adaptConfigChoices(config.type, config.sval))
+{
+    switch (type)
+    {
+        case CONFIG_BOOLEAN:
+            bVal = config.ival;
+            break;
+        case CONFIG_STRING:
+            sVal = QString(config.sval);
+            break;
+        case CONFIG_CHOICES:
+            iVal = config.ival;
+            break;
+    }
+}
+
+KnotGameParamList::KnotGameParamList()
+{
+
+}
+
+KnotGameParamList::KnotGameParamList(config_item* configList, char *n_title): m_title(n_title)
+{
+    while (configList->type != C_END)
+    {
+        this->push_back(KnotGameParamItem(*configList));
+        configList ++;
+    }
+}
+
+QString KnotGameParamList::title()
+{
+    return m_title;
 }
 
 /*
@@ -199,6 +272,21 @@ QList< QPair< QString, KnotGameParams > > KnotMidend::presetList()
     }
     
     return re;
+}
+
+KnotGameParamList KnotMidend::getConfig()
+{
+    KnotGameParamList paramList;
+    
+    config_item* itemList;
+    char *title;
+    
+    itemList = midend_get_config(m_me, CFG_SETTINGS, &title);
+    paramList = KnotGameParamList(itemList, title);
+    
+    free(title);
+    
+    return paramList;
 }
 
 bool KnotMidend::canConfig()

@@ -1,9 +1,12 @@
 #include "Knotconfig.h"
 #include "Knotdebug.h"
+#include "Knotwrap.h"
 
 #include <QString>
 #include <QVBoxLayout>
 #include <KDE/KLocalizedString>
+#include <KDE/KLineEdit>
+#include <QCheckBox>
 #include <kconfiggroup.h>
 
 struct KnotGameConfig::Private
@@ -13,6 +16,8 @@ struct KnotGameConfig::Private
     KComboBox* m_game;
     KComboBox* m_preset;
     QGroupBox* m_params_group;
+    QGridLayout *m_params_layout;
+    QList<QPair<QLabel*, QWidget*> > m_params_list;
     
     QGridLayout *m_mainLayout;
     KConfigGroup m_cg;
@@ -28,14 +33,14 @@ int KnotConfig::getGameId(KConfigGroup cg)
 int KnotConfig::getPresetId(KConfigGroup cg)
 {
     int gameId = getGameId(cg);
-    int presetId = cg.readEntry(QString("Preset_%1").arg(gameId), 0);
+    int presetId = cg.readEntry(QString("Preset_%1").arg(gamelist[gameId]->name), 0);
     
     return presetId;
 }
 
 int KnotConfig::getPresetId(KConfigGroup cg, int gameId)
 {
-    int presetId = cg.readEntry(QString("Preset_%1").arg(gameId), 0);
+    int presetId = cg.readEntry(QString("Preset_%1").arg(gamelist[gameId]->name), 0);
     
     return presetId;
 }
@@ -81,6 +86,9 @@ KnotGameConfig::KnotGameConfig(QWidget *parent, KConfigGroup cg) :QWidget(parent
     d->m_params_group->setTitle(i18n("Parameters"));
     d->m_params_group->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     
+    d->m_params_layout = new QGridLayout(this);
+    d->m_params_group->setLayout(d->m_params_layout);
+    
     d->m_mainLayout->addWidget(d->m_gameLabel, 0, 0); 
     d->m_mainLayout->addWidget(d->m_game, 0, 1);
     d->m_mainLayout->addWidget(d->m_presetLabel, 1, 0); 
@@ -107,7 +115,7 @@ bool KnotGameConfig::saveConfig()
         presetId = -1;
     
     d->m_cg.writeEntry("Game", gameId);
-    d->m_cg.writeEntry(QString("Preset_%1").arg(gameId), presetId);
+    d->m_cg.writeEntry(QString("Preset_%1").arg(gamelist[gameId]->name), presetId);
     
     return true;
 }
@@ -121,13 +129,84 @@ void KnotGameConfig::gameChanged(int id)
     for (QList<QPair<QString, KnotGameParams> >::iterator it = list.begin(); it != list.end(); ++ it)
         d->m_preset->addItem(it->first);
     
+    for (QList<QPair<QLabel*, QWidget*> >::iterator it = d->m_params_list.begin(); it != d->m_params_list.end(); ++ it)
+    {
+        delete it->first;
+        if (it->second)
+        {
+            delete it->second;
+        }
+    }
+    d->m_params_list.clear();
+    
     if (me->canConfig())
     {
         d->m_preset->addItem(i18n("Custom"));
         d->m_preset_custom_id = list.size();
+        
+        KnotGameParamList paramList = me->getConfig();
+        
+        int x = 0;
+        for (KnotGameParamList::iterator it = paramList.begin(); it != paramList.end(); ++it, ++x)
+        {
+            QLabel* label;
+            
+            label = new QLabel(this);
+            label->setText(it->name);
+            d->m_params_layout->addWidget(label, x, 0);
+            
+            QWidget *widget = NULL;
+            
+            switch (it->type)
+            {
+                case KnotGameParamItem::CONFIG_STRING:
+                {
+                    KLineEdit *edit = new KLineEdit(this);
+                    
+                    edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+                    edit->setText(it->sVal);
+                    
+                    d->m_params_layout->addWidget(edit, x, 1);
+                    widget = edit;
+                }
+                    break;
+                case KnotGameParamItem::CONFIG_BOOLEAN:
+                {
+                    QCheckBox *check = new QCheckBox(this);
+                    
+                    check->setChecked(it->bVal);
+                    
+                    d->m_params_layout->addWidget(check, x, 1);
+                    widget = check;
+                }
+                    break;
+                case KnotGameParamItem::CONFIG_CHOICES:
+                {
+                    KComboBox *combo = new KComboBox(this);
+                    
+                    for (QStringList::const_iterator jt = it->choices.begin(); jt != it->choices.end(); ++jt)
+                        combo->addItem(*jt);
+                    combo->setEditable(false);
+                    
+                    combo->setCurrentIndex(it->iVal);
+
+                    d->m_params_layout->addWidget(combo, x, 1);
+                    widget = combo;
+                }
+                    break;
+            }
+            
+            d->m_params_list.push_back(qMakePair<QLabel*, QWidget*>(label, widget));
+        }
+//        d->m_params_group->setTitle(QString("There are %1 options").arg(x));
+        d->m_params_group->updateGeometry();
     }
     else
+    {
         d->m_preset_custom_id = -1;
+        
+        // TODO: Add some text about there's no config available
+    }
 
     int presetId = KnotConfig::getPresetId(d->m_cg, id);
     if (presetId == -1)

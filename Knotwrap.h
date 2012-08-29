@@ -3,7 +3,6 @@
 #include <QObject>
 #include <QPoint>
 #include <QPair>
-#include "Knotconfig.h"
 
 extern "C"
 {
@@ -18,6 +17,35 @@ extern "C"
     void fatal(char *fmt, ...);
     void frontend_default_colour(frontend *fe, float *output);
 }
+
+struct KnotGameParamItem
+{
+public:
+    KnotGameParamItem ();
+    KnotGameParamItem (const config_item& config);
+    enum ConfigItemType
+        {CONFIG_STRING, CONFIG_BOOLEAN, CONFIG_CHOICES, CONFIG_ERROR, N_CONFIG=CONFIG_ERROR};
+
+    const ConfigItemType type;
+    const QString name;
+    const QStringList choices;
+    int iVal;
+    QString sVal;
+    bool bVal;
+    
+private:
+    class Private;
+};
+
+class KnotGameParamList : public QList<KnotGameParamItem>
+{
+public:
+    KnotGameParamList();
+    KnotGameParamList(config_item* configList, char *title);
+    QString title ();
+private:
+    QString m_title;
+};
 
 struct KnotGameParams
 {
@@ -38,6 +66,9 @@ public:
     QList<QPair<QString, KnotGameParams> > presetList ();
     bool canConfig ();
     void setParam (KnotGameParams params);
+    KnotGameParams getParam ();
+    KnotGameParamList getConfig();
+    void setConfig (KnotGameParamList config);
     
 public slots:
     void newGame();
