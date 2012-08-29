@@ -235,7 +235,15 @@ void Knotplasm::configChanged()
             delete d->m_me;
         d->m_me = new KnotMidend(this, gameId);
     
-        d->m_me->setParam(d->m_me->presetList()[presetId].second);
+        if (presetId == -1)
+        {
+            KnotGameParamList list = d->m_me->getConfig();
+            for (KnotGameParamList::iterator it = list.begin(); it != list.end(); ++ it)
+                KnotConfig::setKnotGameParam (cg, *it);
+            d->m_me->setConfig(list);
+        }
+        else
+            d->m_me->setParam(d->m_me->presetList()[presetId].second);
         
         d->m_me->newGame();
         
@@ -278,7 +286,15 @@ void Knotplasm::configChanged()
     }
     else
     {
-        d->m_me->setParam(d->m_me->presetList()[presetId].second);
+        if (presetId == -1)
+        {
+            KnotGameParamList list = d->m_me->getConfig();
+            for (KnotGameParamList::iterator it = list.begin(); it != list.end(); ++ it)
+                KnotConfig::setKnotGameParam (cg, *it);
+            d->m_me->setConfig(list);
+        }
+        else
+            d->m_me->setParam(d->m_me->presetList()[presetId].second);
     }
 }
 

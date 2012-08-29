@@ -2,6 +2,7 @@
 #include "Knotdebug.h"
 #include "Knotwrap.h"
 
+#include <cassert>
 #include <QString>
 #include <QVBoxLayout>
 #include <KDE/KLocalizedString>
@@ -33,16 +34,44 @@ int KnotConfig::getGameId(KConfigGroup cg)
 int KnotConfig::getPresetId(KConfigGroup cg)
 {
     int gameId = getGameId(cg);
-    int presetId = cg.readEntry(QString("Preset_%1").arg(gamelist[gameId]->name), 0);
+    int presetId = cg.readEntry(QString("Preset_%1").arg(sanitize(gamelist[gameId]->name)), 0);
     
     return presetId;
 }
 
 int KnotConfig::getPresetId(KConfigGroup cg, int gameId)
 {
-    int presetId = cg.readEntry(QString("Preset_%1").arg(gamelist[gameId]->name), 0);
+    int presetId = cg.readEntry(QString("Preset_%1").arg(sanitize(gamelist[gameId]->name)), 0);
     
     return presetId;
+}
+
+QString KnotConfig::sanitize(QString s)
+{
+    QString re;
+    for (QString::iterator it = s.begin(); it != s.end(); ++it)
+        if (*it >= 'A' && *it <= 'Z' || *it >= 'a' && *it <= 'z')
+            re.push_back(*it);
+    return re;
+}
+
+void KnotConfig::setKnotGameParam(KConfigGroup cg, KnotGameParamItem& item)
+{
+    int gameId = getGameId(cg);
+    QString key = QString("Option_%1_%2").arg(sanitize(gamelist[gameId]->name)).arg(sanitize(item.name));
+    
+    switch (item.type)
+    {
+        case KnotGameParamItem::CONFIG_STRING:
+            item.sVal = cg.readEntry(key, "");
+            break;
+        case KnotGameParamItem::CONFIG_BOOLEAN:
+            item.bVal = cg.readEntry(key, false);
+            break;
+        case KnotGameParamItem::CONFIG_CHOICES:
+            item.iVal = cg.readEntry(key, 0);
+            break;
+    }
 }
 
 KnotGameConfig::KnotGameConfig(QWidget *parent, KConfigGroup cg) :QWidget(parent)
@@ -103,7 +132,7 @@ KnotGameConfig::KnotGameConfig(QWidget *parent, KConfigGroup cg) :QWidget(parent
     
     setLayout(layout);
 
-    gameChanged(cg.readEntry("Game", 0));
+    gameChanged(KnotConfig::getGameId(cg));
 }
 
 bool KnotGameConfig::saveConfig()
@@ -115,13 +144,51 @@ bool KnotGameConfig::saveConfig()
         presetId = -1;
     
     d->m_cg.writeEntry("Game", gameId);
-    d->m_cg.writeEntry(QString("Preset_%1").arg(gamelist[gameId]->name), presetId);
+    d->m_cg.writeEntry(QString("Preset_%1").arg(KnotConfig::sanitize(gamelist[gameId]->name)), presetId);
+    if (presetId == -1)
+    {
+        KnotMidend *me = new KnotMidend(NULL, gameId);
+
+        KnotGameParamList paramList = me->getConfig();
+
+        int x = 0;
+        for (KnotGameParamList::iterator it = paramList.begin(); it != paramList.end(); ++it, ++x)
+        {
+            QString key = QString("Option_%1_%2").arg(KnotConfig::sanitize(gamelist[gameId]->name)).arg(KnotConfig::sanitize(it->name));
+            
+            switch (it->type)
+            {
+                case KnotGameParamItem::CONFIG_STRING:
+                {
+                    KLineEdit *edit = (KLineEdit *)d->m_params_list[x].second;
+                    d->m_cg.writeEntry(key, edit->text());
+                }
+                    break;
+                case KnotGameParamItem::CONFIG_BOOLEAN:
+                {
+                    QCheckBox *check = (QCheckBox *)d->m_params_list[x].second;
+                    d->m_cg.writeEntry(key, check->isChecked());
+                }
+                    break;
+                case KnotGameParamItem::CONFIG_CHOICES:
+                {
+                    KComboBox *combo = (KComboBox *)d->m_params_list[x].second;
+                    d->m_cg.writeEntry(key, combo->currentIndex());
+                }
+                    break;
+            }
+        }
+        
+        delete me;
+    }
     
     return true;
 }
 
 void KnotGameConfig::gameChanged(int id)
 {
+    disconnect (d->m_preset, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+
     d->m_preset->clear();
     
     KnotMidend *me = new KnotMidend(NULL, id);
@@ -142,7 +209,7 @@ void KnotGameConfig::gameChanged(int id)
     if (me->canConfig())
     {
         d->m_preset->addItem(i18n("Custom"));
-        d->m_preset_custom_id = list.size();
+        d->m_preset_custom_id = list.size() - 1;
         
         KnotGameParamList paramList = me->getConfig();
         
@@ -164,9 +231,9 @@ void KnotGameConfig::gameChanged(int id)
                     KLineEdit *edit = new KLineEdit(this);
                     
                     edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-                    edit->setText(it->sVal);
-                    
+
                     d->m_params_layout->addWidget(edit, x, 1);
+                    connect(edit, SIGNAL(textChanged(QString)), parent(), SLOT(settingsModified()));
                     widget = edit;
                 }
                     break;
@@ -174,9 +241,8 @@ void KnotGameConfig::gameChanged(int id)
                 {
                     QCheckBox *check = new QCheckBox(this);
                     
-                    check->setChecked(it->bVal);
-                    
                     d->m_params_layout->addWidget(check, x, 1);
+                    connect(check, SIGNAL(toggled(bool)), parent(), SLOT(settingsModified()));
                     widget = check;
                 }
                     break;
@@ -188,9 +254,8 @@ void KnotGameConfig::gameChanged(int id)
                         combo->addItem(*jt);
                     combo->setEditable(false);
                     
-                    combo->setCurrentIndex(it->iVal);
-
                     d->m_params_layout->addWidget(combo, x, 1);
+                    connect(combo, SIGNAL(currentIndexChanged(int)), parent(), SLOT(settingsModified()));
                     widget = combo;
                 }
                     break;
@@ -198,7 +263,6 @@ void KnotGameConfig::gameChanged(int id)
             
             d->m_params_list.push_back(qMakePair<QLabel*, QWidget*>(label, widget));
         }
-//        d->m_params_group->setTitle(QString("There are %1 options").arg(x));
         d->m_params_group->updateGeometry();
     }
     else
@@ -210,9 +274,110 @@ void KnotGameConfig::gameChanged(int id)
 
     int presetId = KnotConfig::getPresetId(d->m_cg, id);
     if (presetId == -1)
+    {
         d->m_preset->setCurrentIndex(d->m_preset_custom_id);
+    }
     else
+    {
         d->m_preset->setCurrentIndex(presetId);
+    }
+    delete me;
+
+    connect (d->m_preset, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+    paramChanged();
+}
+
+void KnotGameConfig::paramCustomized()
+{
+    disconnect (d->m_preset, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+    d->m_preset->setCurrentIndex(d->m_preset_custom_id);
+    connect (d->m_preset, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+}
+
+void KnotGameConfig::paramChanged()
+{
+    int gameId = d->m_game->currentIndex();
+    int presetId = d->m_preset->currentIndex();
+    
+    if (presetId == d->m_preset_custom_id)
+        presetId = -1;
+    
+    KnotMidend *me = new KnotMidend(NULL, gameId);
+
+    if (presetId != -1)
+        me->setParam(me->presetList()[presetId].second);
+    KnotGameParamList paramList = me->getConfig();
+    
+    assert(paramList.size() == d->m_params_list.size());
+    
+    QList<QPair<QLabel*, QWidget*> >::iterator jt = d->m_params_list.begin();
+    for (KnotGameParamList::iterator it = paramList.begin(); it != paramList.end(); ++it, ++jt)
+    {
+        QString key = QString("Option_%1_%2").arg(KnotConfig::sanitize(gamelist[gameId]->name)).arg(KnotConfig::sanitize(it->name));
+        
+        switch (it->type)
+        {
+            case KnotGameParamItem::CONFIG_STRING:
+            {
+                KLineEdit *edit = dynamic_cast<KLineEdit*>(jt->second);
+                if (edit == NULL)
+                    break;
+                QString str;
+                if (presetId == -1 && d->m_cg.hasKey(key))
+                {
+                    str = d->m_cg.readEntry(key, "");
+                }
+                if (presetId != -1)
+                {
+                    str = it->sVal;
+                }
+                disconnect(edit, SIGNAL(textChanged(QString)), this, SLOT(paramCustomized()));
+                edit->setText(str);
+                connect(edit, SIGNAL(textChanged(QString)), this, SLOT(paramCustomized()));
+            }
+                break;
+            case KnotGameParamItem::CONFIG_BOOLEAN:
+            {
+                QCheckBox *check = dynamic_cast<QCheckBox*>(jt->second);
+                if (check == NULL)
+                    break;
+                bool status;
+                
+                if (presetId == -1 && d->m_cg.hasKey(key))
+                {
+                    status = d->m_cg.readEntry(key, false);
+                }
+                if (presetId != -1)
+                {
+                    status = it->iVal;
+                }
+                disconnect(check, SIGNAL(toggled(bool)), this, SLOT(paramCustomized()));
+                check->setChecked(status);
+                connect(check, SIGNAL(toggled(bool)), this, SLOT(paramCustomized()));
+            }
+                break;
+            case KnotGameParamItem::CONFIG_CHOICES:
+            {
+                KComboBox *combo = dynamic_cast<KComboBox*>(jt->second);
+                if (combo == NULL)
+                    break;
+                int choice;
+                
+                if (presetId == -1 && d->m_cg.hasKey(key))
+                {
+                    choice = d->m_cg.readEntry(key, 0);
+                }
+                if (presetId != -1)
+                {
+                    choice = it->iVal;
+                }
+                disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(paramCustomized()));
+                combo->setCurrentIndex(choice);
+                connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(paramCustomized()));
+            }
+                break;
+        }
+    }
     
     delete me;
 }

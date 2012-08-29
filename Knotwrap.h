@@ -66,7 +66,6 @@ public:
     QList<QPair<QString, KnotGameParams> > presetList ();
     bool canConfig ();
     void setParam (KnotGameParams params);
-    KnotGameParams getParam ();
     KnotGameParamList getConfig();
     void setConfig (KnotGameParamList config);
     

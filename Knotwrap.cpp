@@ -4,6 +4,7 @@
 extern "C"
 {
 #include "puzzles.h"
+#include "malloc.h"
 }
 
 #include "Knotplasm.h"
@@ -285,8 +286,41 @@ KnotGameParamList KnotMidend::getConfig()
     paramList = KnotGameParamList(itemList, title);
     
     free(title);
+    free_cfg(itemList);
     
     return paramList;
+}
+
+void KnotMidend::setConfig(KnotGameParamList config)
+{
+    config_item* itemList, *p;
+    char *title;
+    
+    itemList = midend_get_config(m_me, CFG_SETTINGS, &title);
+    p = itemList;
+    for (KnotGameParamList::iterator it = config.begin(); it != config.end(); ++ it)
+    {
+        switch (it->type)
+        {
+            case KnotGameParamItem::CONFIG_STRING:
+                free(p->sval);
+                p->sval = (char*)malloc(it->sVal.size() + 1);
+                memcpy(p->sval, it->sVal.toAscii().constData(), it->sVal.size());
+                p->sval[it->sVal.size()] = 0;
+                break;
+            case KnotGameParamItem::CONFIG_BOOLEAN:
+                p->ival = it->bVal;
+                break;
+            case KnotGameParamItem::CONFIG_CHOICES:
+                p->ival = it->iVal;
+                break;
+        }
+        p ++;
+    }
+    midend_set_config(m_me, CFG_SETTINGS, itemList);
+    
+    free(title);
+    free_cfg(itemList);
 }
 
 bool KnotMidend::canConfig()

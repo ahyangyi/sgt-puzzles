@@ -17,6 +17,8 @@ public:
     static int getGameId (KConfigGroup cg);
     static int getPresetId (KConfigGroup cg);
     static int getPresetId (KConfigGroup cg, int gameId);
+    static void setKnotGameParam (KConfigGroup cg, KnotGameParamItem& item);
+    static QString sanitize (QString s);
 };
 
 class KnotGameConfig : public QWidget
@@ -31,6 +33,8 @@ public:
     
 protected slots:
     void gameChanged (int id);
+    void paramChanged ();
+    void paramCustomized ();
 private:
     struct Private;
     Private *d;
