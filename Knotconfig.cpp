@@ -214,7 +214,7 @@ void KnotGameConfig::gameChanged(int id)
     if (me->canConfig())
     {
         d->m_preset->addItem(i18n("Custom"));
-        d->m_preset_custom_id = list.size() - 1;
+        d->m_preset_custom_id = list.size();
         
         KnotGameParamList paramList = me->getConfig();
         
@@ -330,7 +330,7 @@ void KnotGameConfig::paramChanged()
                 {
                     str = d->m_cg.readEntry(key, "");
                 }
-                if (presetId != -1)
+                else
                 {
                     str = it->sVal;
                 }
@@ -350,9 +350,9 @@ void KnotGameConfig::paramChanged()
                 {
                     status = d->m_cg.readEntry(key, false);
                 }
-                if (presetId != -1)
+                else
                 {
-                    status = it->iVal;
+                    status = it->bVal;
                 }
                 disconnect(check, SIGNAL(toggled(bool)), this, SLOT(paramCustomized()));
                 check->setChecked(status);
@@ -370,7 +370,7 @@ void KnotGameConfig::paramChanged()
                 {
                     choice = d->m_cg.readEntry(key, 0);
                 }
-                if (presetId != -1)
+                else
                 {
                     choice = it->iVal;
                 }
