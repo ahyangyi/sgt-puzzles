@@ -65,8 +65,13 @@ protected:
     
     struct KnotBatchAction
     {
-        virtual QString getType () = 0;
         virtual QString toString () = 0;
+/*
+ * I don't know why my CMake compiles this without RTTI.
+ * And I can't make this a QObject.
+ * Therefore, I'd better implement this polymorphism myself.
+ */
+        virtual int type () = 0;
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
         
         virtual ~KnotBatchAction () {}
@@ -82,8 +87,9 @@ protected:
             int n_align, int n_colour, const QString& n_text): 
             x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), monospace(n_monospace), text(n_text){}
 
-        virtual QString getType () {return "text";}
         virtual QString toString () {return QString("text \"%1\" at %2 %3, size %4, align %5").arg(text).arg(x).arg(y).arg(fontsize).arg(align,4,16,QChar('0'));}
+#define KNOTBATCH_TEXTACTION 1
+        virtual int type () {return KNOTBATCH_TEXTACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -94,8 +100,9 @@ protected:
         KnotBatchRectAction(int n_x, int n_y, int n_w, int n_h, int n_colour):
             x(n_x), y(n_y), w(n_w), h(n_h), colour(n_colour){}
 
-        virtual QString getType () {return "rect";}
         virtual QString toString () {return QString("rect at %1 %2 %3 %4, color %5").arg(x).arg(y).arg(w).arg(h).arg(colour);}
+#define KNOTBATCH_RECTACTION 2
+        virtual int type () {return KNOTBATCH_RECTACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -106,8 +113,9 @@ protected:
         KnotBatchLineAction(int n_x1, int n_y1, int n_x2, int n_y2,
                     int n_colour): x1(n_x1), y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
 
-        virtual QString getType () {return "line";}
         virtual QString toString () {return QString("line from %1 %2 to %3 %4").arg(x1).arg(y1).arg(x2).arg(y2);}
+#define KNOTBATCH_LINEACTION 3
+        virtual int type () {return KNOTBATCH_LINEACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -120,8 +128,8 @@ protected:
             int n_fillcolour, int n_outlinecolour): 
             polygon(n_polygon), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
-        virtual QString getType () {return "poly";}
         virtual QString toString () {return QString("polyon");}
+        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -133,8 +141,8 @@ protected:
             int n_fillcolour, int n_outlinecolour):
             cx(n_cx), cy(n_cy), radius(n_radius), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
-        virtual QString getType () {return "circle";}
         virtual QString toString () {return QString("circle at %1 %2 radius %3").arg(cx).arg(cy).arg(radius);}
+        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -145,15 +153,15 @@ protected:
         KnotBatchClipAction(int n_x, int n_y, int n_w, int n_h):
             x(n_x), y(n_y), w(n_w), h(n_h){}
 
-        virtual QString getType () {return "clip";}
         virtual QString toString () {return QString("clip %1 %2 %3 %4").arg(x).arg(y).arg(w).arg(h);}
+        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
     struct KnotBatchUnclipAction : public KnotBatchAction
     {
-        virtual QString getType () {return "unclip";}
         virtual QString toString () {return "unclip";}
+        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -167,8 +175,8 @@ protected:
             int n_colour): thickness(n_thickness), x1(n_x1),
             y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
 
-        virtual QString getType () {return "thick";}
         virtual QString toString () {return QString("thick line from %1 %2 to %3 %4").arg(x1).arg(y1).arg(x2).arg(y2);}
+        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 

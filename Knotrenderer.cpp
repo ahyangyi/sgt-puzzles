@@ -16,6 +16,8 @@ KnotRenderer::KnotRenderer(QGraphicsItem* parent, Qt::WindowFlags wFlags): QGrap
     updateGeometry();
     setFlag(ItemIsFocusable, true);
     
+    m_initialized = false;
+    
     connect(this,SIGNAL(geometryChanged()),this,SLOT(geometryChangedHandler()));
     connect(Plasma::Theme::defaultTheme(),SIGNAL(themeChanged()),this,SLOT(themeChangedHandler()));
 }
@@ -86,6 +88,8 @@ void KnotRenderer::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 
 void KnotRenderer::geometryChangedHandler()
 {
+    if (!m_initialized)
+        return;
     int x = int(contentsRect().width()), y = int(contentsRect().height());
 
     emit sizeRequest(&x, &y);
@@ -95,13 +99,15 @@ void KnotRenderer::geometryChangedHandler()
 
 void KnotRenderer::themeChangedHandler()
 {
+    geometryChangedHandler();
     emit colorRequest(Plasma::Theme::defaultTheme()->color(Plasma::Theme::ViewBackgroundColor));
 }
 
-void KnotRenderer::initialize()
+void KnotRenderer::initialize(KConfigGroup cg)
 {
     geometryChangedHandler();
     themeChangedHandler();
+    m_initialized = true;
 }
 
 QPointF KnotRenderer::getOffset()

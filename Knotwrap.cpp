@@ -259,9 +259,9 @@ void KnotMidend::tickTimer(qreal tplus)
     midend_timer (this->m_me, (float)tplus);
 }
 
-QList< QPair< QString, KnotGameParams > > KnotMidend::presetList()
+QStringList KnotMidend::presetList()
 {
-    QList< QPair< QString, KnotGameParams > > re;
+    QStringList re;
     int n = midend_num_presets (this->m_me);
     char *str;
     game_params *params;
@@ -269,10 +269,21 @@ QList< QPair< QString, KnotGameParams > > KnotMidend::presetList()
     for (int i = 0; i < n; i ++)
     {
         midend_fetch_preset(this->m_me, i, &str, &params);
-        re.push_back(qMakePair(QString(str), KnotGameParams(params)));
+        re.push_back(QString(str));
     }
     
     return re;
+}
+
+void KnotMidend::setPreset(int preset)
+{
+    game_params *params;
+    char *str;
+    
+    midend_num_presets (this->m_me); // This must be called. Don't ask why.
+    midend_fetch_preset(this->m_me, preset, &str, &params);
+    
+    midend_set_params(this->m_me, params);
 }
 
 KnotGameParamList KnotMidend::getConfig()
@@ -326,11 +337,6 @@ void KnotMidend::setConfig(KnotGameParamList config)
 bool KnotMidend::canConfig()
 {
     return gamelist[this->m_game_id]->can_configure;
-}
-
-void KnotMidend::setParam(KnotGameParams params)
-{
-    midend_set_params(this->m_me, params.m_params);
 }
 
 /*

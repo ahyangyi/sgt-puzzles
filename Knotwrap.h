@@ -63,9 +63,9 @@ public:
     virtual ~KnotMidend();
     
     int gameId ();
-    QList<QPair<QString, KnotGameParams> > presetList ();
+    QStringList presetList ();
     bool canConfig ();
-    void setParam (KnotGameParams params);
+    void setPreset (int preset);
     KnotGameParamList getConfig();
     void setConfig (KnotGameParamList config);
     

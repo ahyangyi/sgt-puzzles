@@ -147,7 +147,6 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
 
             __debug_label->setTextSelectable(true);
             __debug_label->setWordWrap(false);
-            __debug_label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::LineEdit);
             __debug_area->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed, QSizePolicy::Frame);
             __debug_area->setPreferredHeight(120);
 
@@ -233,6 +232,7 @@ void Knotplasm::configChanged()
     {
         if (d->m_me != NULL)
             delete d->m_me;
+    
         d->m_me = new KnotMidend(this, gameId);
     
         if (presetId == -1)
@@ -243,8 +243,7 @@ void Knotplasm::configChanged()
             d->m_me->setConfig(list);
         }
         else
-            d->m_me->setParam(d->m_me->presetList()[presetId].second);
-        
+            d->m_me->setPreset(presetId);
         d->m_me->newGame();
         
         connect(d->m_start, SIGNAL(clicked()), d->m_me, SLOT(newGame()));
@@ -281,20 +280,8 @@ void Knotplasm::configChanged()
         connect(d->m_timer, SIGNAL(tick(qreal)), d->m_me, SLOT(tickTimer(qreal)));
 
         setStatus("");
-        d->m_renderer->initialize();
+        d->m_renderer->initialize(cg);
         grabFocus();
-    }
-    else
-    {
-        if (presetId == -1)
-        {
-            KnotGameParamList list = d->m_me->getConfig();
-            for (KnotGameParamList::iterator it = list.begin(); it != list.end(); ++ it)
-                KnotConfig::setKnotGameParam (cg, *it);
-            d->m_me->setConfig(list);
-        }
-        else
-            d->m_me->setParam(d->m_me->presetList()[presetId].second);
     }
 }
 

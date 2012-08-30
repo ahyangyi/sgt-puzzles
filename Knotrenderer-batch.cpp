@@ -32,6 +32,7 @@ void KnotRendererBatch::themeChangedHandler()
         color.setHsvF(color.hueF(), color.saturationF(), 0.2);
     
     emit colorRequest(color);
+    geometryChangedHandler();
 }
 
 void KnotRendererBatch::drawText(int x, int y, bool monospace, int fontsize,
@@ -231,8 +232,9 @@ void KnotRendererBatch::KnotBatchTextAction::apply(KnotRendererBatch::PaintInter
 #define ALIGN_HLEFT   0x000
 #define ALIGN_HCENTRE 0x001
 #define ALIGN_HRIGHT  0x002
+#define ALIGN_HMASK   0x003
 
-    if (align & ALIGN_HLEFT)
+    if ((align & ALIGN_HMASK) == ALIGN_HLEFT)
     {
         rect = QRectF(
             x,
@@ -242,7 +244,7 @@ void KnotRendererBatch::KnotBatchTextAction::apply(KnotRendererBatch::PaintInter
             );
         flag = Qt::AlignLeft|Qt::AlignVCenter; 
     }
-    if (align & ALIGN_HCENTRE)
+    if ((align & ALIGN_HMASK) == ALIGN_HCENTRE)
     {
         rect = QRectF(
             x - largeDimension / 2,
@@ -252,7 +254,7 @@ void KnotRendererBatch::KnotBatchTextAction::apply(KnotRendererBatch::PaintInter
             );
         flag = Qt::AlignHCenter|Qt::AlignVCenter; 
     }
-    if (align & ALIGN_HRIGHT)
+    if ((align & ALIGN_HMASK) == ALIGN_HRIGHT)
     {
         rect = QRectF(
             x - largeDimension,

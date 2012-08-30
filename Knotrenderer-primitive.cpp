@@ -92,35 +92,36 @@ void KnotRendererPrimitive::drawText(int x, int y, bool monospace, int fontsize,
 #define ALIGN_HLEFT   0x000
 #define ALIGN_HCENTRE 0x001
 #define ALIGN_HRIGHT  0x002
+#define ALIGN_HMASK   0x003
 
-        if (align & ALIGN_HLEFT)
+        if ((align & ALIGN_HMASK) == ALIGN_HLEFT)
         {
             rect = QRectF(
                 x,
                 y - largeDimension / 2,
                 largeDimension,
                 largeDimension
-               );
+                );
             flag = Qt::AlignLeft|Qt::AlignVCenter; 
         }
-        if (align & ALIGN_HCENTRE)
+        if ((align & ALIGN_HMASK) == ALIGN_HCENTRE)
         {
             rect = QRectF(
                 x - largeDimension / 2,
                 y - largeDimension / 2,
                 largeDimension,
                 largeDimension
-               );
+                );
             flag = Qt::AlignHCenter|Qt::AlignVCenter; 
         }
-        if (align & ALIGN_HRIGHT)
+        if ((align & ALIGN_HMASK) == ALIGN_HRIGHT)
         {
             rect = QRectF(
                 x - largeDimension,
                 y - largeDimension / 2,
                 largeDimension,
                 largeDimension
-               );
+                );
             flag = Qt::AlignRight|Qt::AlignVCenter; 
         }
         

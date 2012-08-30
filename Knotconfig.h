@@ -15,6 +15,7 @@ class KnotConfig
 {
 public:
     static int getGameId (KConfigGroup cg);
+    static QString getGameName (KConfigGroup cg);
     static int getPresetId (KConfigGroup cg);
     static int getPresetId (KConfigGroup cg, int gameId);
     static void setKnotGameParam (KConfigGroup cg, KnotGameParamItem& item);

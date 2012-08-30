@@ -3,6 +3,7 @@
 
 #include <QGraphicsWidget>
 #include <Plasma/Frame>
+#include <KConfigGroup>
 
 class KnotRenderer: public QGraphicsWidget
 {
@@ -28,7 +29,7 @@ public slots:
     // Responding to desktop events
     virtual void geometryChangedHandler ();
     virtual void themeChangedHandler ();
-    virtual void initialize ();
+    virtual void initialize (KConfigGroup cg);
     
     // Real SGT APIs
     virtual void drawText(int x, int y, bool monospace, int fontsize,
@@ -69,6 +70,7 @@ signals:
 protected:
     virtual QPointF getOffset();
     virtual void setOffset(const QPointF& offset);
+    bool m_initialized;
     
 private:
     virtual void paint (QPainter * painter, 

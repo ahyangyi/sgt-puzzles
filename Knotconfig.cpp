@@ -31,6 +31,11 @@ int KnotConfig::getGameId(KConfigGroup cg)
     return cg.readEntry("Game", 0);
 }
 
+QString KnotConfig::getGameName(KConfigGroup cg)
+{
+    return gamelist[getGameId(cg)]->name;
+}
+
 int KnotConfig::getPresetId(KConfigGroup cg)
 {
     int gameId = getGameId(cg);
@@ -192,9 +197,9 @@ void KnotGameConfig::gameChanged(int id)
     d->m_preset->clear();
     
     KnotMidend *me = new KnotMidend(NULL, id);
-    QList<QPair<QString, KnotGameParams> > list = me->presetList();
-    for (QList<QPair<QString, KnotGameParams> >::iterator it = list.begin(); it != list.end(); ++ it)
-        d->m_preset->addItem(it->first);
+    QStringList list = me->presetList();
+    for (QStringList::iterator it = list.begin(); it != list.end(); ++ it)
+        d->m_preset->addItem(*it);
     
     for (QList<QPair<QLabel*, QWidget*> >::iterator it = d->m_params_list.begin(); it != d->m_params_list.end(); ++ it)
     {
@@ -305,10 +310,8 @@ void KnotGameConfig::paramChanged()
     KnotMidend *me = new KnotMidend(NULL, gameId);
 
     if (presetId != -1)
-        me->setParam(me->presetList()[presetId].second);
+        me->setPreset(presetId);
     KnotGameParamList paramList = me->getConfig();
-    
-    assert(paramList.size() == d->m_params_list.size());
     
     QList<QPair<QLabel*, QWidget*> >::iterator jt = d->m_params_list.begin();
     for (KnotGameParamList::iterator it = paramList.begin(); it != paramList.end(); ++it, ++jt)
