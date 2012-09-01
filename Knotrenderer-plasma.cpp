@@ -188,6 +188,8 @@ void KnotRendererPlasma::preprocessBatch(QList<QColor> colorList)
         preprocessMines(colorList);
     if (gameName == "Signpost")
         preprocessSignpost(colorList);
+    if (gameName == "Slide")
+        preprocessSlide(colorList);
 }
 
 void KnotRendererPlasma::preprocessGalaxies(QList< QColor > colorList)
