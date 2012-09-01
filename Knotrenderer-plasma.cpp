@@ -108,7 +108,8 @@ void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
         return;
     }
     if (gameName == "Mines" || 
-        gameName == "Signpost"
+        gameName == "Signpost" ||
+        gameName == "Slide"
     )
     {
         getRealDimensionAllRectButFirst(x, y, ox, oy, 1);
@@ -221,6 +222,17 @@ void KnotRendererPlasma::preprocessMines(QList< QColor > colorList)
 }
 
 void KnotRendererPlasma::preprocessSignpost(QList< QColor > colorList)
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+}
+
+void KnotRendererPlasma::preprocessSlide(QList< QColor > colorList)
 {
     /*
      * Step 1: throw away the big background rectangle.

@@ -21,6 +21,7 @@ protected:
     void preprocessGalaxies(QList<QColor> colorList);
     void preprocessMines(QList<QColor> colorList);
     void preprocessSignpost(QList<QColor> colorList);
+    void preprocessSlide(QList<QColor> colorList);
     void getRealDimension(int &x, int &y, int &ox, int &oy);
     void getRealDimensionSecondRect(int &x, int &y, int &ox, int &oy);
     void getRealDimensionAllRectButFirst(int &x, int &y, int &ox, int &oy, int n);

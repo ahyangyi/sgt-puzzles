@@ -30,6 +30,8 @@ set(
     galaxies.c guess.c inertia.c keen.c lightup.c loopy.c magnets.c map.c mines.c
     net.c netslide.c pattern.c pearl.c pegs.c range.c rect.c samegame.c signpost.c
     singles.c sixteen.c slant.c solo.c tents.c towers.c twiddle.c unequal.c untangle.c
+# unfinished games
+    group.c slide.c sokoban.c
     )
 # We will migrate to using list.c after finishing playing with galaxies.
 # add_definitions (-DKNOTPLASM_DEBUG)
