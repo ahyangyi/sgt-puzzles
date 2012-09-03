@@ -17,14 +17,15 @@ public slots:
     virtual void initialize (KConfigGroup cg);
     virtual void geometryChangedHandler ();
 protected:
-    virtual void preprocessBatch(QList<QColor> colorList);
-    void preprocessGalaxies(QList<QColor> colorList);
-    void preprocessMines(QList<QColor> colorList);
-    void preprocessSignpost(QList<QColor> colorList);
-    void preprocessSlide(QList<QColor> colorList);
+    virtual void preprocessBatch();
+    void preprocessBridges();
+    void preprocessGalaxies();
+    void preprocessLoopy();
+    void preprocessMines();
+    void preprocessSignpost();
+    void preprocessSlide();
     void getRealDimension(int &x, int &y, int &ox, int &oy);
-    void getRealDimensionSecondRect(int &x, int &y, int &ox, int &oy);
-    void getRealDimensionAllRectButFirst(int &x, int &y, int &ox, int &oy, int n);
+    void getRealDimensionGeneric(int &x, int &y, int &ox, int &oy);
     
     struct KnotPlasmaRectAction : public KnotBatchAction
     {

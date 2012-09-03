@@ -127,6 +127,11 @@ void KnotMidend::newGame()
     midend_new_game(m_me);
 }
 
+void KnotMidend::solve()
+{
+    midend_solve(m_me);
+}
+
 int KnotMidend::gameId()
 {
     return m_game_id;

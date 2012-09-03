@@ -165,7 +165,7 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     /*
      * Preprocess the batch
      */
-    preprocessBatch(m_color_list);
+    preprocessBatch();
     
     /*
      * Run the batch
@@ -186,7 +186,7 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     p->restore();
 }
 
-void KnotRendererBatch::preprocessBatch(QList<QColor> colorList)
+void KnotRendererBatch::preprocessBatch()
 {
     /*
      * Intentionally left blank

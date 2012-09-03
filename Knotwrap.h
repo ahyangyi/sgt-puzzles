@@ -71,6 +71,7 @@ public:
     
 public slots:
     void newGame();
+    void solve();
     void size(int* portX, int* portY);
     void redraw();
     void forceRedraw();

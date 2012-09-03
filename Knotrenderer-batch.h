@@ -47,7 +47,7 @@ public slots:
     virtual void setColor(QList<QColor> colorList);
     
 protected:
-    virtual void preprocessBatch(QList<QColor> colorList);
+    virtual void preprocessBatch();
     
     struct PaintInterfaceData
     {
@@ -142,7 +142,8 @@ protected:
             cx(n_cx), cy(n_cy), radius(n_radius), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
         virtual QString toString () {return QString("circle at %1 %2 radius %3").arg(cx).arg(cy).arg(radius);}
-        virtual int type () {return -1;}
+#define KNOTBATCH_CIRCLEACTION 5
+        virtual int type () {return KNOTBATCH_CIRCLEACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -176,7 +177,8 @@ protected:
             y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
 
         virtual QString toString () {return QString("thick line from %1 %2 to %3 %4").arg(x1).arg(y1).arg(x2).arg(y2);}
-        virtual int type () {return -1;}
+#define KNOTBATCH_THICKACTION 8
+        virtual int type () {return KNOTBATCH_THICKACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 

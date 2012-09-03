@@ -41,6 +41,7 @@ public:
     KnotRenderer* m_renderer;
     Plasma::Label* m_status;
     Plasma::PushButton* m_start;
+    Plasma::PushButton* m_solve;
     KnotTimer* m_timer;
 
     KnotGameConfig *m_game_page;
@@ -129,6 +130,14 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
             d->m_start->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::PushButton);
             d->m_start->setText("New");
             statusBarLayout->addItem(d->m_start);
+        }
+        
+        {
+            /* "Solve" button */
+            d->m_solve = new Plasma::PushButton(this);
+            d->m_solve->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::PushButton);
+            d->m_solve->setText("Solve");
+            statusBarLayout->addItem(d->m_solve);
         }
         
         statusBarLayout->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
@@ -249,7 +258,9 @@ void Knotplasm::configChanged()
         connect(d->m_start, SIGNAL(clicked()), d->m_me, SLOT(newGame()));
         connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(geometryChangedHandler()));          /* This is needed because newGaming with different params need an additional call to size()*/
         connect(d->m_start, SIGNAL(clicked()), this, SLOT(grabFocus()));          /* This is needed because newGaming with different params need an additional call to size()*/
-        
+
+        connect(d->m_solve, SIGNAL(clicked()), d->m_me, SLOT(solve()));
+
         connect(d->m_renderer, SIGNAL(redrawRequest()), d->m_me, SLOT(redraw()));
         connect(d->m_renderer, SIGNAL(forceRedrawRequest()), d->m_me, SLOT(forceRedraw()));
         connect(d->m_renderer, SIGNAL(sizeRequest(int*,int*)), d->m_me, SLOT(size(int*,int*)));
