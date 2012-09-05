@@ -19,6 +19,8 @@ public slots:
 protected:
     virtual void preprocessBatch();
     void preprocessBridges();
+    void preprocessFifteen();
+    void preprocessFilling();
     void preprocessGalaxies();
     void preprocessLoopy();
     void preprocessMines();

@@ -66,13 +66,13 @@ protected:
     struct KnotBatchAction
     {
         virtual QString toString () = 0;
-/*
- * I don't know why my CMake compiles this without RTTI.
- * And I can't make this a QObject.
- * Therefore, I'd better implement this polymorphism myself.
- */
+        // Type of this shape
         virtual int type () = 0;
+        // Draw this shape
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
+        // Bounding box of this shape.
+        // If it's to be ignored, return the specific rectangle QRectF(1e20, 1e20, -2e20, -2e20).
+        virtual QRectF boundingBox () {return QRectF(1e20, 1e20, -2e20, -2e20);}
         
         virtual ~KnotBatchAction () {}
     };
@@ -104,6 +104,7 @@ protected:
 #define KNOTBATCH_RECTACTION 2
         virtual int type () {return KNOTBATCH_RECTACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+        virtual QRectF boundingBox () {return QRectF(x, y, w, h);}
     };
 
     struct KnotBatchLineAction : public KnotBatchAction
@@ -117,6 +118,12 @@ protected:
 #define KNOTBATCH_LINEACTION 3
         virtual int type () {return KNOTBATCH_LINEACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+        virtual QRectF boundingBox () {return QRectF(
+            qMin(x1, x2),
+            qMin(y1, y2),
+            qAbs(x1 - x2),
+            qAbs(y1 - y2)
+        );}
     };
 
     struct KnotBatchPolyAction : public KnotBatchAction
@@ -145,6 +152,7 @@ protected:
 #define KNOTBATCH_CIRCLEACTION 5
         virtual int type () {return KNOTBATCH_CIRCLEACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+        virtual QRectF boundingBox () {return QRectF(cx - radius, cy - radius, radius * 2, radius * 2);}
     };
 
     struct KnotBatchClipAction : public KnotBatchAction

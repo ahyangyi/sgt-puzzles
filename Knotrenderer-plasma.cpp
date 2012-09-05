@@ -126,72 +126,31 @@ void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
 {
     QString gameName = KnotConfig::getGameName(d->m_cg);
     
-    if (gameName == "Bridges"   ||
-        gameName == "Galaxies"  ||
-        gameName == "Loopy"     ||
-        gameName == "Mines"     || 
-        gameName == "Signpost"  ||
-        gameName == "Slide"     ||
-        false
-    )
-    {
-        getRealDimensionGeneric(x, y, ox, oy);
-        return;
-    }
-    ox = oy = 0;
+    getRealDimensionGeneric(x, y, ox, oy);
 }
 
 void KnotRendererPlasma::getRealDimensionGeneric(int& x, int& y, int& ox, int& oy)
 {
-    int x1 = x, x2 = 0, y1 = y, y2 = 0;
+    double x1 = x, x2 = 0, y1 = y, y2 = 0;
     
     preprocessBatch();
     for (int i = 0; i < m_batch.size(); ++i)
     {
-        if (m_batch[i]->type() == KNOTBATCH_RECTACTION)
-        {
-            KnotPlasmaRectAction *rect = (KnotPlasmaRectAction*)m_batch[i];
-            
-            x1 = qMin(x1, rect->x);
-            x2 = qMax(x2, rect->x + rect->w);
-            y1 = qMin(y1, rect->y);
-            y2 = qMax(y2, rect->y + rect->h);
-        }
-        if (m_batch[i]->type() == KNOTBATCH_LINEACTION)
-        {
-            KnotBatchLineAction *line= (KnotBatchLineAction*)m_batch[i];
-            
-            x1 = qMin(x1, qMin(line->x1, line->x2));
-            x2 = qMax(x2, qMax(line->x1, line->x2));
-            y1 = qMin(y1, qMin(line->y1, line->y2));
-            y2 = qMax(y2, qMax(line->y1, line->y2));
-        }
-        if (m_batch[i]->type() == KNOTBATCH_THICKACTION)
-        {
-            KnotBatchThickAction *line= (KnotBatchThickAction*)m_batch[i];
-            
-            x1 = qMin(x1, (int)floor(qMin(line->x1, line->x2)));
-            x2 = qMax(x2, (int)ceil(qMax(line->x1, line->x2)));
-            y1 = qMin(y1, (int)floor(qMin(line->y1, line->y2)));
-            y2 = qMax(y2, (int)ceil(qMax(line->y1, line->y2)));
-        }
-        if (m_batch[i]->type() == KNOTBATCH_CIRCLEACTION)
-        {
-            KnotBatchCircleAction *circ= (KnotBatchCircleAction*)m_batch[i];
-            
-            x1 = qMin(x1, circ->cx - circ->radius);
-            x2 = qMax(x2, circ->cx + circ->radius);
-            y1 = qMin(y1, circ->cy - circ->radius);
-            y2 = qMax(y2, circ->cy + circ->radius);
-        }
+        QRectF bbox;
+        
+        bbox = m_batch[i]->boundingBox();
+        x1 = qMin(x1, floor(bbox.left()));
+        x2 = qMax(x2, ceil(bbox.right()));
+        y1 = qMin(y1, floor(bbox.top()));
+        y2 = qMax(y2, ceil(bbox.bottom()));
     }
     
     if (x1 <= x2)
     {
-        x = x2 - x1;
-        y = y2 - y1;
-        ox = x1;
-        oy = y1;
+        x = ceil(x2) - floor(x1);
+        y = ceil(y2) - floor(y1);
+        ox = floor(x1);
+        oy = floor(y1);
     }
     else
         ox = oy = 0;
@@ -210,6 +169,10 @@ void KnotRendererPlasma::preprocessBatch()
     QString gameName = KnotConfig::getGameName(d->m_cg);
     if (gameName == "Bridges")
         preprocessBridges();
+    if (gameName == "Dominosa")
+        preprocessFifteen();
+    if (gameName == "Filling")
+        preprocessFilling();
     if (gameName == "Galaxies")
         preprocessGalaxies();
     if (gameName == "Loopy")
@@ -249,6 +212,26 @@ void KnotRendererPlasma::preprocessBridges()
         }
         ++ it;
     }
+}
+
+void KnotRendererPlasma::preprocessFifteen()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+}
+
+void KnotRendererPlasma::preprocessFilling()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
 }
 
 void KnotRendererPlasma::preprocessGalaxies()
