@@ -169,7 +169,7 @@ void KnotRendererPlasma::preprocessBatch()
     QString gameName = KnotConfig::getGameName(d->m_cg);
     if (gameName == "Bridges")
         preprocessBridges();
-    if (gameName == "Dominosa")
+    if (gameName == "Fifteen")
         preprocessFifteen();
     if (gameName == "Filling")
         preprocessFilling();
