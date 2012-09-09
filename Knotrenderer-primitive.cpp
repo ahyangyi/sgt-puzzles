@@ -54,9 +54,15 @@ void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int ou
 {
     QPen pen = d->m_paint_interface->p->pen();
     pen.setWidth(outlineWidth);
-    pen.setColor(d->m_color_list[outlineColour]);
+    if (outlineColour != -1)
+        pen.setColor(d->m_color_list[outlineColour]);
+    else
+    {
+        QBrush brush = pen.brush();
+        brush.setStyle(Qt::NoBrush);
+        pen.setBrush(brush);
+    }
     d->m_paint_interface->p->setPen(pen);
-    
 
     QBrush brush = d->m_paint_interface->p->brush();
     if (fillColour == -1)
@@ -141,8 +147,8 @@ void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(colour, colour, 0);
-        d->m_paint_interface->p->drawRect(QRectF(x,y,w,h));
+        setPainter(colour, -1, 0);
+        d->m_paint_interface->p->drawRect(QRectF(x,y,w - 1,h - 1));
     }
 }
 

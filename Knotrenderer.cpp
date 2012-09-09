@@ -80,10 +80,12 @@ void KnotRenderer::keyPressEvent(QKeyEvent* e)
 
 void KnotRenderer::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+    painter->save();
     painter->setRenderHint(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setRenderHint(QPainter::TextAntialiasing);
     paintInterface(painter, option, contentsRect());
+    painter->restore();
 }
 
 void KnotRenderer::geometryChangedHandler()

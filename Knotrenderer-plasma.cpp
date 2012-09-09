@@ -125,6 +125,13 @@ void KnotRendererPlasma::geometryChangedHandler()
 void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
 {
     QString gameName = KnotConfig::getGameName(d->m_cg);
+
+    ox = oy = 0;
+    
+    if (gameName == "Cube")
+    {
+        return;
+    }
     
     getRealDimensionGeneric(x, y, ox, oy);
 }
@@ -169,6 +176,8 @@ void KnotRendererPlasma::preprocessBatch()
     QString gameName = KnotConfig::getGameName(d->m_cg);
     if (gameName == "Bridges")
         preprocessBridges();
+    if (gameName == "Cube")
+        preprocessCube();
     if (gameName == "Fifteen")
         preprocessFifteen();
     if (gameName == "Filling")
@@ -212,6 +221,16 @@ void KnotRendererPlasma::preprocessBridges()
         }
         ++ it;
     }
+}
+
+void KnotRendererPlasma::preprocessCube()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
 }
 
 void KnotRendererPlasma::preprocessFifteen()

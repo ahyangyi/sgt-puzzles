@@ -135,7 +135,7 @@ protected:
             int n_fillcolour, int n_outlinecolour): 
             polygon(n_polygon), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
-        virtual QString toString () {return QString("polyon");}
+        virtual QString toString ();
         virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
