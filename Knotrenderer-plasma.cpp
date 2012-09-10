@@ -45,7 +45,7 @@ void KnotRendererPlasma::geometryChangedHandler()
     
     while (true)
     {
-        int rx = cx, ry = cy, ox, oy;
+        int rx = cx, ry = cy, ox = 0, oy = 0;
         emit sizeRequest(&rx, &ry);
 
         m_paint_interface = new PaintInterfaceData();
@@ -70,7 +70,7 @@ void KnotRendererPlasma::geometryChangedHandler()
     int lx = cx/2, ly = cy/2;
     while (lx < cx || ly < cy)
     {
-        int rx = (lx+cx+1)/2, ry = (ly+cy+1)/2, ox, oy;
+        int rx = (lx+cx+1)/2, ry = (ly+cy+1)/2, ox = 0, oy = 0;
         emit sizeRequest(&rx, &ry);
 
         m_paint_interface = new PaintInterfaceData();
@@ -99,9 +99,7 @@ void KnotRendererPlasma::geometryChangedHandler()
     }
     
     {
-        int rx, ry, ox, oy;
-        rx = cx;
-        ry = cy;
+        int rx = cx, ry = cy, ox = 0, oy = 0;
         
         emit sizeRequest(&rx, &ry);
 
@@ -126,14 +124,43 @@ void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
 {
     QString gameName = KnotConfig::getGameName(d->m_cg);
 
-    ox = oy = 0;
-    
-    if (gameName == "Cube")
+    if (gameName == "Cube" ||
+        gameName == "Untangle"
+    )
     {
         return;
     }
     
+    if (gameName == "Dominosa")
+    {
+        getRealDimensionDominosa(x, y, ox, oy);
+    }
+    
     getRealDimensionGeneric(x, y, ox, oy);
+}
+
+void KnotRendererPlasma::getRealDimensionDominosa(int& x, int& y, int& ox, int& oy)
+{
+    double x1 = x, x2 = 0, y1 = y, y2 = 0;
+    
+    for (int i = 1; i < m_batch.size(); ++i)
+    {
+        QRectF bbox;
+        
+        bbox = m_batch[i]->boundingBox();
+        x1 = qMin(x1, floor(bbox.left()));
+        x2 = qMax(x2, ceil(bbox.right()));
+        y1 = qMin(y1, floor(bbox.top()));
+        y2 = qMax(y2, ceil(bbox.bottom()));
+    }
+    
+    if (x1 <= x2)
+    {
+        x = ceil(x2) - floor(x1);
+        y = ceil(y2) - floor(y1);
+        ox = floor(x1);
+        oy = floor(y1);
+    }
 }
 
 void KnotRendererPlasma::getRealDimensionGeneric(int& x, int& y, int& ox, int& oy)
@@ -159,8 +186,6 @@ void KnotRendererPlasma::getRealDimensionGeneric(int& x, int& y, int& ox, int& o
         ox = floor(x1);
         oy = floor(y1);
     }
-    else
-        ox = oy = 0;
 }
 
 void KnotRendererPlasma::preprocessBatch()
@@ -178,6 +203,8 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessBridges();
     if (gameName == "Cube")
         preprocessCube();
+    if (gameName == "Dominosa")
+        preprocessDominosa();
     if (gameName == "Fifteen")
         preprocessFifteen();
     if (gameName == "Filling")
@@ -188,10 +215,16 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessLoopy();
     if (gameName == "Mines")
         preprocessMines();
+    if (gameName == "Pearl")
+        preprocessPearl();
+    if (gameName == "Range")
+        preprocessRange();
     if (gameName == "Signpost")
         preprocessSignpost();
     if (gameName == "Slide")
         preprocessSlide();
+    if (gameName == "Untangle")
+        preprocessUntangle();
 }
 
 void KnotRendererPlasma::preprocessBridges()
@@ -224,6 +257,16 @@ void KnotRendererPlasma::preprocessBridges()
 }
 
 void KnotRendererPlasma::preprocessCube()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+}
+
+void KnotRendererPlasma::preprocessDominosa()
 {
     /*
      * Step 1: throw away the big background rectangle.
@@ -294,6 +337,28 @@ void KnotRendererPlasma::preprocessMines()
     
 }
 
+void KnotRendererPlasma::preprocessPearl()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+}
+
+void KnotRendererPlasma::preprocessRange()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+}
+
 void KnotRendererPlasma::preprocessSignpost()
 {
     /*
@@ -306,6 +371,17 @@ void KnotRendererPlasma::preprocessSignpost()
 }
 
 void KnotRendererPlasma::preprocessSlide()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+}
+
+void KnotRendererPlasma::preprocessUntangle()
 {
     /*
      * Step 1: throw away the big background rectangle.
