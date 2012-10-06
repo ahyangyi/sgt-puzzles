@@ -223,6 +223,8 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessSignpost();
     if (gameName == "Slide")
         preprocessSlide();
+    if (gameName == "Solo")
+        preprocessSolo();
     if (gameName == "Untangle")
         preprocessUntangle();
 }
@@ -379,6 +381,16 @@ void KnotRendererPlasma::preprocessSlide()
     delete *(this->m_batch.begin());
     this->m_batch.erase(this->m_batch.begin());
     
+}
+
+void KnotRendererPlasma::preprocessSolo()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
 }
 
 void KnotRendererPlasma::preprocessUntangle()

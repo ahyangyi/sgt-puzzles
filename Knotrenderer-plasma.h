@@ -30,6 +30,7 @@ protected:
     void preprocessRange();
     void preprocessSignpost();
     void preprocessSlide();
+    void preprocessSolo();
     void preprocessUntangle();
     void getRealDimension(int &x, int &y, int &ox, int &oy);
     void getRealDimensionDominosa(int &x, int &y, int &ox, int &oy);
