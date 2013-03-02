@@ -28,6 +28,7 @@ protected:
     void preprocessMines();
     void preprocessPearl();
     void preprocessRange();
+    void preprocessSameGame();
     void preprocessSignpost();
     void preprocessSlide();
     void preprocessSolo();

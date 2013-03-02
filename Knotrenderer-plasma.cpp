@@ -219,6 +219,8 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessPearl();
     if (gameName == "Range")
         preprocessRange();
+    if (gameName == "Same Game")
+        preprocessSameGame();
     if (gameName == "Signpost")
         preprocessSignpost();
     if (gameName == "Slide")
@@ -316,6 +318,11 @@ void KnotRendererPlasma::preprocessGalaxies()
     /*  
      * Step 3: change any KnotPlasmaCircleAction 
      */
+    
+    
+    /*
+     * Step 4: 
+     */
 }
 
 void KnotRendererPlasma::preprocessLoopy()
@@ -351,6 +358,17 @@ void KnotRendererPlasma::preprocessPearl()
 }
 
 void KnotRendererPlasma::preprocessRange()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+}
+
+void KnotRendererPlasma::preprocessSameGame()
 {
     /*
      * Step 1: throw away the big background rectangle.

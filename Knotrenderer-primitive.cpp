@@ -147,8 +147,8 @@ void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
 {
     if (d->m_paint_interface != NULL)
     {
-        setPainter(colour, -1, 0);
-        d->m_paint_interface->p->drawRect(QRectF(x,y,w - 1,h - 1));
+        setPainter(colour, colour, 0);
+        d->m_paint_interface->p->drawRect(QRectF(x - .5,y - .5,w,h));
     }
 }
 
