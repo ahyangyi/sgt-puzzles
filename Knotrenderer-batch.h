@@ -163,7 +163,8 @@ protected:
             x(n_x), y(n_y), w(n_w), h(n_h){}
 
         virtual QString toString () {return QString("clip %1 %2 %3 %4").arg(x).arg(y).arg(w).arg(h);}
-        virtual int type () {return -1;}
+#define KNOTBATCH_CLIPACTION 6
+        virtual int type () {return KNOTBATCH_CLIPACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 

@@ -83,6 +83,7 @@ void KnotRenderer::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
     painter->save();
     painter->setRenderHint(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::Antialiasing);
+    painter->setRenderHint(QPainter::HighQualityAntialiasing);
     painter->setRenderHint(QPainter::TextAntialiasing);
     paintInterface(painter, option, contentsRect());
     painter->restore();

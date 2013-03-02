@@ -25,6 +25,7 @@ protected:
     void preprocessFilling();
     void preprocessGalaxies();
     void preprocessLoopy();
+    void preprocessMap();
     void preprocessMines();
     void preprocessPearl();
     void preprocessRange();

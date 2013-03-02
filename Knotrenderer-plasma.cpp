@@ -213,6 +213,8 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessGalaxies();
     if (gameName == "Loopy")
         preprocessLoopy();
+    if (gameName == "Map")
+        preprocessMap();
     if (gameName == "Mines")
         preprocessMines();
     if (gameName == "Pearl")
@@ -333,6 +335,38 @@ void KnotRendererPlasma::preprocessLoopy()
     
     delete this->m_batch.at(1);
     this->m_batch.erase(++this->m_batch.begin());
+}
+
+void KnotRendererPlasma::preprocessMap()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+    /*
+     * Step 2: enlarge all major rectangles by a little
+     */
+    
+    for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
+    {
+        if ((*it)->type() == KNOTBATCH_CLIPACTION)
+        {
+            ++ it;
+            if ((*it)->type() == KNOTBATCH_RECTACTION)
+            {
+                KnotBatchRectAction *rect = (KnotBatchRectAction *)(*it);
+                
+                rect->x --;
+                rect->y --;
+                rect->h += 2;
+                rect->w += 2;
+            }
+        }
+        ++ it;
+    }
 }
 
 void KnotRendererPlasma::preprocessMines()
