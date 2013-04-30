@@ -28,7 +28,11 @@ struct KnotGameConfig::Private
 
 int KnotConfig::getGameId(KConfigGroup cg)
 {
-    return cg.readEntry("Game", 0);
+    int re = cg.readEntry("Game", 0);
+
+    if (re < 0 || re >= gamecount)
+        re = 0;
+    return re;
 }
 
 QString KnotConfig::getGameName(KConfigGroup cg)
