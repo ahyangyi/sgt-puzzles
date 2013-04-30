@@ -262,44 +262,30 @@ void KnotRendererPlasma::preprocessBridges()
     }
 }
 
-void KnotRendererPlasma::preprocessCube()
+void KnotRendererPlasma::genericRemoveSpace()
 {
-    /*
-     * Step 1: throw away the big background rectangle.
-     */
-    
     delete *(this->m_batch.begin());
     this->m_batch.erase(this->m_batch.begin());
+}
+
+void KnotRendererPlasma::preprocessCube()
+{
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::preprocessDominosa()
 {
-    /*
-     * Step 1: throw away the big background rectangle.
-     */
-    
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::preprocessFifteen()
 {
-    /*
-     * Step 1: throw away the big background rectangle.
-     */
-    
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::preprocessFilling()
 {
-    /*
-     * Step 1: throw away the big background rectangle.
-     */
-    
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::preprocessGalaxies()
@@ -307,9 +293,7 @@ void KnotRendererPlasma::preprocessGalaxies()
     /*
      * Step 1: throw away the big background rectangle.
      */
-    
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
     /*
      * Step 2: remove the black outer frame.
@@ -343,8 +327,7 @@ void KnotRendererPlasma::preprocessMap()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
     /*
      * Step 2: enlarge all major rectangles by a little
@@ -375,8 +358,7 @@ void KnotRendererPlasma::preprocessMines()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 
@@ -386,8 +368,7 @@ void KnotRendererPlasma::preprocessPearl()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 
@@ -397,8 +378,7 @@ void KnotRendererPlasma::preprocessRange()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 
@@ -408,8 +388,7 @@ void KnotRendererPlasma::preprocessSameGame()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 
@@ -419,8 +398,7 @@ void KnotRendererPlasma::preprocessSignpost()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 
@@ -430,8 +408,7 @@ void KnotRendererPlasma::preprocessSlide()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 
@@ -440,9 +417,8 @@ void KnotRendererPlasma::preprocessSolo()
     /*
      * Step 1: throw away the big background rectangle.
      */
-    
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::preprocessUntangle()
@@ -451,8 +427,7 @@ void KnotRendererPlasma::preprocessUntangle()
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
 }
 

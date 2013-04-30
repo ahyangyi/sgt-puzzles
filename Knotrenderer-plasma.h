@@ -18,6 +18,7 @@ public slots:
     virtual void geometryChangedHandler ();
 protected:
     virtual void preprocessBatch();
+    void genericRemoveSpace();
     void preprocessBridges();
     void preprocessCube();
     void preprocessDominosa();
