@@ -1,5 +1,6 @@
 #!/bin/bash
 
+./mkfiles.pl
 rm -Rf Build
 mkdir Build
 cd Build
