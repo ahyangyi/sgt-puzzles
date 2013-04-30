@@ -233,21 +233,29 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessUntangle();
 }
 
+void KnotRendererPlasma::genericRemoveSpace()
+{
+    if (typeid(**this->m_batch.begin()) == typeid(KnotBatchRectAction))
+    {
+        delete *(this->m_batch.begin());
+        this->m_batch.erase(this->m_batch.begin());
+    }
+}
+
 void KnotRendererPlasma::preprocessBridges()
 {
     /*
      * Step 1: throw away the big background rectangle.
      */
     
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
+    genericRemoveSpace();
     
     /*
      * Step 2: throw away all the smaller background rectangle with color 0.
      */
     for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
     {
-        if ((*it)->type() == KNOTBATCH_RECTACTION)
+        if (typeid(**it) == typeid(KnotBatchRectAction))
         {
             KnotBatchRectAction *rect = (KnotBatchRectAction *)(*it);
             
@@ -260,12 +268,6 @@ void KnotRendererPlasma::preprocessBridges()
         }
         ++ it;
     }
-}
-
-void KnotRendererPlasma::genericRemoveSpace()
-{
-    delete *(this->m_batch.begin());
-    this->m_batch.erase(this->m_batch.begin());
 }
 
 void KnotRendererPlasma::preprocessCube()
@@ -335,10 +337,10 @@ void KnotRendererPlasma::preprocessMap()
     
     for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
     {
-        if ((*it)->type() == KNOTBATCH_CLIPACTION)
+        if (typeid(**it) == typeid(KnotBatchClipAction))
         {
             ++ it;
-            if ((*it)->type() == KNOTBATCH_RECTACTION)
+            if (typeid(**it) == typeid(KnotBatchRectAction))
             {
                 KnotBatchRectAction *rect = (KnotBatchRectAction *)(*it);
                 

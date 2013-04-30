@@ -66,8 +66,6 @@ protected:
     struct KnotBatchAction
     {
         virtual QString toString () = 0;
-        // Type of this shape
-        virtual int type () = 0;
         // Draw this shape
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
         // Bounding box of this shape.
@@ -88,8 +86,6 @@ protected:
             x(n_x), y(n_y), fontsize(n_fontsize), align(n_align), colour(n_colour), monospace(n_monospace), text(n_text){}
 
         virtual QString toString () {return QString("text \"%1\" at %2 %3, size %4, align %5").arg(text).arg(x).arg(y).arg(fontsize).arg(align,4,16,QChar('0'));}
-#define KNOTBATCH_TEXTACTION 1
-        virtual int type () {return KNOTBATCH_TEXTACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -101,8 +97,6 @@ protected:
             x(n_x), y(n_y), w(n_w), h(n_h), colour(n_colour){}
 
         virtual QString toString () {return QString("rect at %1 %2 %3 %4, color %5").arg(x).arg(y).arg(w).arg(h).arg(colour);}
-#define KNOTBATCH_RECTACTION 2
-        virtual int type () {return KNOTBATCH_RECTACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(x, y, w, h);}
     };
@@ -115,8 +109,6 @@ protected:
                     int n_colour): x1(n_x1), y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
 
         virtual QString toString () {return QString("line from %1 %2 to %3 %4").arg(x1).arg(y1).arg(x2).arg(y2);}
-#define KNOTBATCH_LINEACTION 3
-        virtual int type () {return KNOTBATCH_LINEACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(
             qMin(x1, x2),
@@ -136,7 +128,6 @@ protected:
             polygon(n_polygon), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
         virtual QString toString ();
-        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -149,8 +140,6 @@ protected:
             cx(n_cx), cy(n_cy), radius(n_radius), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
         virtual QString toString () {return QString("circle at %1 %2 radius %3").arg(cx).arg(cy).arg(radius);}
-#define KNOTBATCH_CIRCLEACTION 5
-        virtual int type () {return KNOTBATCH_CIRCLEACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(cx - radius, cy - radius, radius * 2, radius * 2);}
     };
@@ -163,15 +152,12 @@ protected:
             x(n_x), y(n_y), w(n_w), h(n_h){}
 
         virtual QString toString () {return QString("clip %1 %2 %3 %4").arg(x).arg(y).arg(w).arg(h);}
-#define KNOTBATCH_CLIPACTION 6
-        virtual int type () {return KNOTBATCH_CLIPACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
     struct KnotBatchUnclipAction : public KnotBatchAction
     {
         virtual QString toString () {return "unclip";}
-        virtual int type () {return -1;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
@@ -186,8 +172,6 @@ protected:
             y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
 
         virtual QString toString () {return QString("thick line from %1 %2 to %3 %4").arg(x1).arg(y1).arg(x2).arg(y2);}
-#define KNOTBATCH_THICKACTION 8
-        virtual int type () {return KNOTBATCH_THICKACTION;}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
 
