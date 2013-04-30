@@ -274,7 +274,11 @@ void KnotGameConfig::gameChanged(int id)
     {
         d->m_preset_custom_id = -1;
         
-        // TODO: Add some text about there's no config available
+        QLabel* label;
+        
+        label = new QLabel(this);
+        label->setText(i18n("No configuration available."));
+        d->m_params_layout->addWidget(label, x, 0);
     }
 
     int presetId = KnotConfig::getPresetId(d->m_cg, id);
