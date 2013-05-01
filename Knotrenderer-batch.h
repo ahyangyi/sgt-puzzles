@@ -70,6 +70,7 @@ protected:
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
         // Bounding box of this shape.
         // If it's to be ignored, return the specific rectangle QRectF(1e20, 1e20, -2e20, -2e20).
+        // Note that it's a rectangle with *negative* area!
         virtual QRectF boundingBox () {return QRectF(1e20, 1e20, -2e20, -2e20);}
         
         virtual ~KnotBatchAction () {}

@@ -17,11 +17,11 @@ public:
             color.blue() >= 79 && color.blue() <= 83;
     };
     KConfigGroup m_cg;
+    Plasma::FrameSvg *round;
 };
 
 KnotRendererPlasma::KnotRendererPlasma(QGraphicsItem* parent, Qt::WindowFlags wFlags): KnotRendererBatch(parent, wFlags), d(new Private())
 {
-
 }
 
 KnotRendererPlasma::~KnotRendererPlasma()
@@ -29,9 +29,17 @@ KnotRendererPlasma::~KnotRendererPlasma()
 
 }
 
+void KnotRendererPlasma::themeChangedHandler()
+{
+    KnotRendererBatch::themeChangedHandler();
+}
+
 void KnotRendererPlasma::initialize(KConfigGroup cg)
 {
     d->m_cg = cg;
+    d->round = new Plasma::FrameSvg(this);
+    d->round->setImagePath("widgets/circular-background");
+    d->round->setEnabledBorders(Plasma::FrameSvg::NoBorder);
     KnotRenderer::initialize(cg);
 }
 
@@ -306,7 +314,17 @@ void KnotRendererPlasma::preprocessGalaxies()
     /*  
      * Step 3: change any KnotPlasmaCircleAction 
      */
-    
+    for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
+    {
+        if (typeid(**it) == typeid(KnotBatchCircleAction))
+        {
+            KnotBatchCircleAction *old = (KnotBatchCircleAction *)(*it);
+            KnotPlasmaCircleAction *neo = new KnotPlasmaCircleAction(old->cx, old->cy, old->radius, 0, this);
+            
+            *it = neo;
+            delete old;
+        }
+    }
     
     /*
      * Step 4: 
@@ -435,13 +453,12 @@ void KnotRendererPlasma::preprocessUntangle()
 
 void KnotRendererPlasma::KnotPlasmaRectAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-    
 }
 
 void KnotRendererPlasma::KnotPlasmaCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-    paint_interface->set(0, 0, 0, color_list);
-    paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2));
+    parent->d->round->resizeFrame(QSizeF(radius*2, radius*2));
+    parent->d->round->paintFrame(paint_interface->p, QPointF(cx-radius, cy-radius));
 }
 
 #include "Knotrenderer-plasma.moc"

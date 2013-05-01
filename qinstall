@@ -3,7 +3,3 @@
 cd Build
 make;
 su -c "make install";
-kbuildsycoca4;
-kquitapp plasma-desktop;
-sleep 2s;
-plasma-desktop 1>/dev/null 2>/dev/null;
