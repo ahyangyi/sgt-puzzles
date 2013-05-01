@@ -25,6 +25,7 @@ protected:
     void preprocessDominosa();
     void preprocessFifteen();
     void preprocessFilling();
+    void preprocessFlip();
     void preprocessGalaxies();
     void preprocessLoopy();
     void preprocessMap();
@@ -35,6 +36,7 @@ protected:
     void preprocessSignpost();
     void preprocessSlide();
     void preprocessSolo();
+    void preprocessUndead();
     void preprocessUntangle();
     void getRealDimension(int &x, int &y, int &ox, int &oy);
     void getRealDimensionDominosa(int &x, int &y, int &ox, int &oy);

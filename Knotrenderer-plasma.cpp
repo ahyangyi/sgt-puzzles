@@ -209,36 +209,43 @@ void KnotRendererPlasma::preprocessBatch()
     QString gameName = KnotConfig::getGameName(d->m_cg);
     if (gameName == "Bridges")
         preprocessBridges();
-    if (gameName == "Cube")
+    else if (gameName == "Cube")
         preprocessCube();
-    if (gameName == "Dominosa")
+    else if (gameName == "Dominosa")
         preprocessDominosa();
-    if (gameName == "Fifteen")
+    else if (gameName == "Fifteen")
         preprocessFifteen();
-    if (gameName == "Filling")
+    else if (gameName == "Filling")
         preprocessFilling();
-    if (gameName == "Galaxies")
+    else if (gameName == "Flip")
+        preprocessFlip();
+    else if (gameName == "Galaxies")
         preprocessGalaxies();
-    if (gameName == "Loopy")
+    else if (gameName == "Loopy")
         preprocessLoopy();
-    if (gameName == "Map")
+    else if (gameName == "Map")
         preprocessMap();
-    if (gameName == "Mines")
+    else if (gameName == "Mines")
         preprocessMines();
-    if (gameName == "Pearl")
+    else if (gameName == "Pearl")
         preprocessPearl();
-    if (gameName == "Range")
+    else if (gameName == "Range")
         preprocessRange();
-    if (gameName == "Same Game")
+    else if (gameName == "Same Game")
         preprocessSameGame();
-    if (gameName == "Signpost")
+    else if (gameName == "Signpost")
         preprocessSignpost();
-    if (gameName == "Slide")
+    else if (gameName == "Slide")
         preprocessSlide();
-    if (gameName == "Solo")
+    else if (gameName == "Solo")
         preprocessSolo();
-    if (gameName == "Untangle")
+    else if (gameName == "Undead")
+        preprocessUndead();
+    else if (gameName == "Untangle")
         preprocessUntangle();
+    else
+    {
+    }
 }
 
 void KnotRendererPlasma::genericRemoveSpace()
@@ -294,6 +301,11 @@ void KnotRendererPlasma::preprocessFifteen()
 }
 
 void KnotRendererPlasma::preprocessFilling()
+{
+    genericRemoveSpace();
+}
+
+void KnotRendererPlasma::preprocessFlip()
 {
     genericRemoveSpace();
 }
@@ -439,6 +451,16 @@ void KnotRendererPlasma::preprocessSolo()
      */
 
     genericRemoveSpace();
+}
+
+void KnotRendererPlasma::preprocessUndead()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    genericRemoveSpace();
+    
 }
 
 void KnotRendererPlasma::preprocessUntangle()
