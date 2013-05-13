@@ -54,4 +54,19 @@ private:
     KConfigGroup m_cg;
 };
 
+class KnotGameStateSaver : public QObject
+{  
+    Q_OBJECT
+public:
+    KnotGameStateSaver(KConfigGroup cg);
+
+protected slots:
+    void gameStateChanged (const QString& state);
+public:
+    QString gameState ();
+private:
+    struct Private;
+    Private *d;
+};
+
 #endif

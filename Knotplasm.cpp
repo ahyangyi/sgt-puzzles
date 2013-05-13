@@ -46,6 +46,8 @@ public:
 
     KnotGameConfig *m_game_page;
     KnotDisplayConfig *m_display_page;
+    
+    KnotGameStateSaver *m_game_state_saver;
 
     Private (): m_me(NULL)
     {
@@ -168,6 +170,12 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
 
     d->m_timer=new KnotTimer(this);
     d->m_timer->setInterval(KNOTPLASM_TIMER_INTERVAL);
+
+    {    
+        KConfigGroup cg = config();
+
+        d->m_game_state_saver = new KnotGameStateSaver(cg);
+    }
     
     connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(updateAll()));
     
@@ -236,7 +244,7 @@ void Knotplasm::configChanged()
     
     int gameId = KnotConfig::getGameId(cg);
     int presetId = KnotConfig::getPresetId(cg);
-
+    
     if (true)
     {
         if (d->m_me != NULL)
@@ -295,6 +303,7 @@ void Knotplasm::configChanged()
         grabFocus();
     }
 }
+
 
 void Knotplasm::grabFocus()
 {

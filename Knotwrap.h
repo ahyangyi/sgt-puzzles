@@ -69,6 +69,9 @@ public:
     KnotGameParamList getConfig();
     void setConfig (KnotGameParamList config);
     
+    QString serialize ();
+    void deserialize (const QString& str);
+    
 public slots:
     void newGame();
     void solve();
@@ -111,6 +114,8 @@ signals:
     
     void startDraw();
     void endDraw();
+    
+    void changeState (const QString& state);
     
 private:
     midend* m_me;

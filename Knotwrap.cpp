@@ -70,6 +70,65 @@ public:
     }
 };
 
+class SerializeHelper
+{
+private:
+    QByteArray buf;
+    int ptr;
+protected:
+    void write (const char* b, int len)
+    {
+        for (int i = 0; i < len; i ++)
+        {
+            if (ptr < buf.size())
+                buf[ptr] = b[i];
+            else
+            {
+                while (ptr > buf.size())
+                    buf.push_back(' ');
+                buf.push_back(b[i]);
+            }
+            
+            ptr ++;
+        }
+    }
+    
+    bool read (char* b, int len)
+    {
+        for (int i = 0; i < len; i ++)
+        {
+            if (ptr < buf.size())
+                b[i] = buf[ptr];
+            else
+                return false;
+            
+            ptr ++;
+        }
+        
+        return true;
+    }
+    
+public:
+    
+    SerializeHelper (): ptr(0) {}
+    SerializeHelper (const QString& str): buf(str.toAscii()), ptr(0) {}
+    
+    static void write_serialize (void *helper, void *buf, int len)
+    {
+        ((SerializeHelper *)helper) -> write ((const char *)buf, len);
+    }
+    
+    static int read_serialize (void *helper, void *buf, int len)
+    {
+        return ((SerializeHelper *)helper) -> read ((char *)buf, len);
+    }
+    
+    QString str ()
+    {
+        return buf;
+    }
+};
+
 KnotGameParamItem::KnotGameParamItem(): type(CONFIG_ERROR)
 {
 
@@ -342,6 +401,20 @@ void KnotMidend::setConfig(KnotGameParamList config)
 bool KnotMidend::canConfig()
 {
     return gamelist[this->m_game_id]->can_configure;
+}
+
+QString KnotMidend::serialize()
+{
+    SerializeHelper sh;
+    midend_serialise(m_me, SerializeHelper::write_serialize, &sh);
+    
+    return sh.str();
+}
+
+void KnotMidend::deserialize(const QString& str)
+{
+    SerializeHelper sh (str);
+    midend_deserialise(m_me, SerializeHelper::read_serialize, &sh);
 }
 
 /*

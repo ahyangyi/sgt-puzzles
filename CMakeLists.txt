@@ -34,6 +34,11 @@ include("Knotplasm.dep")
 # add_definitions (-DKNOTPLASM_DEBUG)
 add_definitions (-DCOMBINED)
 
+# We use C++11.
+if(UNIX)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 # Now make sure all files get to the right place
 kde4_add_plugin(Knotplasm ${Knotplasm_SRCS})
 

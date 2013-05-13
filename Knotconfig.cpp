@@ -26,18 +26,35 @@ struct KnotGameConfig::Private
     int m_preset_custom_id;
 };
 
+struct KnotGameStateSaver::Private
+{
+    KConfigGroup m_cg;
+};
+
 int KnotConfig::getGameId(KConfigGroup cg)
 {
-    int re = cg.readEntry("Game", 0);
-
-    if (re < 0 || re >= gamecount)
-        re = 0;
-    return re;
+    QString re = cg.readEntry("Game", "");
+    
+    for (int i = 0; i < gamecount; i ++)
+    {
+        if (re == gamelist[i]->name)
+            return i;
+    }
+    
+    return 0;
 }
 
 QString KnotConfig::getGameName(KConfigGroup cg)
 {
-    return gamelist[getGameId(cg)]->name;
+    QString re = cg.readEntry("Game", "");
+    
+    for (int i = 0; i < gamecount; i ++)
+    {
+        if (re == gamelist[i]->name)
+            return re;
+    }
+    
+    return gamelist[0]->name;
 }
 
 int KnotConfig::getPresetId(KConfigGroup cg)
@@ -152,7 +169,7 @@ bool KnotGameConfig::saveConfig()
     if (d->m_preset_custom_id == presetId)
         presetId = -1;
     
-    d->m_cg.writeEntry("Game", gameId);
+    d->m_cg.writeEntry("Game", gamelist[gameId]->name);
     d->m_cg.writeEntry(QString("Preset_%1").arg(KnotConfig::sanitize(gamelist[gameId]->name)), presetId);
     if (presetId == -1)
     {
@@ -205,7 +222,7 @@ void KnotGameConfig::gameChanged(int id)
     for (QStringList::iterator it = list.begin(); it != list.end(); ++ it)
         d->m_preset->addItem(*it);
     
-    for (QList<QPair<QLabel*, QWidget*> >::iterator it = d->m_params_list.begin(); it != d->m_params_list.end(); ++ it)
+    for (auto it = d->m_params_list.begin(); it != d->m_params_list.end(); ++ it)
     {
         delete it->first;
         if (it->second)
@@ -399,12 +416,30 @@ KnotGameConfig::~KnotGameConfig()
 
 KnotDisplayConfig::KnotDisplayConfig(QWidget* parent, KConfigGroup cg): QWidget(parent), m_cg(cg)
 {
-
+    
 }
 
 KnotDisplayConfig::~KnotDisplayConfig()
 {
 
 }
+
+KnotGameStateSaver::KnotGameStateSaver(KConfigGroup cg)
+{
+    d = new Private();
+
+    d->m_cg = cg;
+}
+
+void KnotGameStateSaver::gameStateChanged(const QString& state)
+{
+    d->m_cg.writeEntry("GameState", state);
+}
+
+QString KnotGameStateSaver::gameState()
+{
+    return d->m_cg.readEntry("GameState", "");
+}
+
 
 #include "Knotconfig.moc"
