@@ -27,6 +27,7 @@ protected:
     void preprocessFilling();
     void preprocessFlip();
     void preprocessGalaxies();
+    void preprocessInertia();
     void preprocessLoopy();
     void preprocessMap();
     void preprocessMines();
@@ -34,6 +35,8 @@ protected:
     void preprocessRange();
     void preprocessSameGame();
     void preprocessSignpost();
+    void preprocessSingles();
+    void preprocessSlant();
     void preprocessSlide();
     void preprocessSolo();
     void preprocessUndead();

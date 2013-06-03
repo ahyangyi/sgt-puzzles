@@ -221,6 +221,8 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessFlip();
     else if (gameName == "Galaxies")
         preprocessGalaxies();
+    else if (gameName == "Inertia")
+        preprocessInertia();
     else if (gameName == "Loopy")
         preprocessLoopy();
     else if (gameName == "Map")
@@ -233,8 +235,12 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessRange();
     else if (gameName == "Same Game")
         preprocessSameGame();
+    else if (gameName == "Singles")
+        preprocessSingles();
     else if (gameName == "Signpost")
         preprocessSignpost();
+    else if (gameName == "Slant")
+        preprocessSlant();
     else if (gameName == "Slide")
         preprocessSlide();
     else if (gameName == "Solo")
@@ -274,7 +280,7 @@ void KnotRendererPlasma::preprocessBridges()
         {
             KnotBatchRectAction *rect = (KnotBatchRectAction *)(*it);
             
-            if (rect->colour == 0)
+            if (rect->colour == 0 || rect->colour == 5)
             {
                 delete rect;
                 it = m_batch.erase(it);
@@ -292,7 +298,30 @@ void KnotRendererPlasma::preprocessCube()
 
 void KnotRendererPlasma::preprocessDominosa()
 {
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+
     genericRemoveSpace();
+
+    /*
+     * Step 2: throw away all the smaller background rectangle with color 0.
+     */
+    for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
+    {
+        if (typeid(**it) == typeid(KnotBatchRectAction))
+        {
+            KnotBatchRectAction *rect = (KnotBatchRectAction *)(*it);
+            
+            if (rect->colour == 0)
+            {
+                delete rect;
+                it = m_batch.erase(it);
+                continue;
+            }
+        }
+        ++ it;
+    }
 }
 
 void KnotRendererPlasma::preprocessFifteen()
@@ -341,6 +370,14 @@ void KnotRendererPlasma::preprocessGalaxies()
     /*
      * Step 4: 
      */
+}
+
+void KnotRendererPlasma::preprocessInertia()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::preprocessLoopy()
@@ -425,6 +462,26 @@ void KnotRendererPlasma::preprocessSameGame()
 }
 
 void KnotRendererPlasma::preprocessSignpost()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    genericRemoveSpace();
+    
+}
+
+void KnotRendererPlasma::preprocessSingles()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+    
+    genericRemoveSpace();
+    
+}
+
+void KnotRendererPlasma::preprocessSlant()
 {
     /*
      * Step 1: throw away the big background rectangle.
