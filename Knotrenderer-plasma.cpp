@@ -139,43 +139,23 @@ void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
         return;
     }
     
-    if (gameName == "Dominosa")
+    if (gameName == "Undead" || gameName == "Dominosa")
     {
-        getRealDimensionDominosa(x, y, ox, oy);
+        /* For Undead and Dominosa, 
+         * the real dimension is calculated by the boundingBox just after removing the outer background */
+        genericRemoveSpace();
+        getRealDimensionByBoundingBox(x, y, ox, oy);
+        return;
     }
-    
-    getRealDimensionGeneric(x, y, ox, oy);
-}
 
-void KnotRendererPlasma::getRealDimensionDominosa(int& x, int& y, int& ox, int& oy)
-{
-    double x1 = x, x2 = 0, y1 = y, y2 = 0;
-    
-    for (int i = 1; i < m_batch.size(); ++i)
-    {
-        QRectF bbox;
-        
-        bbox = m_batch[i]->boundingBox();
-        x1 = qMin(x1, floor(bbox.left()));
-        x2 = qMax(x2, ceil(bbox.right()));
-        y1 = qMin(y1, floor(bbox.top()));
-        y2 = qMax(y2, ceil(bbox.bottom()));
-    }
-    
-    if (x1 <= x2)
-    {
-        x = ceil(x2) - floor(x1);
-        y = ceil(y2) - floor(y1);
-        ox = floor(x1);
-        oy = floor(y1);
-    }
-}
-
-void KnotRendererPlasma::getRealDimensionGeneric(int& x, int& y, int& ox, int& oy)
-{
-    double x1 = x, x2 = 0, y1 = y, y2 = 0;
-    
     preprocessBatch();
+    getRealDimensionByBoundingBox(x, y, ox, oy);
+}
+
+void KnotRendererPlasma::getRealDimensionByBoundingBox(int& x, int& y, int& ox, int& oy)
+{
+    double x1 = x, x2 = 0, y1 = y, y2 = 0;
+    
     for (int i = 0; i < m_batch.size(); ++i)
     {
         QRectF bbox;
@@ -272,7 +252,7 @@ void KnotRendererPlasma::preprocessBridges()
     genericRemoveSpace();
     
     /*
-     * Step 2: throw away all the smaller background rectangle with color 0.
+     * Step 2: throw away all the smaller background rectangle with color 0 or 5.
      */
     for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
     {
@@ -518,6 +498,27 @@ void KnotRendererPlasma::preprocessUndead()
     
     genericRemoveSpace();
     
+    /*
+     * Step 2: throw away all the smaller rectangle with color 0 and outside the board.
+     */
+    
+    QRectF board = (*m_batch.begin())->boundingBox();
+    
+    for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
+    {
+        if (typeid(**it) == typeid(KnotBatchRectAction))
+        {
+            KnotBatchRectAction *rect = (KnotBatchRectAction *)(*it);
+            
+            if (rect->colour == 0 && !board.contains(rect->rectangle()))
+            {
+                delete rect;
+                it = m_batch.erase(it);
+                continue;
+            }
+        }
+        ++ it;
+    }
 }
 
 void KnotRendererPlasma::preprocessUntangle()

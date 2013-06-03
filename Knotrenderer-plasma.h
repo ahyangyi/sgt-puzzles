@@ -42,8 +42,7 @@ protected:
     void preprocessUndead();
     void preprocessUntangle();
     void getRealDimension(int &x, int &y, int &ox, int &oy);
-    void getRealDimensionDominosa(int &x, int &y, int &ox, int &oy);
-    void getRealDimensionGeneric(int &x, int &y, int &ox, int &oy);
+    void getRealDimensionByBoundingBox(int &x, int &y, int &ox, int &oy);
     
     struct KnotPlasmaRectAction : public KnotBatchAction
     {

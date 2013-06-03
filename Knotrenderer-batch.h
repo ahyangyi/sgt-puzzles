@@ -100,6 +100,7 @@ protected:
         virtual QString toString () {return QString("rect at %1 %2 %3 %4, color %5").arg(x).arg(y).arg(w).arg(h).arg(colour);}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(x, y, w, h);}
+        virtual QRectF rectangle () {return QRectF(x, y, w, h);}
     };
 
     struct KnotBatchLineAction : public KnotBatchAction

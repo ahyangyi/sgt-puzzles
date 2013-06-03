@@ -172,6 +172,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     d->m_timer->setInterval(KNOTPLASM_TIMER_INTERVAL);
 
     {    
+        // FIXME: execute this after init()
         KConfigGroup cg = config();
 
         d->m_game_state_saver = new KnotGameStateSaver(cg);
