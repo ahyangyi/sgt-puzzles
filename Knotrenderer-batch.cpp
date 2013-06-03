@@ -11,7 +11,7 @@
 #include "Knotdebug.h"
 
 KnotRendererBatch::KnotRendererBatch(QGraphicsItem* parent, Qt::WindowFlags wFlags):KnotRenderer(parent, wFlags)
-    , m_paint_interface(NULL)
+    , m_paint_interface(nullptr)
 {
 }
 
@@ -38,7 +38,7 @@ void KnotRendererBatch::themeChangedHandler()
 void KnotRendererBatch::drawText(int x, int y, bool monospace, int fontsize,
      int align, int colour, const QString& text)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchTextAction(x,y,monospace,fontsize,align,colour,text));
     }
@@ -46,7 +46,7 @@ void KnotRendererBatch::drawText(int x, int y, bool monospace, int fontsize,
 
 void KnotRendererBatch::drawRect(int x, int y, int w, int h, int colour)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchRectAction(x,y,w,h,colour));
     }
@@ -55,7 +55,7 @@ void KnotRendererBatch::drawRect(int x, int y, int w, int h, int colour)
 void KnotRendererBatch::drawLine(int x1, int y1, int x2, int y2,
      int colour)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchLineAction(x1,y1,x2,y2,colour));
     }
@@ -64,7 +64,7 @@ void KnotRendererBatch::drawLine(int x1, int y1, int x2, int y2,
 void KnotRendererBatch::drawPolygon(const QPolygon& polygon,
      int fillcolour, int outlinecolour)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchPolyAction(polygon,fillcolour,outlinecolour));
     }
@@ -73,7 +73,7 @@ void KnotRendererBatch::drawPolygon(const QPolygon& polygon,
 void KnotRendererBatch::drawCircle(int cx, int cy, int radius,
      int fillcolour, int outlinecolour)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchCircleAction(cx,cy,radius,fillcolour,outlinecolour));
     }
@@ -83,7 +83,7 @@ void KnotRendererBatch::drawThickLine(float thickness,
      float x1, float y1, float x2, float y2,
      int colour)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchThickAction(thickness,x1,y1,x2,y2,colour));
     }
@@ -91,7 +91,7 @@ void KnotRendererBatch::drawThickLine(float thickness,
 
 void KnotRendererBatch::drawUpdate(int x, int y, int w, int h)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
     }
     else
@@ -107,7 +107,7 @@ void KnotRendererBatch::updateAll()
 
 void KnotRendererBatch::clip(int x, int y, int w, int h)
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchClipAction(x,y,w,h));
     }
@@ -115,7 +115,7 @@ void KnotRendererBatch::clip(int x, int y, int w, int h)
 
 void KnotRendererBatch::unclip()
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
         m_batch.append(new KnotBatchUnclipAction());
     }
@@ -123,21 +123,21 @@ void KnotRendererBatch::unclip()
 
 void KnotRendererBatch::startDraw()
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
     }
 }
 
 void KnotRendererBatch::endDraw()
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
     }
 }
 
 void KnotRendererBatch::notStarted()
 {
-    if (m_paint_interface != NULL)
+    if (m_paint_interface != nullptr)
     {
     }
 }
@@ -181,7 +181,7 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     m_batch.clear();
 
     delete m_paint_interface;
-    m_paint_interface = NULL;
+    m_paint_interface = nullptr;
 
     p->restore();
 }

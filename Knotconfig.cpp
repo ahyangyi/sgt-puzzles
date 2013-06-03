@@ -26,7 +26,7 @@ struct KnotGameConfig::Private
     int m_preset_custom_id;
 };
 
-struct KnotGameStateSaver::Private
+struct KnotGameStateTracker::Private
 {
     KConfigGroup m_cg;
 };
@@ -41,6 +41,7 @@ int KnotConfig::getGameId(KConfigGroup cg)
             return i;
     }
     
+    // Fallback to the first game. Crash is acceptable if we have 0 games compiled in :)
     return 0;
 }
 
@@ -116,14 +117,6 @@ KnotGameConfig::KnotGameConfig(QWidget *parent, KConfigGroup cg) :QWidget(parent
     d->m_game->setEditable(false);
     for (int i = 0; i < gamecount; i ++)
         d->m_game->addItem(i18n(gamelist[i]->name));
-#ifndef KNOT_FINAL
-        i18n("blackbox");
-        i18n("bridges");
-        i18n("cube");
-        i18n("galaxies");
-        i18n("fifteen");
-        i18n("solo");
-#endif
     d->m_game->setCurrentIndex(gameId);
     d->m_game->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect (d->m_game, SIGNAL(currentIndexChanged(int)), this, SLOT(gameChanged(int)));
@@ -173,7 +166,7 @@ bool KnotGameConfig::saveConfig()
     d->m_cg.writeEntry(QString("Preset_%1").arg(KnotConfig::sanitize(gamelist[gameId]->name)), presetId);
     if (presetId == -1)
     {
-        KnotMidend *me = new KnotMidend(NULL, gameId);
+        KnotMidend *me = new KnotMidend(nullptr, gameId);
 
         KnotGameParamList paramList = me->getConfig();
 
@@ -217,7 +210,7 @@ void KnotGameConfig::gameChanged(int id)
 
     d->m_preset->clear();
     
-    KnotMidend *me = new KnotMidend(NULL, id);
+    KnotMidend *me = new KnotMidend(nullptr, id);
     QStringList list = me->presetList();
     for (QStringList::iterator it = list.begin(); it != list.end(); ++ it)
         d->m_preset->addItem(*it);
@@ -248,7 +241,7 @@ void KnotGameConfig::gameChanged(int id)
             label->setText(it->name);
             d->m_params_layout->addWidget(label, x, 0);
             
-            QWidget *widget = NULL;
+            QWidget *widget = nullptr;
             
             switch (it->type)
             {
@@ -332,7 +325,7 @@ void KnotGameConfig::paramChanged()
     if (presetId == d->m_preset_custom_id)
         presetId = -1;
     
-    KnotMidend *me = new KnotMidend(NULL, gameId);
+    KnotMidend *me = new KnotMidend(nullptr, gameId);
 
     if (presetId != -1)
         me->setPreset(presetId);
@@ -348,7 +341,7 @@ void KnotGameConfig::paramChanged()
             case KnotGameParamItem::CONFIG_STRING:
             {
                 KLineEdit *edit = dynamic_cast<KLineEdit*>(jt->second);
-                if (edit == NULL)
+                if (edit == nullptr)
                     break;
                 QString str;
                 if (presetId == -1 && d->m_cg.hasKey(key))
@@ -367,7 +360,7 @@ void KnotGameConfig::paramChanged()
             case KnotGameParamItem::CONFIG_BOOLEAN:
             {
                 QCheckBox *check = dynamic_cast<QCheckBox*>(jt->second);
-                if (check == NULL)
+                if (check == nullptr)
                     break;
                 bool status;
                 
@@ -387,7 +380,7 @@ void KnotGameConfig::paramChanged()
             case KnotGameParamItem::CONFIG_CHOICES:
             {
                 KComboBox *combo = dynamic_cast<KComboBox*>(jt->second);
-                if (combo == NULL)
+                if (combo == nullptr)
                     break;
                 int choice;
                 
@@ -424,19 +417,19 @@ KnotDisplayConfig::~KnotDisplayConfig()
 
 }
 
-KnotGameStateSaver::KnotGameStateSaver(KConfigGroup cg)
+KnotGameStateTracker::KnotGameStateTracker(KConfigGroup cg)
 {
     d = new Private();
 
     d->m_cg = cg;
 }
 
-void KnotGameStateSaver::gameStateChanged(const QString& state)
+void KnotGameStateTracker::gameStateChanged(const QString& state)
 {
     d->m_cg.writeEntry("GameState", state);
 }
 
-QString KnotGameStateSaver::gameState()
+QString KnotGameStateTracker::gameState()
 {
     return d->m_cg.readEntry("GameState", "");
 }

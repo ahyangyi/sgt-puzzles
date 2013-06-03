@@ -67,7 +67,7 @@ void KnotRendererPlasma::geometryChangedHandler()
         m_batch.clear();
     
         delete m_paint_interface;
-        m_paint_interface = NULL;
+        m_paint_interface = nullptr;
     
         if (rx > x || ry > y)
             break;
@@ -92,7 +92,7 @@ void KnotRendererPlasma::geometryChangedHandler()
         m_batch.clear();
     
         delete m_paint_interface;
-        m_paint_interface = NULL;
+        m_paint_interface = nullptr;
 
         if (rx > x || ry > y)
         {
@@ -122,7 +122,7 @@ void KnotRendererPlasma::geometryChangedHandler()
         m_batch.clear();
     
         delete m_paint_interface;
-        m_paint_interface = NULL;
+        m_paint_interface = nullptr;
 
         setOffset(contentsRect().center() - QPointF(rx / 2., ry / 2.) - QPointF(ox, oy));
     }

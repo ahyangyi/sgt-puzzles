@@ -184,11 +184,15 @@ KnotMidend::~KnotMidend() {}
 void KnotMidend::newGame()
 {
     midend_new_game(m_me);
+
+    emit stateChanged(serialize());
 }
 
 void KnotMidend::solve()
 {
     midend_solve(m_me);
+    
+    emit stateChanged(serialize());
 }
 
 int KnotMidend::gameId()
@@ -238,6 +242,8 @@ void KnotMidend::pressButton(QPoint pos, Qt::MouseButton btn)
         midend_process_key(m_me, x, y, MIDDLE_BUTTON);
     if (btn==Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_BUTTON);
+    
+    emit stateChanged(serialize());
 }
 
 void KnotMidend::releaseButton(QPoint pos, Qt::MouseButton btn)
@@ -251,6 +257,8 @@ void KnotMidend::releaseButton(QPoint pos, Qt::MouseButton btn)
         midend_process_key(m_me, x, y, MIDDLE_RELEASE);
     if (btn==Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_RELEASE);
+
+    emit stateChanged(serialize());
 }
 
 void KnotMidend::dragButton(QPoint pos, Qt::MouseButtons btn)
@@ -264,6 +272,8 @@ void KnotMidend::dragButton(QPoint pos, Qt::MouseButtons btn)
         midend_process_key(m_me, x, y, MIDDLE_DRAG);
     else if (btn&Qt::RightButton)
         midend_process_key(m_me, x, y, RIGHT_DRAG);
+
+    emit stateChanged(serialize());
 }
 
 void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
@@ -315,12 +325,14 @@ void KnotMidend::pressKey(int key, Qt::KeyboardModifiers modifier)
         if (modifier & Qt::Key_Shift)
             myKey |= MOD_SHFT;
         midend_process_key(m_me, 0, 0, myKey);
+        emit stateChanged(serialize());
     }
 }
 
 void KnotMidend::tickTimer(qreal tplus)
 {
     midend_timer (this->m_me, (float)tplus);
+    emit stateChanged(serialize());
 }
 
 QStringList KnotMidend::presetList()
@@ -411,10 +423,19 @@ QString KnotMidend::serialize()
     return sh.str();
 }
 
-void KnotMidend::deserialize(const QString& str)
+bool KnotMidend::deserialize(const QString& str)
 {
+    bool success;
+    
     SerializeHelper sh (str);
-    midend_deserialise(m_me, SerializeHelper::read_serialize, &sh);
+    success = midend_deserialise(m_me, SerializeHelper::read_serialize, &sh) == nullptr;
+    
+    if (success)
+    {
+        emit stateChanged(serialize());
+    }
+    
+    return success;
 }
 
 /*
@@ -475,7 +496,7 @@ void knotplasm_status_bar(void *handle, char *text)
 }
 blitter *knotplasm_blitter_new(void *handle, int w, int h)
 {
-    return NULL;
+    return nullptr;
 }
 void knotplasm_blitter_free(void *handle, blitter *bl)
 {
@@ -492,7 +513,7 @@ void knotplasm_line_dotted(void *handle, int dotted)
 char *knotplasm_text_fallback(void *handle, const char *const *strings,
             int nstrings)
 {
-    return NULL;
+    return nullptr;
 }
 void knotplasm_draw_thick_line(void *handle, float thickness,
             float x1, float y1, float x2, float y2,
@@ -517,8 +538,8 @@ const struct drawing_api knotplasm_drawing = {
     knotplasm_blitter_free,
     knotplasm_blitter_save,
     knotplasm_blitter_load,
-    NULL, NULL, NULL, NULL, NULL, NULL, /* {begin,end}_{doc,page,puzzle} */
-    NULL, 
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, /* {begin,end}_{doc,page,puzzle} */
+    nullptr, 
     knotplasm_line_dotted,                /* line_width */
     knotplasm_text_fallback,
     knotplasm_draw_thick_line,

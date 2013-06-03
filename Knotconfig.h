@@ -54,11 +54,11 @@ private:
     KConfigGroup m_cg;
 };
 
-class KnotGameStateSaver : public QObject
+class KnotGameStateTracker : public QObject
 {  
     Q_OBJECT
 public:
-    KnotGameStateSaver(KConfigGroup cg);
+    KnotGameStateTracker(KConfigGroup cg);
 
 protected slots:
     void gameStateChanged (const QString& state);

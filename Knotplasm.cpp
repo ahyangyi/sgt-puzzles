@@ -47,16 +47,16 @@ public:
     KnotGameConfig *m_game_page;
     KnotDisplayConfig *m_display_page;
     
-    KnotGameStateSaver *m_game_state_saver;
+    KnotGameStateTracker *m_game_state_tracker;
 
-    Private (): m_me(NULL)
+    Private (): m_me(nullptr)
     {
     }
 };
 
 #ifdef KNOTPLASM_DEBUG
-static Plasma::Label* __debug_label = NULL;
-static Plasma::ScrollWidget* __debug_area = NULL;
+static Plasma::Label* __debug_label = nullptr;
+static Plasma::ScrollWidget* __debug_area = nullptr;
 
 static QMap<QString,QVector<QPair<QString,qint16> > > __debug_history;
 
@@ -150,7 +150,7 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     {
         /* Vertical component 3: the silly debug info area*/
         
-        if (__debug_area == NULL)
+        if (__debug_area == nullptr)
         {
             __debug_area = new Plasma::ScrollWidget(this);
             __debug_label = new Plasma::Label(this);
@@ -171,13 +171,6 @@ Knotplasm::Knotplasm(QObject *parent, const QVariantList &args)
     d->m_timer=new KnotTimer(this);
     d->m_timer->setInterval(KNOTPLASM_TIMER_INTERVAL);
 
-    {    
-        // FIXME: execute this after init()
-        KConfigGroup cg = config();
-
-        d->m_game_state_saver = new KnotGameStateSaver(cg);
-    }
-    
     connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(updateAll()));
     
     setBackgroundHints(StandardBackground);
@@ -195,6 +188,12 @@ Knotplasm::~Knotplasm()
  
 void Knotplasm::init()
 {
+    {    
+        KConfigGroup cg = config();
+
+        d->m_game_state_tracker = new KnotGameStateTracker(cg);
+    }
+    
     configChanged();
 }
 
@@ -246,63 +245,76 @@ void Knotplasm::configChanged()
     int gameId = KnotConfig::getGameId(cg);
     int presetId = KnotConfig::getPresetId(cg);
     
-    if (true)
+    bool loadSavedGame = (d->m_me == nullptr);
+    
+    if (d->m_me != nullptr)
+        delete d->m_me;
+
+    d->m_me = new KnotMidend(this, gameId);
+
+    if (presetId == -1)
     {
-        if (d->m_me != NULL)
-            delete d->m_me;
-    
-        d->m_me = new KnotMidend(this, gameId);
-    
-        if (presetId == -1)
-        {
-            KnotGameParamList list = d->m_me->getConfig();
-            for (KnotGameParamList::iterator it = list.begin(); it != list.end(); ++ it)
-                KnotConfig::setKnotGameParam (cg, *it);
-            d->m_me->setConfig(list);
-        }
-        else
-            d->m_me->setPreset(presetId);
-        d->m_me->newGame();
-        
-        connect(d->m_start, SIGNAL(clicked()), d->m_me, SLOT(newGame()));
-        connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(geometryChangedHandler()));          /* This is needed because newGaming with different params need an additional call to size()*/
-        connect(d->m_start, SIGNAL(clicked()), this, SLOT(grabFocus()));          /* This is needed because newGaming with different params need an additional call to size()*/
-
-        connect(d->m_solve, SIGNAL(clicked()), d->m_me, SLOT(solve()));
-
-        connect(d->m_renderer, SIGNAL(redrawRequest()), d->m_me, SLOT(redraw()));
-        connect(d->m_renderer, SIGNAL(forceRedrawRequest()), d->m_me, SLOT(forceRedraw()));
-        connect(d->m_renderer, SIGNAL(sizeRequest(int*,int*)), d->m_me, SLOT(size(int*,int*)));
-        connect(d->m_renderer, SIGNAL(colorRequest(QColor)), d->m_me, SLOT(color(QColor)));
-        connect(d->m_me, SIGNAL(drawText(int,int,bool,int,int,int,QString)), d->m_renderer, SLOT(drawText(int,int,bool,int,int,int,QString)));
-        connect(d->m_me, SIGNAL(drawRect(int,int,int,int,int)), d->m_renderer, SLOT(drawRect(int,int,int,int,int)));
-        connect(d->m_me, SIGNAL(drawLine(int,int,int,int,int)), d->m_renderer, SLOT(drawLine(int,int,int,int,int)));
-        connect(d->m_me, SIGNAL(drawPolygon(QPolygon,int,int)), d->m_renderer, SLOT(drawPolygon(QPolygon,int,int)));
-        connect(d->m_me, SIGNAL(drawCircle(int,int,int,int,int)), d->m_renderer, SLOT(drawCircle(int,int,int,int,int)));
-        connect(d->m_me, SIGNAL(drawThickLine(float,float,float,float,float,int)), d->m_renderer, SLOT(drawThickLine(float,float,float,float,float,int)));
-        connect(d->m_me, SIGNAL(clip(int,int,int,int)), d->m_renderer, SLOT(clip(int,int,int,int)));
-        connect(d->m_me, SIGNAL(unclip()), d->m_renderer, SLOT(unclip()));
-        connect(d->m_me, SIGNAL(startDraw()), d->m_renderer, SLOT(startDraw()));
-        connect(d->m_me, SIGNAL(endDraw()), d->m_renderer, SLOT(endDraw()));
-        connect(d->m_me, SIGNAL(drawUpdate(int,int,int,int)), d->m_renderer, SLOT(drawUpdate(int,int,int,int)));
-    
-        connect(d->m_me, SIGNAL(setColor(QList<QColor>)), d->m_renderer, SLOT(setColor(QList<QColor>)));
-
-        connect(d->m_me, SIGNAL(statusBar(QString)), this, SLOT(setStatus(QString)));
-        
-        connect(d->m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), d->m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
-        connect(d->m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), d->m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
-        connect(d->m_renderer, SIGNAL(mouseDragged(QPoint,Qt::MouseButtons)), d->m_me, SLOT(dragButton(QPoint,Qt::MouseButtons)));
-        connect(d->m_renderer, SIGNAL(keyPressed(int,Qt::KeyboardModifiers)), d->m_me, SLOT(pressKey(int,Qt::KeyboardModifiers)));
-        
-        connect(d->m_me, SIGNAL(activateTimer()), d->m_timer, SLOT(start()));
-        connect(d->m_me, SIGNAL(deactivateTimer()), d->m_timer, SLOT(stop()));
-        connect(d->m_timer, SIGNAL(tick(qreal)), d->m_me, SLOT(tickTimer(qreal)));
-
-        setStatus("");
-        d->m_renderer->initialize(cg);
-        grabFocus();
+        KnotGameParamList list = d->m_me->getConfig();
+        for (KnotGameParamList::iterator it = list.begin(); it != list.end(); ++ it)
+            KnotConfig::setKnotGameParam (cg, *it);
+        d->m_me->setConfig(list);
     }
+    else
+        d->m_me->setPreset(presetId);
+    
+    connect(d->m_start, SIGNAL(clicked()), d->m_me, SLOT(newGame()));
+    connect(d->m_start, SIGNAL(clicked()), d->m_renderer, SLOT(geometryChangedHandler()));          /* This is needed because newGaming with different params need an additional call to size()*/
+    connect(d->m_start, SIGNAL(clicked()), this, SLOT(grabFocus()));          /* This is needed because newGaming with different params need an additional call to size()*/
+
+    connect(d->m_solve, SIGNAL(clicked()), d->m_me, SLOT(solve()));
+
+    connect(d->m_renderer, SIGNAL(redrawRequest()), d->m_me, SLOT(redraw()));
+    connect(d->m_renderer, SIGNAL(forceRedrawRequest()), d->m_me, SLOT(forceRedraw()));
+    connect(d->m_renderer, SIGNAL(sizeRequest(int*,int*)), d->m_me, SLOT(size(int*,int*)));
+    connect(d->m_renderer, SIGNAL(colorRequest(QColor)), d->m_me, SLOT(color(QColor)));
+    connect(d->m_me, SIGNAL(drawText(int,int,bool,int,int,int,QString)), d->m_renderer, SLOT(drawText(int,int,bool,int,int,int,QString)));
+    connect(d->m_me, SIGNAL(drawRect(int,int,int,int,int)), d->m_renderer, SLOT(drawRect(int,int,int,int,int)));
+    connect(d->m_me, SIGNAL(drawLine(int,int,int,int,int)), d->m_renderer, SLOT(drawLine(int,int,int,int,int)));
+    connect(d->m_me, SIGNAL(drawPolygon(QPolygon,int,int)), d->m_renderer, SLOT(drawPolygon(QPolygon,int,int)));
+    connect(d->m_me, SIGNAL(drawCircle(int,int,int,int,int)), d->m_renderer, SLOT(drawCircle(int,int,int,int,int)));
+    connect(d->m_me, SIGNAL(drawThickLine(float,float,float,float,float,int)), d->m_renderer, SLOT(drawThickLine(float,float,float,float,float,int)));
+    connect(d->m_me, SIGNAL(clip(int,int,int,int)), d->m_renderer, SLOT(clip(int,int,int,int)));
+    connect(d->m_me, SIGNAL(unclip()), d->m_renderer, SLOT(unclip()));
+    connect(d->m_me, SIGNAL(startDraw()), d->m_renderer, SLOT(startDraw()));
+    connect(d->m_me, SIGNAL(endDraw()), d->m_renderer, SLOT(endDraw()));
+    connect(d->m_me, SIGNAL(drawUpdate(int,int,int,int)), d->m_renderer, SLOT(drawUpdate(int,int,int,int)));
+
+    connect(d->m_me, SIGNAL(setColor(QList<QColor>)), d->m_renderer, SLOT(setColor(QList<QColor>)));
+
+    connect(d->m_me, SIGNAL(statusBar(QString)), this, SLOT(setStatus(QString)));
+    
+    connect(d->m_renderer, SIGNAL(mousePressed(QPoint,Qt::MouseButton)), d->m_me, SLOT(pressButton(QPoint,Qt::MouseButton)));
+    connect(d->m_renderer, SIGNAL(mouseReleased(QPoint,Qt::MouseButton)), d->m_me, SLOT(releaseButton(QPoint,Qt::MouseButton)));
+    connect(d->m_renderer, SIGNAL(mouseDragged(QPoint,Qt::MouseButtons)), d->m_me, SLOT(dragButton(QPoint,Qt::MouseButtons)));
+    connect(d->m_renderer, SIGNAL(keyPressed(int,Qt::KeyboardModifiers)), d->m_me, SLOT(pressKey(int,Qt::KeyboardModifiers)));
+    
+    connect(d->m_me, SIGNAL(activateTimer()), d->m_timer, SLOT(start()));
+    connect(d->m_me, SIGNAL(deactivateTimer()), d->m_timer, SLOT(stop()));
+    connect(d->m_timer, SIGNAL(tick(qreal)), d->m_me, SLOT(tickTimer(qreal)));
+    
+    connect(d->m_me, SIGNAL(stateChanged(QString)), d->m_game_state_tracker, SLOT(gameStateChanged(QString)));
+    connect(d->m_me, SIGNAL(stateChanged(QString)), this, SIGNAL(configNeedsSaving()));
+
+    if (loadSavedGame && d->m_game_state_tracker->gameState() != "")
+    {
+        if (!d->m_me->deserialize(d->m_game_state_tracker->gameState()))
+        {
+            d->m_me->newGame();
+        }
+    }
+    else
+    {
+        d->m_me->newGame();
+    }
+    
+    setStatus("");
+    d->m_renderer->initialize(cg);
+    grabFocus();
 }
 
 

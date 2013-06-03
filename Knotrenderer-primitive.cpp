@@ -27,7 +27,7 @@ public:
 KnotRendererPrimitive::KnotRendererPrimitive(QGraphicsItem* parent, Qt::WindowFlags wFlags):KnotRenderer(parent, wFlags)
     ,d(new Private)
 {
-    d->m_paint_interface = NULL;
+    d->m_paint_interface = nullptr;
 }
 
 KnotRendererPrimitive::~KnotRendererPrimitive()
@@ -80,7 +80,7 @@ void KnotRendererPrimitive::setPainter(int fillColour, int outlineColour, int ou
 void KnotRendererPrimitive::drawText(int x, int y, bool monospace, int fontsize,
      int align, int colour, const QString& text)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         setPainter(colour, colour, 0);
         d->m_paint_interface->p->setFont(QFont(monospace? "monospace" : "sans", fontsize));
@@ -145,7 +145,7 @@ void KnotRendererPrimitive::drawText(int x, int y, bool monospace, int fontsize,
 
 void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         setPainter(colour, colour, 0);
         d->m_paint_interface->p->drawRect(QRectF(x - .5,y - .5,w,h));
@@ -155,7 +155,7 @@ void KnotRendererPrimitive::drawRect(int x, int y, int w, int h, int colour)
 void KnotRendererPrimitive::drawLine(int x1, int y1, int x2, int y2,
      int colour)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         setPainter(colour, colour, 0);
         d->m_paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
@@ -165,7 +165,7 @@ void KnotRendererPrimitive::drawLine(int x1, int y1, int x2, int y2,
 void KnotRendererPrimitive::drawPolygon(const QPolygon& polygon,
      int fillcolour, int outlinecolour)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         setPainter(fillcolour, outlinecolour, 0);
         d->m_paint_interface->p->drawPolygon(polygon);
@@ -175,7 +175,7 @@ void KnotRendererPrimitive::drawPolygon(const QPolygon& polygon,
 void KnotRendererPrimitive::drawCircle(int cx, int cy, int radius,
      int fillcolour, int outlinecolour)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         setPainter(fillcolour, outlinecolour, 0);
         d->m_paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2));
@@ -187,7 +187,7 @@ void KnotRendererPrimitive::drawThickLine(float thickness,
      int colour)
 {
     
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         setPainter(colour, colour, thickness);
         d->m_paint_interface->p->drawLine(QPointF(x1,y1), QPointF(x2,y2));
@@ -196,7 +196,7 @@ void KnotRendererPrimitive::drawThickLine(float thickness,
 
 void KnotRendererPrimitive::drawUpdate(int x, int y, int w, int h)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
     }
     else
@@ -212,7 +212,7 @@ void KnotRendererPrimitive::updateAll()
 
 void KnotRendererPrimitive::clip(int x, int y, int w, int h)
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         d->m_paint_interface->p->setClipRect(QRectF(x,y,w,h));
         d->m_paint_interface->p->setClipping(true);
@@ -221,7 +221,7 @@ void KnotRendererPrimitive::clip(int x, int y, int w, int h)
 
 void KnotRendererPrimitive::unclip()
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
         d->m_paint_interface->p->setClipping(false);
     }
@@ -229,7 +229,7 @@ void KnotRendererPrimitive::unclip()
 
 void KnotRendererPrimitive::startDraw()
 {
-    if (d->m_paint_interface != NULL)
+    if (d->m_paint_interface != nullptr)
     {
     }
 }
@@ -264,7 +264,7 @@ void KnotRendererPrimitive::paintInterface(QPainter *p,
     p->restore();
 
     delete d->m_paint_interface;
-    d->m_paint_interface = NULL;
+    d->m_paint_interface = nullptr;
 }
 
 #include "Knotrenderer-primitive.moc"
