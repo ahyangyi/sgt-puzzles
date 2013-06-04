@@ -39,7 +39,9 @@ protected:
     void preprocessSlant();
     void preprocessSlide();
     void preprocessSolo();
+    void preprocessUnequal();
     void preprocessUndead();
+    void preprocessUnruly();
     void preprocessUntangle();
     void getRealDimension(int &x, int &y, int &ox, int &oy);
     void getRealDimensionByBoundingBox(int &x, int &y, int &ox, int &oy);

@@ -227,6 +227,10 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessSolo();
     else if (gameName == "Undead")
         preprocessUndead();
+    else if (gameName == "Unequal")
+        preprocessUnequal();
+    else if (gameName == "Unruly")
+        preprocessUnruly();
     else if (gameName == "Untangle")
         preprocessUntangle();
     else
@@ -521,6 +525,15 @@ void KnotRendererPlasma::preprocessUndead()
     }
 }
 
+void KnotRendererPlasma::preprocessUnequal()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+
+    genericRemoveSpace();
+}
+
 void KnotRendererPlasma::preprocessUntangle()
 {
     /*
@@ -529,6 +542,15 @@ void KnotRendererPlasma::preprocessUntangle()
     
     genericRemoveSpace();
     
+}
+
+void KnotRendererPlasma::preprocessUnruly()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+
+    genericRemoveSpace();
 }
 
 void KnotRendererPlasma::KnotPlasmaRectAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
