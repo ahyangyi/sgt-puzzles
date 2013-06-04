@@ -10,6 +10,44 @@
 class KnotRendererPlasma::Private
 {
 public:
+    struct KnotPlasmaRectAction : public KnotBatchAction
+    {
+        int x, y, w, h, style, edge;
+        KnotRendererPlasma* parent;
+        
+        KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, int n_style, int n_edge, KnotRendererPlasma* n_parent):
+            x(n_x), y(n_y), w(n_w), h(n_h), style(n_style), edge(n_edge), parent(n_parent){}
+
+        virtual QString toString () {return QString("plasma-rect at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h).arg(style).arg(edge);}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
+    struct KnotPlasmaBlockAction : public KnotBatchAction
+    {
+        int x, y, w, h;
+        KnotRendererPlasma* parent;
+        
+        KnotPlasmaBlockAction(int n_x, int n_y, int n_w, int n_h, KnotRendererPlasma* n_parent):
+            x(n_x), y(n_y), w(n_w), h(n_h), parent(n_parent){}
+
+        virtual QString toString () {return QString("plasma-block at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h);}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+        
+        virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
+    };
+
+    struct KnotPlasmaCircleAction : public KnotBatchAction
+    {
+        int cx, cy, radius, style;
+        KnotRendererPlasma* parent;
+        
+        KnotPlasmaCircleAction(int n_cx, int n_cy, int n_radius, int n_style, KnotRendererPlasma* n_parent):
+            cx(n_cx), cy(n_cy), radius(n_radius), style(n_style), parent(n_parent) {}
+
+        virtual QString toString () {return QString("plasma-circle at %1 %2 radius %3, style %4").arg(cx).arg(cy).arg(radius).arg(style);}
+        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    };
+
     static bool isMagical (QColor color)
     {
         return color.red() >= 21 && color.red() <= 25 &&
@@ -17,6 +55,8 @@ public:
             color.blue() >= 79 && color.blue() <= 83;
     };
     KConfigGroup m_cg;
+    
+    Plasma::Svg *fifteen;
     Plasma::FrameSvg *round;
 };
 
@@ -40,6 +80,8 @@ void KnotRendererPlasma::initialize(KConfigGroup cg)
     d->round = new Plasma::FrameSvg(this);
     d->round->setImagePath("widgets/circular-background");
     d->round->setEnabledBorders(Plasma::FrameSvg::NoBorder);
+    d->fifteen = new Plasma::Svg(this);
+    d->fifteen->setImagePath("fifteenPuzzle/blanksquare");
     KnotRenderer::initialize(cg);
 }
 
@@ -235,6 +277,7 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessUntangle();
     else
     {
+        genericRemoveSpace();
     }
 }
 
@@ -310,7 +353,64 @@ void KnotRendererPlasma::preprocessDominosa()
 
 void KnotRendererPlasma::preprocessFifteen()
 {
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+
     genericRemoveSpace();
+    
+    /*
+     * Step 2: step the outer bevel
+     */
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+    /*
+     * Step 3: transform to the fifteen squares.
+     */
+    QRectF blockRect;
+    bool valid = false;
+
+    for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
+    {
+        if (typeid(**it) == typeid(KnotBatchPolyAction))
+        {
+            KnotBatchPolyAction* poly = (KnotBatchPolyAction*)*it;
+            
+            blockRect = poly->boundingBox();
+            valid = true;
+            
+            delete poly;
+            it = m_batch.erase(it);
+            delete *it;
+            it = m_batch.erase(it);
+        }
+        else if (typeid(**it) == typeid(KnotBatchRectAction))
+        {
+            KnotBatchRectAction* rect = (KnotBatchRectAction*)*it;
+            
+            if (valid)
+            {
+                *it = new Private::KnotPlasmaBlockAction(blockRect.x(), blockRect.y(), blockRect.width(), blockRect.height(), this);
+                delete rect;
+                
+                ++ it;
+                
+                valid = false;
+            }
+            else
+            {
+                delete rect;
+                it = m_batch.erase(it);
+            }
+        }
+        else
+        {
+            ++ it;
+        }
+    }
 }
 
 void KnotRendererPlasma::preprocessFilling()
@@ -344,7 +444,7 @@ void KnotRendererPlasma::preprocessGalaxies()
         if (typeid(**it) == typeid(KnotBatchCircleAction))
         {
             KnotBatchCircleAction *old = (KnotBatchCircleAction *)(*it);
-            KnotPlasmaCircleAction *neo = new KnotPlasmaCircleAction(old->cx, old->cy, old->radius, 0, this);
+            Private::KnotPlasmaCircleAction *neo = new Private::KnotPlasmaCircleAction(old->cx, old->cy, old->radius, 0, this);
             
             *it = neo;
             delete old;
@@ -553,11 +653,16 @@ void KnotRendererPlasma::preprocessUnruly()
     genericRemoveSpace();
 }
 
-void KnotRendererPlasma::KnotPlasmaRectAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+void KnotRendererPlasma::Private::KnotPlasmaRectAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
 }
 
-void KnotRendererPlasma::KnotPlasmaCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+void KnotRendererPlasma::Private::KnotPlasmaBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+{
+    parent->d->fifteen->paint(paint_interface->p, x, y, w, h);
+}
+
+void KnotRendererPlasma::Private::KnotPlasmaCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
     parent->d->round->resizeFrame(QSizeF(radius*2, radius*2));
     parent->d->round->paintFrame(paint_interface->p, QPointF(cx-radius, cy-radius));

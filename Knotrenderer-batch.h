@@ -131,6 +131,7 @@ protected:
 
         virtual QString toString ();
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+        virtual QRectF boundingBox () {return polygon.boundingRect();}
     };
 
     struct KnotBatchCircleAction : public KnotBatchAction
