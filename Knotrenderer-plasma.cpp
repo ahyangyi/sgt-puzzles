@@ -1,5 +1,6 @@
 #include <QPainter>
 
+#include <algorithm>
 #include "Knotrenderer-plasma.h"
 #include "Knotdebug.h"
 #include "Knotconfig.h"
@@ -39,10 +40,11 @@ public:
     struct KnotPlasmaCircleAction : public KnotBatchAction
     {
         int cx, cy, radius, style;
+        bool canGrow;
         KnotRendererPlasma* parent;
         
-        KnotPlasmaCircleAction(int n_cx, int n_cy, int n_radius, int n_style, KnotRendererPlasma* n_parent):
-            cx(n_cx), cy(n_cy), radius(n_radius), style(n_style), parent(n_parent) {}
+        KnotPlasmaCircleAction(int n_cx, int n_cy, int n_radius, int n_style, KnotRendererPlasma* n_parent, bool n_canGrow = false):
+            cx(n_cx), cy(n_cy), radius(n_radius), style(n_style), parent(n_parent), canGrow(n_canGrow) {}
 
         virtual QString toString () {return QString("plasma-circle at %1 %2 radius %3, style %4").arg(cx).arg(cy).arg(radius).arg(style);}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
@@ -58,6 +60,9 @@ public:
     
     Plasma::Svg *fifteen;
     Plasma::FrameSvg *round;
+    bool roundValid;
+    Plasma::FrameSvg *roundFallback;
+    bool roundFallbackValid;
 };
 
 KnotRendererPlasma::KnotRendererPlasma(QGraphicsItem* parent, Qt::WindowFlags wFlags): KnotRendererBatch(parent, wFlags), d(new Private())
@@ -80,6 +85,14 @@ void KnotRendererPlasma::initialize(KConfigGroup cg)
     d->round = new Plasma::FrameSvg(this);
     d->round->setImagePath("widgets/circular-background");
     d->round->setEnabledBorders(Plasma::FrameSvg::NoBorder);
+    d->roundValid = d->round->isValid();
+    if (!d->roundValid)
+    {
+        d->roundFallback = new Plasma::FrameSvg(this);
+        d->roundFallback->setImagePath("widgets/translucentbackground");
+        d->roundFallback->setEnabledBorders(Plasma::FrameSvg::AllBorders);
+        d->roundFallbackValid = d->roundFallback->isValid();
+    }
     d->fifteen = new Plasma::Svg(this);
     d->fifteen->setImagePath("fifteenPuzzle/blanksquare");
     KnotRenderer::initialize(cg);
@@ -444,7 +457,7 @@ void KnotRendererPlasma::preprocessGalaxies()
         if (typeid(**it) == typeid(KnotBatchCircleAction))
         {
             KnotBatchCircleAction *old = (KnotBatchCircleAction *)(*it);
-            Private::KnotPlasmaCircleAction *neo = new Private::KnotPlasmaCircleAction(old->cx, old->cy, old->radius, 0, this);
+            Private::KnotPlasmaCircleAction *neo = new Private::KnotPlasmaCircleAction(old->cx, old->cy, old->radius, 0, this, true);
             
             *it = neo;
             delete old;
@@ -664,8 +677,34 @@ void KnotRendererPlasma::Private::KnotPlasmaBlockAction::apply(KnotRendererBatch
 
 void KnotRendererPlasma::Private::KnotPlasmaCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-    parent->d->round->resizeFrame(QSizeF(radius*2, radius*2));
-    parent->d->round->paintFrame(paint_interface->p, QPointF(cx-radius, cy-radius));
+    if (parent->d->roundValid)
+    {
+        parent->d->round->resizeFrame(QSizeF(radius*2, radius*2));
+        parent->d->round->paintFrame(paint_interface->p, QPointF(cx-radius, cy-radius));
+        return;
+    }
+    if (parent->d->roundFallbackValid)
+    {
+        qreal left, top, right, bottom;
+        parent->d->roundFallback->getMargins(left, top, right, bottom);
+        if (radius * 2 >= left + right && radius * 2 >= top + bottom || canGrow)
+        {
+            qreal realRadius = radius;
+            if ((left+right)/2 > realRadius)
+                realRadius = (left+right) / 2;
+            if ((top+bottom)/2 > realRadius)
+                realRadius = (top+bottom) / 2;
+            parent->d->roundFallback->resizeFrame(QSizeF(realRadius * 2, realRadius * 2));
+            parent->d->roundFallback->paintFrame(paint_interface->p, QPointF(cx-realRadius, cy-realRadius));
+
+            return;
+        }
+    }
+
+    // fall back to just draw a circle
+    // but we don't even know what color to use now
+    paint_interface->set(0, 1, 1, color_list);
+    paint_interface->p->drawEllipse(QRectF(cx-radius,cy-radius,radius*2,radius*2));
 }
 
 #include "Knotrenderer-plasma.moc"
