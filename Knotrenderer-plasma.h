@@ -36,6 +36,7 @@ protected:
     void preprocessSameGame();
     void preprocessSignpost();
     void preprocessSingles();
+    void preprocessSixteen();
     void preprocessSlant();
     void preprocessSlide();
     void preprocessSolo();

@@ -77,6 +77,8 @@ KnotRendererPlasma::~KnotRendererPlasma()
 void KnotRendererPlasma::themeChangedHandler()
 {
     KnotRendererBatch::themeChangedHandler();
+    d->roundValid = d->round->isValid();
+    d->roundFallbackValid = d->roundFallback->isValid();
 }
 
 void KnotRendererPlasma::initialize(KConfigGroup cg)
@@ -86,13 +88,10 @@ void KnotRendererPlasma::initialize(KConfigGroup cg)
     d->round->setImagePath("widgets/circular-background");
     d->round->setEnabledBorders(Plasma::FrameSvg::NoBorder);
     d->roundValid = d->round->isValid();
-    if (!d->roundValid)
-    {
-        d->roundFallback = new Plasma::FrameSvg(this);
-        d->roundFallback->setImagePath("widgets/translucentbackground");
-        d->roundFallback->setEnabledBorders(Plasma::FrameSvg::AllBorders);
-        d->roundFallbackValid = d->roundFallback->isValid();
-    }
+    d->roundFallback = new Plasma::FrameSvg(this);
+    d->roundFallback->setImagePath("widgets/translucentbackground");
+    d->roundFallback->setEnabledBorders(Plasma::FrameSvg::AllBorders);
+    d->roundFallbackValid = d->roundFallback->isValid();
     d->fifteen = new Plasma::Svg(this);
     d->fifteen->setImagePath("fifteenPuzzle/blanksquare");
     KnotRenderer::initialize(cg);
@@ -274,6 +273,8 @@ void KnotRendererPlasma::preprocessBatch()
         preprocessSingles();
     else if (gameName == "Signpost")
         preprocessSignpost();
+    else if (gameName == "Sixteen")
+        preprocessSixteen();
     else if (gameName == "Slant")
         preprocessSlant();
     else if (gameName == "Slide")
@@ -373,7 +374,7 @@ void KnotRendererPlasma::preprocessFifteen()
     genericRemoveSpace();
     
     /*
-     * Step 2: step the outer bevel
+     * Step 2: remove the outer bevel
      */
     delete *(this->m_batch.begin());
     this->m_batch.erase(this->m_batch.begin());
@@ -576,6 +577,73 @@ void KnotRendererPlasma::preprocessSingles()
     
     genericRemoveSpace();
     
+}
+
+void KnotRendererPlasma::preprocessSixteen()
+{
+    /*
+     * Step 1: throw away the big background rectangle.
+     */
+
+    genericRemoveSpace();
+    
+    /*
+     * Step 2: remove the outer bevel
+     */
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    delete *(this->m_batch.begin());
+    this->m_batch.erase(this->m_batch.begin());
+    
+    /*
+     * Step 3: transform to the fifteen squares.
+     */
+    QRectF blockRect;
+    bool valid = false;
+
+    for (QList<KnotBatchAction *>::iterator it = m_batch.begin(); it != m_batch.end();)
+    {
+        if (typeid(**it) == typeid(KnotBatchPolyAction))
+        {
+            KnotBatchPolyAction* poly = (KnotBatchPolyAction*)*it;
+            
+            if (poly->polygon.size() == 3)
+            {
+                blockRect = poly->boundingBox();
+                valid = true;
+                
+                delete poly;
+                it = m_batch.erase(it);
+                delete *it;
+                it = m_batch.erase(it);
+            }
+            else
+                ++ it;
+        }
+        else if (typeid(**it) == typeid(KnotBatchRectAction))
+        {
+            KnotBatchRectAction* rect = (KnotBatchRectAction*)*it;
+            
+            if (valid)
+            {
+                *it = new Private::KnotPlasmaBlockAction(blockRect.x(), blockRect.y(), blockRect.width(), blockRect.height(), this);
+                delete rect;
+                
+                ++ it;
+                
+                valid = false;
+            }
+            else
+            {
+                delete rect;
+                it = m_batch.erase(it);
+            }
+        }
+        else
+        {
+            ++ it;
+        }
+    }
 }
 
 void KnotRendererPlasma::preprocessSlant()
