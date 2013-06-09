@@ -21,7 +21,7 @@ set(
     Knotplasm.cpp Knotconfig.cpp Knotrenderer.cpp Knottimer.cpp
     Knotwrap.cpp
     Knotrenderer-primitive.cpp Knotrenderer-batch.cpp Knotrenderer-plasma.cpp
-    Knotbatchaction.cpp
+    Knotbatchaction.cpp Knotplasmagamehandler.cpp
 # sgt libraries
     combi.c divvy.c drawing.c dsf.c grid.c latin.c laydomino.c list.c loopgen.c malloc.c
     maxflow.c midend.c misc.c no-icon.c penrose.c printing.c ps.c random.c tdq.c tree234.c

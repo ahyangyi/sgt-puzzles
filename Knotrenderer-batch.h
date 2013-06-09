@@ -62,7 +62,8 @@ protected:
     };
 
     struct PaintInterfaceData* m_paint_interface;
-    
+
+public:    
     struct KnotBatchAction
     {
         virtual QString toString () = 0;
@@ -75,7 +76,7 @@ protected:
         
         virtual ~KnotBatchAction () {}
     };
-
+    
     struct KnotBatchTextAction : public KnotBatchAction
     {
         int x, y, fontsize, align, colour;

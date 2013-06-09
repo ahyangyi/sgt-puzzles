@@ -4,6 +4,7 @@
 #include "Knotrenderer-plasma.h"
 #include "Knotdebug.h"
 #include "Knotconfig.h"
+#include "Knotplasmagamehandler.h"
 #include <cmath>
 #include <Plasma/Theme>
 #include <typeinfo>
@@ -58,6 +59,7 @@ public:
     };
     KConfigGroup m_cg;
     
+    DefaultGameHandler *m_game_handler;
     Plasma::Svg *fifteen;
     Plasma::FrameSvg *round;
     bool roundValid;
@@ -65,8 +67,14 @@ public:
     bool roundFallbackValid;
 };
 
-KnotRendererPlasma::KnotRendererPlasma(QGraphicsItem* parent, Qt::WindowFlags wFlags): KnotRendererBatch(parent, wFlags), d(new Private())
+KnotRendererPlasma::KnotRendererPlasma(QGraphicsItem* parent, Qt::WindowFlags wFlags): KnotRendererPlasma(GameHandlerFactoryImpl::instance(), parent, wFlags)
 {
+}
+
+KnotRendererPlasma::KnotRendererPlasma(KnotRendererPlasma::GameHandlerFactory* handlerFactory, QGraphicsItem* parent, Qt::WindowFlags wFlags): 
+    KnotRendererBatch(parent, wFlags), d(new Private()), m_handler_factory()
+{
+
 }
 
 KnotRendererPlasma::~KnotRendererPlasma()
@@ -180,6 +188,11 @@ void KnotRendererPlasma::geometryChangedHandler()
 
         setOffset(contentsRect().center() - QPointF(rx / 2., ry / 2.) - QPointF(ox, oy));
     }
+}
+
+bool KnotRendererPlasma::contains(const QPointF& point) const
+{
+    return QGraphicsItem::contains(point);
 }
 
 void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
