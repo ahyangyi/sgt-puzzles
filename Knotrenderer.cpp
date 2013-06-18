@@ -106,9 +106,8 @@ void KnotRenderer::themeChangedHandler()
     emit colorRequest(Plasma::Theme::defaultTheme()->color(Plasma::Theme::ViewBackgroundColor));
 }
 
-void KnotRenderer::initialize(KConfigGroup cg)
+void KnotRenderer::configChangedHandler(KConfigGroup cg)
 {
-    geometryChangedHandler();
     themeChangedHandler();
     m_initialized = true;
 }

@@ -22,6 +22,10 @@ set(
     Knotwrap.cpp
     Knotrenderer-primitive.cpp Knotrenderer-batch.cpp Knotrenderer-plasma.cpp
     Knotbatchaction.cpp Knotplasmagamehandler.cpp
+    Kpgh-bridges.cpp
+    Kpgh-cube.cpp
+    Kpgh-dominosa.cpp
+    Kpgh-galaxies.cpp
 # sgt libraries
     combi.c divvy.c drawing.c dsf.c grid.c latin.c laydomino.c list.c loopgen.c malloc.c
     maxflow.c midend.c misc.c no-icon.c penrose.c printing.c ps.c random.c tdq.c tree234.c

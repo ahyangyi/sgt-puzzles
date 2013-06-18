@@ -29,7 +29,7 @@ public slots:
     // Responding to desktop events
     virtual void geometryChangedHandler ();
     virtual void themeChangedHandler ();
-    virtual void initialize (KConfigGroup cg);
+    virtual void configChangedHandler (KConfigGroup cg);
     
     // Real SGT APIs
     virtual void drawText(int x, int y, bool monospace, int fontsize,

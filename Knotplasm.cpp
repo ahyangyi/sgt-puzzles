@@ -313,7 +313,7 @@ void Knotplasm::configChanged()
     }
     
     setStatus("");
-    d->m_renderer->initialize(cg);
+    d->m_renderer->configChangedHandler(cg);
     grabFocus();
 }
 
