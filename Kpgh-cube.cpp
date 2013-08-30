@@ -1,9 +1,9 @@
 #include "Knotplasmagamehandler.h"
 #include <typeinfo>
 
-bool CubeGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch)
+bool CubeGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
-    return DefaultGameHandler::contains(point, batch);
+    return DefaultGameHandler::contains(point, batch, size);
 }
 void CubeGameHandler::free()
 {

@@ -165,7 +165,7 @@ bool KnotRendererPlasma::contains(const QPointF& point) const
 {
     if (m_handler)
     {
-        return m_handler->contains(point, m_batch);
+        return m_handler->contains(point, m_batch, size());
     }
 
     return QGraphicsItem::contains(point);

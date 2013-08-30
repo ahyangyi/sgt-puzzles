@@ -41,9 +41,9 @@ DefaultGameHandler::~DefaultGameHandler()
 
 }
 
-bool DefaultGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch)
+bool DefaultGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
-    return true;
+    return (QRectF(QPointF(0,0), size).contains(point));
 }
 
 void DefaultGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
