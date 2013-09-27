@@ -31,6 +31,22 @@ set(
     Kpgh-flip.cpp
     Kpgh-galaxies.cpp
     Kpgh-inertia.cpp
+    Kpgh-loopy.cpp
+    Kpgh-map.cpp
+    Kpgh-mines.cpp
+    Kpgh-pearl.cpp
+    Kpgh-range.cpp
+    Kpgh-samegame.cpp
+    Kpgh-signpost.cpp
+    Kpgh-singles.cpp
+    Kpgh-sixteen.cpp
+    Kpgh-slant.cpp
+    Kpgh-slide.cpp
+    Kpgh-solo.cpp
+    Kpgh-undead.cpp
+    Kpgh-unequal.cpp
+    Kpgh-unruly.cpp
+    Kpgh-untangle.cpp
 # sgt libraries
     combi.c divvy.c drawing.c dsf.c grid.c latin.c laydomino.c list.c loopgen.c malloc.c
     maxflow.c midend.c misc.c no-icon.c penrose.c printing.c ps.c random.c tdq.c tree234.c

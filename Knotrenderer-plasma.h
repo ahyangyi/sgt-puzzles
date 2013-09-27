@@ -36,30 +36,6 @@ public slots:
 protected:
     virtual void preprocessBatch();
     void genericRemoveSpace();
-    void preprocessBridges();
-    void preprocessCube();
-    void preprocessDominosa();
-    void preprocessFifteen();
-    void preprocessFilling();
-    void preprocessFlip();
-    void preprocessGalaxies();
-    void preprocessInertia();
-    void preprocessLoopy();
-    void preprocessMap();
-    void preprocessMines();
-    void preprocessPearl();
-    void preprocessRange();
-    void preprocessSameGame();
-    void preprocessSignpost();
-    void preprocessSingles();
-    void preprocessSixteen();
-    void preprocessSlant();
-    void preprocessSlide();
-    void preprocessSolo();
-    void preprocessUnequal();
-    void preprocessUndead();
-    void preprocessUnruly();
-    void preprocessUntangle();
     void getRealDimension(int &x, int &y, int &ox, int &oy);
     void getRealDimensionByBoundingBox(int &x, int &y, int &ox, int &oy);
     

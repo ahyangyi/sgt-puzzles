@@ -1,5 +1,4 @@
 #include "Knotplasmagamehandler.h"
-#include <typeinfo>
 
 InertiaGameHandler::InertiaGameHandler(const GameHandlerFactories& factories): DefaultGameHandler(factories)
 {

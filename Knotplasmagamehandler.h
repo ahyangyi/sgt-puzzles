@@ -161,4 +161,180 @@ public:
     virtual void free();
 };
 
+class LoopyGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~LoopyGameHandler ();
+    LoopyGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class MapGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~MapGameHandler ();
+    MapGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class MinesGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~MinesGameHandler ();
+    MinesGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class PearlGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~PearlGameHandler ();
+    PearlGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class RangeGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~RangeGameHandler ();
+    RangeGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SameGameGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SameGameGameHandler ();
+    SameGameGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SignpostGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SignpostGameHandler ();
+    SignpostGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SinglesGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SinglesGameHandler ();
+    SinglesGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SixteenGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SixteenGameHandler ();
+    SixteenGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SlantGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SlantGameHandler ();
+    SlantGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SlideGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SlideGameHandler ();
+    SlideGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class SoloGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~SoloGameHandler ();
+    SoloGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class UndeadGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~UndeadGameHandler ();
+    UndeadGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class UnequalGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~UnequalGameHandler ();
+    UnequalGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class UnrulyGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~UnrulyGameHandler ();
+    UnrulyGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
+class UntangleGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~UntangleGameHandler ();
+    UntangleGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch);
+    virtual bool contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size);
+    virtual void free();
+};
+
 #endif

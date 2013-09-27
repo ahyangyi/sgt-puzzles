@@ -95,8 +95,48 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
         return new CubeGameHandler(factories);
     if (gameName == "Dominosa")
         return new DominosaGameHandler(factories);
+    if (gameName == "Fifteen")
+        return new FifteenGameHandler(factories);
+    if (gameName == "Filling")
+        return new FillingGameHandler(factories);
+    if (gameName == "Flip")
+        return new FlipGameHandler(factories);
     if (gameName == "Galaxies")
         return new GalaxiesGameHandler(factories);
+    if (gameName == "Inertia")
+        return new InertiaGameHandler(factories);
+    if (gameName == "Loopy")
+        return new LoopyGameHandler(factories);
+    if (gameName == "Map")
+        return new MapGameHandler(factories);
+    if (gameName == "Mines")
+        return new MinesGameHandler(factories);
+    if (gameName == "Pearl")
+        return new PearlGameHandler(factories);
+    if (gameName == "Range")
+        return new RangeGameHandler(factories);
+    if (gameName == "Same Game")
+        return new SameGameGameHandler(factories);
+    if (gameName == "Signpost")
+        return new SignpostGameHandler(factories);
+    if (gameName == "Singles")
+        return new SinglesGameHandler(factories);
+    if (gameName == "Sixteen")
+        return new SixteenGameHandler(factories);
+    if (gameName == "Slant")
+        return new SlantGameHandler(factories);
+    if (gameName == "Slide")
+        return new SlideGameHandler(factories);
+    if (gameName == "Solo")
+        return new SoloGameHandler(factories);
+    if (gameName == "Undead")
+        return new UndeadGameHandler(factories);
+    if (gameName == "Unequal")
+        return new UnequalGameHandler(factories);
+    if (gameName == "Unruly")
+        return new UnrulyGameHandler(factories);
+    if (gameName == "Untangle")
+        return new UntangleGameHandler(factories);
     
     return new DefaultGameHandler(factories);
 }
