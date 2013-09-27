@@ -3,6 +3,10 @@
 #include <cmath>
 #include <typeinfo>
 
+DefaultGameHandler::DefaultGameHandler(const GameHandlerFactories& factories): m_factories(factories)
+{
+}
+
 void DefaultGameHandler::genericRemoveSpace(QList< KnotRendererBatch::KnotBatchAction* >& batch)
 {
     if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction))
@@ -83,17 +87,18 @@ GameHandlerFactoryImpl::~GameHandlerFactoryImpl()
 KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KConfigGroup& cg)
 {
     QString gameName = KnotConfig::getGameName(cg);
+    GameHandlerFactories factories;
     
     if (gameName == "Bridges")
-        return new BridgesGameHandler();
+        return new BridgesGameHandler(factories);
     if (gameName == "Cube")
-        return new CubeGameHandler();
+        return new CubeGameHandler(factories);
     if (gameName == "Dominosa")
-        return new DominosaGameHandler();
+        return new DominosaGameHandler(factories);
     if (gameName == "Galaxies")
-        return new GalaxiesGameHandler();
+        return new GalaxiesGameHandler(factories);
     
-    return new DefaultGameHandler();
+    return new DefaultGameHandler(factories);
 }
 
 

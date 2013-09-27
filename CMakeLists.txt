@@ -24,8 +24,13 @@ set(
     Knotbatchaction.cpp Knotplasmagamehandler.cpp
     Kpgh-bridges.cpp
     Kpgh-cube.cpp
+    Kpgh-cube.cpp
     Kpgh-dominosa.cpp
+    Kpgh-fifteen.cpp
+    Kpgh-filling.cpp
+    Kpgh-flip.cpp
     Kpgh-galaxies.cpp
+    Kpgh-inertia.cpp
 # sgt libraries
     combi.c divvy.c drawing.c dsf.c grid.c latin.c laydomino.c list.c loopgen.c malloc.c
     maxflow.c midend.c misc.c no-icon.c penrose.c printing.c ps.c random.c tdq.c tree234.c

@@ -1,6 +1,10 @@
 #include "Knotplasmagamehandler.h"
 #include <typeinfo>
 
+BridgesGameHandler::BridgesGameHandler(const GameHandlerFactories& factories): DefaultGameHandler(factories)
+{
+}
+
 bool BridgesGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);

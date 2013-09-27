@@ -1,6 +1,10 @@
 #include "Knotplasmagamehandler.h"
 #include <typeinfo>
 
+GalaxiesGameHandler::GalaxiesGameHandler(const GameHandlerFactories& factories): DefaultGameHandler(factories)
+{
+}
+
 bool GalaxiesGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size  )
 {
     return DefaultGameHandler::contains(point, batch, size);
@@ -33,7 +37,7 @@ void GalaxiesGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAct
     {
         if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchCircleAction))
         {
-            auto old = (KnotRendererBatch:: KnotBatchCircleAction *)(*it);
+            auto old = (KnotRendererBatch::KnotBatchCircleAction *)(*it);
             auto neo = new KnotRendererPlasma::KnotPlasmaCircleAction(old->cx, old->cy, old->radius, 0, true);
             
             *it = neo;
