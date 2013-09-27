@@ -4,7 +4,7 @@ SameGameGameHandler::SameGameGameHandler(const GameHandlerFactories& factories):
 {
 }
 
-bool SameGameGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool SameGameGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

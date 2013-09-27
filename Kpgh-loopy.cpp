@@ -4,7 +4,7 @@ LoopyGameHandler::LoopyGameHandler(const GameHandlerFactories& factories): Defau
 {
 }
 
-bool LoopyGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool LoopyGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

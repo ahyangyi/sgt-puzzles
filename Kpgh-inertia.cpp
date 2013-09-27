@@ -4,7 +4,7 @@ InertiaGameHandler::InertiaGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool InertiaGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool InertiaGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

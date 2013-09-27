@@ -9,7 +9,9 @@ DefaultGameHandler::DefaultGameHandler(const GameHandlerFactories& factories): m
 
 void DefaultGameHandler::genericRemoveSpace(QList< KnotRendererBatch::KnotBatchAction* >& batch)
 {
-    if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction))
+    if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction) &&
+        ((KnotRendererBatch::KnotBatchRectAction*)(*batch.begin()))->colour == 1
+    )
     {
         delete *(batch.begin());
         batch.erase(batch.begin());
@@ -45,7 +47,7 @@ DefaultGameHandler::~DefaultGameHandler()
 
 }
 
-bool DefaultGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool DefaultGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return (QRectF(QPointF(0,0), size).contains(point));
 }

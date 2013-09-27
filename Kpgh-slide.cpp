@@ -4,7 +4,7 @@ SlideGameHandler::SlideGameHandler(const GameHandlerFactories& factories): Defau
 {
 }
 
-bool SlideGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool SlideGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

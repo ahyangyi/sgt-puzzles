@@ -12,9 +12,10 @@ public:
     class GameHandler
     {
     public:
+        virtual ~GameHandler() {}
         virtual void preprocessBatch (QList<KnotBatchAction*>& batch) = 0;
         virtual void getRealDimension(int &x, int &y, int &ox, int &oy, QList<KnotBatchAction*>& batch) = 0;
-        virtual bool contains (const QPointF& point, const QList<KnotBatchAction*>& batch, const QSizeF& size) = 0;
+        virtual bool contains (const QPointF& point, QList<KnotBatchAction*>& batch, const QSizeF& size) = 0;
         virtual void free () = 0;
     };
     class GameHandlerFactory
@@ -28,7 +29,6 @@ public:
     virtual ~KnotRendererPlasma();
     virtual void themeChangedHandler ();
     
-    // Override
     virtual bool contains(const QPointF& point) const;
 public slots:
     virtual void geometryChangedHandler ();
@@ -43,18 +43,6 @@ protected:
     GameHandler* m_handler;
 
 public:
-    struct KnotPlasmaRectAction : public KnotBatchAction
-    {
-        int x, y, w, h, style, edge;
-        KnotRendererPlasma* parent;
-        
-        KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, int n_style, int n_edge, KnotRendererPlasma* n_parent):
-            x(n_x), y(n_y), w(n_w), h(n_h), style(n_style), edge(n_edge), parent(n_parent){}
-
-        virtual QString toString () {return QString("plasma-rect at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h).arg(style).arg(edge);}
-        virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
-    };
-
     struct KnotPlasmaBlockAction : public KnotBatchAction
     {
         int x, y, w, h;

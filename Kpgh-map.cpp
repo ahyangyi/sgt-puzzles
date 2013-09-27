@@ -5,7 +5,7 @@ MapGameHandler::MapGameHandler(const GameHandlerFactories& factories): DefaultGa
 {
 }
 
-bool MapGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool MapGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }
@@ -37,11 +37,7 @@ void MapGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* 
             if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchRectAction))
             {
                 KnotRendererBatch::KnotBatchRectAction *rect = (KnotRendererBatch::KnotBatchRectAction *)(*it);
-                
-                rect->x --;
-                rect->y --;
-                rect->h += 2;
-                rect->w += 2;
+                *it = new KnotRendererBatch::KnotBatchRectAction(rect->x - 1, rect->y - 1, rect->h + 2, rect->w + 2, rect->colour);
             }
         }
         ++ it;

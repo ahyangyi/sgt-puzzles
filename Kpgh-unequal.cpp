@@ -4,7 +4,7 @@ UnequalGameHandler::UnequalGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool UnequalGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool UnequalGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

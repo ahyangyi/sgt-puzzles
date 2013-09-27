@@ -5,7 +5,7 @@ FifteenGameHandler::FifteenGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool FifteenGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool FifteenGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

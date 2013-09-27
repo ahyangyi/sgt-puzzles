@@ -165,7 +165,9 @@ bool KnotRendererPlasma::contains(const QPointF& point) const
 {
     if (m_handler)
     {
-        return m_handler->contains(point, m_batch, size());
+//        m_batch.clear();
+//        emit forceRedrawRequest();
+//        return m_handler->contains(point, m_batch, size());
     }
 
     return QGraphicsItem::contains(point);
@@ -249,10 +251,6 @@ void KnotRendererPlasma::genericRemoveSpace()
         delete *(this->m_batch.begin());
         this->m_batch.erase(this->m_batch.begin());
     }
-}
-
-void KnotRendererPlasma::KnotPlasmaRectAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
-{
 }
 
 void KnotRendererPlasma::KnotPlasmaBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)

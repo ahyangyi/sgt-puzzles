@@ -5,7 +5,7 @@ FillingGameHandler::FillingGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool FillingGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool FillingGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

@@ -4,7 +4,7 @@ UnrulyGameHandler::UnrulyGameHandler(const GameHandlerFactories& factories): Def
 {
 }
 
-bool UnrulyGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool UnrulyGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

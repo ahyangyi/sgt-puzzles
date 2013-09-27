@@ -36,7 +36,7 @@ QString KnotRendererBatch::KnotBatchPolyAction::toString ()
 {
     QString re = "Polygon";
     
-    for (QPolygon::iterator it = polygon.begin(); it != polygon.end(); ++it)
+    for (QPolygon::const_iterator it = polygon.begin(); it != polygon.end(); ++it)
     {
         re = re + QString(" (%1,%2)").arg(it->x()).arg(it->y());
     }

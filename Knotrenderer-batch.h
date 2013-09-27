@@ -5,9 +5,6 @@
 
 #include "Knotrenderer.h"
 
-struct PaintInterfaceData;
-struct KnotBatchAction;
-
 class KnotRendererBatch: public KnotRenderer
 {
     Q_OBJECT
@@ -46,9 +43,7 @@ public slots:
     virtual void notStarted();
     virtual void setColor(QList<QColor> colorList);
     
-protected:
-    virtual void preprocessBatch();
-    
+public:    
     struct PaintInterfaceData
     {
         QPainter *p;
@@ -61,9 +56,6 @@ protected:
         void set(int fillColour, int outlineColour, int outlineWidth, const QList<QColor> colorList);
     };
 
-    struct PaintInterfaceData* m_paint_interface;
-
-public:    
     struct KnotBatchAction
     {
         virtual QString toString () = 0;
@@ -73,15 +65,16 @@ public:
         // If it's to be ignored, return the specific rectangle QRectF(1e20, 1e20, -2e20, -2e20).
         // Note that it's a rectangle with *negative* area!
         virtual QRectF boundingBox () {return QRectF(1e20, 1e20, -2e20, -2e20);}
+        virtual bool contains (const QPointF& point) {return false;}
         
         virtual ~KnotBatchAction () {}
     };
     
     struct KnotBatchTextAction : public KnotBatchAction
     {
-        int x, y, fontsize, align, colour;
-        bool monospace;
-        QString text;
+        const int x, y, fontsize, align, colour;
+        const bool monospace;
+        const QString text;
         
         KnotBatchTextAction(int n_x, int n_y, bool n_monospace, int n_fontsize,
             int n_align, int n_colour, const QString& n_text): 
@@ -93,7 +86,7 @@ public:
 
     struct KnotBatchRectAction : public KnotBatchAction
     {
-        int x, y, w, h, colour;
+        const int x, y, w, h, colour;
         
         KnotBatchRectAction(int n_x, int n_y, int n_w, int n_h, int n_colour):
             x(n_x), y(n_y), w(n_w), h(n_h), colour(n_colour){}
@@ -102,11 +95,12 @@ public:
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(x, y, w, h);}
         virtual QRectF rectangle () {return QRectF(x, y, w, h);}
+        virtual bool contains (const QPointF& point) {return rectangle().contains(point);}
     };
 
     struct KnotBatchLineAction : public KnotBatchAction
     {
-        int x1, y1, x2, y2, colour;
+        const int x1, y1, x2, y2, colour;
         
         KnotBatchLineAction(int n_x1, int n_y1, int n_x2, int n_y2,
                     int n_colour): x1(n_x1), y1(n_y1), x2(n_x2), y2(n_y2), colour(n_colour){}
@@ -123,8 +117,8 @@ public:
 
     struct KnotBatchPolyAction : public KnotBatchAction
     {
-        QPolygon polygon;
-        int fillColour, outlineColour;
+        const QPolygon polygon;
+        const int fillColour, outlineColour;
         
         KnotBatchPolyAction(const QPolygon& n_polygon,
             int n_fillcolour, int n_outlinecolour): 
@@ -133,11 +127,12 @@ public:
         virtual QString toString ();
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return polygon.boundingRect();}
+        virtual bool contains (const QPointF& point) {return QPolygonF(polygon).containsPoint(point, Qt::OddEvenFill);}
     };
 
     struct KnotBatchCircleAction : public KnotBatchAction
     {
-        int cx, cy, radius, fillColour, outlineColour;
+        const int cx, cy, radius, fillColour, outlineColour;
         
         KnotBatchCircleAction(int n_cx, int n_cy, int n_radius,
             int n_fillcolour, int n_outlinecolour):
@@ -146,11 +141,12 @@ public:
         virtual QString toString () {return QString("circle at %1 %2 radius %3").arg(cx).arg(cy).arg(radius);}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(cx - radius, cy - radius, radius * 2, radius * 2);}
+        virtual bool contains (const QPointF& point) {return QLineF(QPointF(cx, cy), point).length() <= radius;}
     };
 
     struct KnotBatchClipAction : public KnotBatchAction
     {
-        int x, y, w, h;
+        const int x, y, w, h;
 
         KnotBatchClipAction(int n_x, int n_y, int n_w, int n_h):
             x(n_x), y(n_y), w(n_w), h(n_h){}
@@ -167,8 +163,8 @@ public:
 
     struct KnotBatchThickAction : public KnotBatchAction
     {
-        float thickness, x1, y1, x2, y2;
-        int colour;
+        const float thickness, x1, y1, x2, y2;
+        const int colour;
         
         KnotBatchThickAction (float n_thickness,
             float n_x1, float n_y1, float n_x2, float n_y2,
@@ -178,6 +174,11 @@ public:
         virtual QString toString () {return QString("thick line from %1 %2 to %3 %4").arg(x1).arg(y1).arg(x2).arg(y2);}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     };
+
+protected:
+    virtual void preprocessBatch();
+    
+    struct PaintInterfaceData* m_paint_interface;
 
     QList<KnotBatchAction*> m_batch;
     QList<QColor> m_color_list;

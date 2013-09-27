@@ -4,9 +4,13 @@ UntangleGameHandler::UntangleGameHandler(const GameHandlerFactories& factories):
 {
 }
 
-bool UntangleGameHandler::contains(const QPointF& point, const QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool UntangleGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
 {
-    return DefaultGameHandler::contains(point, batch, size);
+    preprocessBatch(batch);
+    for (auto it = batch.begin(); it != batch.end(); ++it)
+        if ((*it)->contains(point))
+            return true;
+    return false;
 }
 void UntangleGameHandler::free()
 {
