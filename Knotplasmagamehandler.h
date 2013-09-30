@@ -19,15 +19,15 @@ private:
 class KnotPlasmaCircleAction : public KnotRendererBatch::KnotBatchAction
 {
 public:
-    int cx, cy, radius, style;
-    bool canGrow;
+    const int cx, cy, radius, style;
+    const bool canGrow;
     
     enum StyleHint{
         NORMAL,
     } styleHint;
     
-    KnotPlasmaCircleAction(int n_cx, int n_cy, int n_radius, int n_style, StyleHint n_styleHint):
-        cx(n_cx), cy(n_cy), radius(n_radius), style(n_style), styleHint(n_styleHint) {}
+    KnotPlasmaCircleAction(int cx, int cy, int radius, int style, bool canGrow, StyleHint styleHint):
+        cx(cx), cy(cy), radius(radius), style(style), canGrow(canGrow), styleHint(styleHint) {}
     virtual ~KnotPlasmaCircleAction ();
 
     virtual QString toString () {return QString("plasma-circle at %1 %2 radius %3, style %4").arg(cx).arg(cy).arg(radius).arg(style);}
@@ -37,25 +37,65 @@ public:
 class KnotPlasmaCircleActionFactory
 {
 public:
-    ~KnotPlasmaCircleActionFactory ();
-    KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, KnotPlasmaCircleAction::StyleHint);
+    virtual ~KnotPlasmaCircleActionFactory ();
+    virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, KnotPlasmaCircleAction::StyleHint);
 };
 
 class KnotplasmaFrameThemedCircleAction : public KnotPlasmaCircleAction
 {
 };
 
-class KnotplasmaUnThemedCircleAction : public KnotPlasmaCircleAction
+class KnotplasmaUnthemedCircleAction : public KnotPlasmaCircleAction
 {
 };
 
 class DefaultCircleActionFactory : public KnotPlasmaCircleActionFactory
 {
+public:
+    DefaultCircleActionFactory();
+    virtual ~DefaultCircleActionFactory ();
+};
+
+class KnotPlasmaBlockAction  : public KnotRendererBatch::KnotBatchAction
+{
+public:
+    const int x, y, w, h;
+    
+    KnotPlasmaBlockAction(int n_x, int n_y, int n_w, int n_h):
+        x(n_x), y(n_y), w(n_w), h(n_h) {}
+
+    virtual QString toString () {return QString("plasma-block at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h);}
+    virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    
+    virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
+    virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
+};
+
+class KnotPlasmaBlockActionFactory
+{
+public:
+    virtual ~KnotPlasmaBlockActionFactory ();
+    virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h);
+};
+
+class KnotplasmaFrameThemedBlockAction : public KnotPlasmaBlockAction
+{
+};
+
+class KnotplasmaUnthemedBlockAction : public KnotPlasmaBlockAction
+{
+};
+
+class DefaultBlockActionFactory : public KnotPlasmaBlockActionFactory
+{
+    DefaultBlockActionFactory ();
+    virtual ~DefaultBlockActionFactory ();
 };
 
 struct GameHandlerFactories
 {
     KnotPlasmaCircleActionFactory *circle_factory;
+    KnotPlasmaBlockActionFactory *block_factory;
 };
 
 class DefaultGameHandler: public KnotRendererPlasma::GameHandler

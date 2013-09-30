@@ -66,7 +66,6 @@ void DefaultGameHandler::free()
     delete this;
 }
 
-
 class GameHandlerFactoryImpl::Private
 {
 public:
@@ -147,6 +146,34 @@ GameHandlerFactoryImpl* GameHandlerFactoryImpl::instance()
     if (Private::instance == nullptr)
         Private::instance = new GameHandlerFactoryImpl();
     return Private::instance;
+}
+
+KnotPlasmaCircleActionFactory::~KnotPlasmaCircleActionFactory()
+{
+}
+
+DefaultCircleActionFactory::DefaultCircleActionFactory()
+{
+
+}
+
+DefaultCircleActionFactory::~DefaultCircleActionFactory()
+{
+
+}
+
+KnotPlasmaBlockActionFactory::~KnotPlasmaBlockActionFactory()
+{
+
+}
+
+DefaultBlockActionFactory::DefaultBlockActionFactory()
+{
+}
+
+DefaultBlockActionFactory::~DefaultBlockActionFactory()
+{
+
 }
 
 #include "Knotplasmagamehandler.moc"
