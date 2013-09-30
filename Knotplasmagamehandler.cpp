@@ -9,9 +9,7 @@ DefaultGameHandler::DefaultGameHandler(const GameHandlerFactories& factories): m
 
 void DefaultGameHandler::genericRemoveSpace(QList< KnotRendererBatch::KnotBatchAction* >& batch)
 {
-    if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction) &&
-        ((KnotRendererBatch::KnotBatchRectAction*)(*batch.begin()))->colour == 1
-    )
+    if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction))
     {
         delete *(batch.begin());
         batch.erase(batch.begin());

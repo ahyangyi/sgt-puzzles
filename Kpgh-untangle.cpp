@@ -1,4 +1,5 @@
 #include "Knotplasmagamehandler.h"
+#include <typeinfo>
 
 UntangleGameHandler::UntangleGameHandler(const GameHandlerFactories& factories): DefaultGameHandler(factories)
 {
@@ -26,7 +27,13 @@ void UntangleGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAct
     /*
      * Step 1: throw away the big background rectangle.
      */
-    genericRemoveSpace(batch);
+    if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction) &&
+        ((KnotRendererBatch::KnotBatchRectAction*)(*batch.begin()))->colour == 1
+    )
+    {
+        delete *(batch.begin());
+        batch.erase(batch.begin());
+    }
 }
 UntangleGameHandler::~UntangleGameHandler()
 {
