@@ -40,7 +40,7 @@ void KnotRendererBatch::drawText(int x, int y, bool monospace, int fontsize,
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchTextAction(x,y,monospace,fontsize,align,colour,text));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchTextAction(x,y,monospace,fontsize,align,colour,text)));
     }
 }
 
@@ -48,7 +48,7 @@ void KnotRendererBatch::drawRect(int x, int y, int w, int h, int colour)
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchRectAction(x,y,w,h,colour));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchRectAction(x,y,w,h,colour)));
     }
 }
 
@@ -57,7 +57,7 @@ void KnotRendererBatch::drawLine(int x1, int y1, int x2, int y2,
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchLineAction(x1,y1,x2,y2,colour));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchLineAction(x1,y1,x2,y2,colour)));
     }
 }
 
@@ -66,7 +66,7 @@ void KnotRendererBatch::drawPolygon(const QPolygon& polygon,
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchPolyAction(polygon,fillcolour,outlinecolour));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchPolyAction(polygon,fillcolour,outlinecolour)));
     }
 }
 
@@ -75,7 +75,7 @@ void KnotRendererBatch::drawCircle(int cx, int cy, int radius,
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchCircleAction(cx,cy,radius,fillcolour,outlinecolour));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchCircleAction(cx,cy,radius,fillcolour,outlinecolour)));
     }
 }
 
@@ -85,7 +85,7 @@ void KnotRendererBatch::drawThickLine(float thickness,
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchThickAction(thickness,x1,y1,x2,y2,colour));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchThickAction(thickness,x1,y1,x2,y2,colour)));
     }
 }
 
@@ -109,7 +109,7 @@ void KnotRendererBatch::clip(int x, int y, int w, int h)
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchClipAction(x,y,w,h));
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchClipAction(x,y,w,h)));
     }
 }
 
@@ -117,7 +117,7 @@ void KnotRendererBatch::unclip()
 {
     if (m_paint_interface != nullptr)
     {
-        m_batch.append(new KnotBatchUnclipAction());
+        m_batch.append(std::shared_ptr<KnotBatchAction>(new KnotBatchUnclipAction()));
     }
 }
 
@@ -170,14 +170,12 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     /*
      * Run the batch
      */
-    for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
+    for (auto it = m_batch.begin(); it != m_batch.end(); ++it)
         (*it)->apply(m_paint_interface, m_color_list);
     
     /*
      * Delete the batch
      */
-    for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
-        delete (*it);
     m_batch.clear();
 
     delete m_paint_interface;

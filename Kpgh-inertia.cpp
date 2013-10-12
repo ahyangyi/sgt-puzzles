@@ -4,7 +4,7 @@ InertiaGameHandler::InertiaGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool InertiaGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool InertiaGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }
@@ -12,12 +12,12 @@ void InertiaGameHandler::free()
 {
     delete this;
 }
-void InertiaGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void InertiaGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     genericRemoveSpace(batch);
     getRealDimensionByBoundingBox(x,y,ox,oy,batch);
 }
-void InertiaGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void InertiaGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     /*
      * Step 1: throw away the big background rectangle.

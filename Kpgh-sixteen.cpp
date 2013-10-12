@@ -5,7 +5,7 @@ SixteenGameHandler::SixteenGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool SixteenGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool SixteenGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }
@@ -13,12 +13,12 @@ void SixteenGameHandler::free()
 {
     delete this;
 }
-void SixteenGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void SixteenGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     genericRemoveSpace(batch);
     getRealDimensionByBoundingBox(x,y,ox,oy,batch);
 }
-void SixteenGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void SixteenGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     /*
      * Step 1: throw away the big background rectangle.
@@ -28,9 +28,7 @@ void SixteenGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchActi
     /*
      * Step 2: remove the outer bevel
      */
-    delete *(batch.begin());
     batch.erase(batch.begin());
-    delete *(batch.begin());
     batch.erase(batch.begin());
     
     /*
@@ -39,23 +37,21 @@ void SixteenGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchActi
     QRectF blockRect;
     bool valid = false;
 
-    for (QList<KnotRendererBatch::KnotBatchAction *>::iterator it = batch.begin(); it != batch.end();)
+    for (auto it = batch.begin(); it != batch.end();)
     {
         if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchPolyAction))
         {
-            KnotRendererBatch::KnotBatchPolyAction* poly = (KnotRendererBatch::KnotBatchPolyAction*)*it;
+            auto poly = std::dynamic_pointer_cast<KnotRendererBatch::KnotBatchPolyAction>(*it);
             
             blockRect = poly->boundingBox();
             valid = true;
             
-            delete poly;
             it = batch.erase(it);
-            delete *it;
             it = batch.erase(it);
         }
         else if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchRectAction))
         {
-            KnotRendererBatch::KnotBatchRectAction* rect = (KnotRendererBatch::KnotBatchRectAction*)*it;
+            auto rect = std::dynamic_pointer_cast<KnotRendererBatch::KnotBatchRectAction>(*it);
             
             if (valid)
             {
@@ -69,7 +65,6 @@ void SixteenGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchActi
             }
             else
             {
-                delete rect;
                 it = batch.erase(it);
             }
         }

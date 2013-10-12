@@ -12,13 +12,6 @@
 class KnotRendererPlasma::Private
 {
 public:
-
-    static bool isMagical (QColor color)
-    {
-        return color.red() >= 21 && color.red() <= 25 &&
-            color.green() >= 12 && color.green() <= 16 &&
-            color.blue() >= 79 && color.blue() <= 83;
-    };
     KConfigGroup m_cg;
     
     Plasma::Svg *fifteen;
@@ -95,8 +88,6 @@ void KnotRendererPlasma::geometryChangedHandler()
         
         getRealDimension(rx, ry, ox, oy);
         
-        for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
-            delete (*it);
         m_batch.clear();
     
         delete m_paint_interface;
@@ -120,8 +111,6 @@ void KnotRendererPlasma::geometryChangedHandler()
         
         getRealDimension(rx, ry, ox, oy);
         
-        for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
-            delete (*it);
         m_batch.clear();
     
         delete m_paint_interface;
@@ -150,8 +139,6 @@ void KnotRendererPlasma::geometryChangedHandler()
         
         getRealDimension(rx, ry, ox, oy);
         
-        for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
-            delete (*it);
         m_batch.clear();
     
         delete m_paint_interface;
@@ -230,7 +217,7 @@ void KnotRendererPlasma::getRealDimensionByBoundingBox(int& x, int& y, int& ox, 
 void KnotRendererPlasma::preprocessBatch()
 {
     knotDebugClear("Batch");
-    for (QList<KnotBatchAction*>::iterator it = m_batch.begin(); it != m_batch.end(); ++it)
+    for (auto it = m_batch.begin(); it != m_batch.end(); ++it)
         knotDebugAppend("Batch", (*it)->toString());
     knotDebugFlush();
 
@@ -248,7 +235,6 @@ void KnotRendererPlasma::genericRemoveSpace()
 {
     if (typeid(**this->m_batch.begin()) == typeid(KnotBatchRectAction))
     {
-        delete *(this->m_batch.begin());
         this->m_batch.erase(this->m_batch.begin());
     }
 }

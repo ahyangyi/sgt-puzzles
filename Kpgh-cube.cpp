@@ -5,7 +5,7 @@ CubeGameHandler::CubeGameHandler(const GameHandlerFactories& factories): Default
 {
 }
 
-bool CubeGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool CubeGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }
@@ -13,11 +13,11 @@ void CubeGameHandler::free()
 {
     delete this;
 }
-void CubeGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void CubeGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     return;
 }
-void CubeGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void CubeGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     /*
      * Step 1: throw away the big background rectangle.

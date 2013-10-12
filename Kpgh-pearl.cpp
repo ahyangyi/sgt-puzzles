@@ -4,7 +4,7 @@ PearlGameHandler::PearlGameHandler(const GameHandlerFactories& factories): Defau
 {
 }
 
-bool PearlGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool PearlGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }
@@ -12,12 +12,12 @@ void PearlGameHandler::free()
 {
     delete this;
 }
-void PearlGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void PearlGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     genericRemoveSpace(batch);
     getRealDimensionByBoundingBox(x,y,ox,oy,batch);
 }
-void PearlGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void PearlGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     /*
      * Step 1: throw away the big background rectangle.

@@ -7,16 +7,15 @@ DefaultGameHandler::DefaultGameHandler(const GameHandlerFactories& factories): m
 {
 }
 
-void DefaultGameHandler::genericRemoveSpace(QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void DefaultGameHandler::genericRemoveSpace(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     if (typeid(**batch.begin()) == typeid(KnotRendererBatch::KnotBatchRectAction))
     {
-        delete *(batch.begin());
         batch.erase(batch.begin());
     }
 }
 
-void DefaultGameHandler::getRealDimensionByBoundingBox(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void DefaultGameHandler::getRealDimensionByBoundingBox(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     double x1 = x, x2 = 0, y1 = y, y2 = 0;
     
@@ -45,18 +44,18 @@ DefaultGameHandler::~DefaultGameHandler()
 
 }
 
-bool DefaultGameHandler::contains(const QPointF& point, QList< KnotRendererBatch::KnotBatchAction* >& batch, const QSizeF& size)
+bool DefaultGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return (QRectF(QPointF(0,0), size).contains(point));
 }
 
-void DefaultGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void DefaultGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     this->preprocessBatch(batch);
     this->getRealDimensionByBoundingBox(x, y, ox, oy, batch);
 }
 
-void DefaultGameHandler::preprocessBatch(QList< KnotRendererBatch::KnotBatchAction* >& batch)
+void DefaultGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
     genericRemoveSpace(batch);
 }
@@ -87,6 +86,9 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
 {
     QString gameName = KnotConfig::getGameName(cg);
     GameHandlerFactories factories;
+    
+    factories.block_factory = new DefaultBlockActionFactory;
+    factories.circle_factory = new DefaultCircleActionFactory;
     
     if (gameName == "Bridges")
         return new BridgesGameHandler(factories);
@@ -162,6 +164,7 @@ DefaultCircleActionFactory::~DefaultCircleActionFactory()
 
 }
 
+
 KnotPlasmaBlockActionFactory::~KnotPlasmaBlockActionFactory()
 {
 
@@ -172,6 +175,31 @@ DefaultBlockActionFactory::DefaultBlockActionFactory()
 }
 
 DefaultBlockActionFactory::~DefaultBlockActionFactory()
+{
+
+}
+
+void KnotPlasmaBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+{
+
+}
+
+KnotPlasmaBlockAction* KnotPlasmaBlockActionFactory::getAction(int x, int y, int w, int h)
+{
+
+}
+
+KnotPlasmaCircleAction::~KnotPlasmaCircleAction()
+{
+
+}
+
+void KnotPlasmaCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+{
+
+}
+
+KnotPlasmaCircleAction* KnotPlasmaCircleActionFactory::getAction(int cx, int cy, int radius, int style, KnotPlasmaCircleAction::StyleHint )
 {
 
 }

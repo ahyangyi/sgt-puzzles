@@ -13,9 +13,9 @@ public:
     {
     public:
         virtual ~GameHandler() {}
-        virtual void preprocessBatch (QList<KnotBatchAction*>& batch) = 0;
-        virtual void getRealDimension(int &x, int &y, int &ox, int &oy, QList<KnotBatchAction*>& batch) = 0;
-        virtual bool contains (const QPointF& point, QList<KnotBatchAction*>& batch, const QSizeF& size) = 0;
+        virtual void preprocessBatch (QList<std::shared_ptr<KnotBatchAction>>& batch) = 0;
+        virtual void getRealDimension(int &x, int &y, int &ox, int &oy, QList<std::shared_ptr<KnotBatchAction>>& batch) = 0;
+        virtual bool contains (const QPointF& point, QList<std::shared_ptr<KnotBatchAction>>& batch, const QSizeF& size) = 0;
         virtual void free () = 0;
     };
     class GameHandlerFactory

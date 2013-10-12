@@ -2,6 +2,7 @@
 #define Knotrenderer_batch_HEADER
 
 #include <Plasma/FrameSvg>
+#include <memory>
 
 #include "Knotrenderer.h"
 
@@ -180,7 +181,7 @@ protected:
     
     struct PaintInterfaceData* m_paint_interface;
 
-    QList<KnotBatchAction*> m_batch;
+    QList<std::shared_ptr<KnotBatchAction>> m_batch;
     QList<QColor> m_color_list;
 };
 
