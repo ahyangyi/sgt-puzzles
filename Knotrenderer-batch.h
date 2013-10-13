@@ -177,7 +177,7 @@ public:
     };
 
 protected:
-    virtual void preprocessBatch();
+    virtual void preprocessBatch(QList<std::shared_ptr<KnotBatchAction>>& m_batch);
     
     struct PaintInterfaceData* m_paint_interface;
 

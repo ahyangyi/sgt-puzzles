@@ -4,7 +4,7 @@ SlantGameHandler::SlantGameHandler(const GameHandlerFactories& factories): Defau
 {
 }
 
-bool SlantGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
+bool SlantGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

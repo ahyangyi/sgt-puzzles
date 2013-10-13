@@ -56,7 +56,7 @@ set(
 include("Knotplasm.dep")
 
 # We will migrate to using list.c after finishing playing with galaxies.
-# add_definitions (-DKNOTPLASM_DEBUG)
+#add_definitions (-DKNOTPLASM_DEBUG)
 add_definitions (-DCOMBINED)
 
 # We use C++11.

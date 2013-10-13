@@ -91,7 +91,7 @@ DefaultGameHandler::~DefaultGameHandler()
 
 }
 
-bool DefaultGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
+bool DefaultGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return (QRectF(QPointF(0,0), size).contains(point));
 }
@@ -254,11 +254,29 @@ KnotplasmaFrameThemedCircleAction::~KnotplasmaFrameThemedCircleAction()
 void KnotplasmaFrameThemedCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
     Plasma::FrameSvg *round;
-    
+
+/*
+        d->round = new Plasma::FrameSvg(this);
+        d->round->setImagePath("widgets/circular-background");
+        d->round->setEnabledBorders(Plasma::FrameSvg::NoBorder);
+*/
     round = new Plasma::FrameSvg(nullptr);
-    if (styleHint == NORMAL)
+    if (styleHint == DEFAULT)
+    {
+        round->setImagePath("widgets/background");
+    }
+    else if (styleHint == TRANSLUCENT)
     {
         round->setImagePath("widgets/translucentbackground");
+    }
+    else if (styleHint == OPAQUE)
+    {
+        round->setImagePath("widgets/opaquebackground");
+    }
+    else if (styleHint == PLAIN)
+    {
+        round->setImagePath("widgets/frame");
+        round->setElementPrefix("plain");
     }
     else if (styleHint == RAISED)
     {

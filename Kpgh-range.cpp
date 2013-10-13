@@ -4,7 +4,7 @@ RangeGameHandler::RangeGameHandler(const GameHandlerFactories& factories): Defau
 {
 }
 
-bool RangeGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
+bool RangeGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

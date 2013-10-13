@@ -4,7 +4,7 @@ SignpostGameHandler::SignpostGameHandler(const GameHandlerFactories& factories):
 {
 }
 
-bool SignpostGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
+bool SignpostGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

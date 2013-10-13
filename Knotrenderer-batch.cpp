@@ -159,24 +159,20 @@ void KnotRendererBatch::paintInterface(QPainter *p,
      * Cannot find a themeChanged event. Just change color every time we paint.
      */
     m_paint_interface = new PaintInterfaceData(p, option);
- 
+    m_batch.clear();
     emit forceRedrawRequest();
     
     /*
      * Preprocess the batch
      */
-    preprocessBatch();
+    QList<std::shared_ptr<KnotBatchAction>> drawbatch = m_batch;
+    preprocessBatch(drawbatch);
     
     /*
      * Run the batch
      */
-    for (auto it = m_batch.begin(); it != m_batch.end(); ++it)
+    for (auto it = drawbatch.begin(); it != drawbatch.end(); ++it)
         (*it)->apply(m_paint_interface, m_color_list);
-    
-    /*
-     * Delete the batch
-     */
-    m_batch.clear();
 
     delete m_paint_interface;
     m_paint_interface = nullptr;
@@ -184,7 +180,7 @@ void KnotRendererBatch::paintInterface(QPainter *p,
     p->restore();
 }
 
-void KnotRendererBatch::preprocessBatch()
+void KnotRendererBatch::preprocessBatch(QList<std::shared_ptr<KnotBatchAction>>& m_batch)
 {
     /*
      * Intentionally left blank

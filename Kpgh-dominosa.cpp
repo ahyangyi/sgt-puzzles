@@ -5,7 +5,7 @@ DominosaGameHandler::DominosaGameHandler(const GameHandlerFactories& factories):
 {
 }
 
-bool DominosaGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
+bool DominosaGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

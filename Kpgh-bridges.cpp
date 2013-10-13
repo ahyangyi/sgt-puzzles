@@ -5,7 +5,7 @@ BridgesGameHandler::BridgesGameHandler(const GameHandlerFactories& factories): D
 {
 }
 
-bool BridgesGameHandler::contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
+bool BridgesGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
     return DefaultGameHandler::contains(point, batch, size);
 }

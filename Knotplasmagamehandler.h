@@ -23,7 +23,7 @@ public:
     const bool canGrow;
     
     enum StyleHint{
-        NORMAL, SUNKEN, RAISED, 
+        DEFAULT, TRANSLUCENT, OPAQUE, PLAIN, SUNKEN, RAISED, 
     } styleHint;
     
     KnotPlasmaCircleAction(int cx, int cy, int radius, int style, bool canGrow, StyleHint styleHint):
@@ -41,6 +41,33 @@ public:
     virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint) = 0;
 };
 
+class KnotPlasmaRectAction  : public KnotRendererBatch::KnotBatchAction
+{
+public:
+    const int x, y, w, h;
+    const bool t, b, l, r;
+
+    enum StyleHint{
+        DEFAULT, TRANSLUCENT, OPAQUE, PLAIN, SUNKEN, RAISED, 
+    } styleHint;
+    
+    KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, StyleHint n_styleHint):
+        x(n_x), y(n_y), w(n_w), h(n_h), t(n_t), b(n_b), l(n_l), r(n_l), styleHint(n_StyleHint) {}
+
+    virtual QString toString () {return QString("plasma-rect at %1 %2 %3 %4, style %5, edge %6/%7/%8/%9").arg(x).arg(y).arg(w).arg(h).arg((int)styleHint).arg(t).arg(b).arg(l).arg(r);}
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    
+    virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
+    virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
+};
+
+class KnotPlasmaRectActionFactory
+{
+public:
+    virtual ~KnotPlasmaRectActionFactory ();
+    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h) = 0;
+};
+
 class KnotPlasmaBlockAction  : public KnotRendererBatch::KnotBatchAction
 {
 public:
@@ -49,7 +76,7 @@ public:
     KnotPlasmaBlockAction(int n_x, int n_y, int n_w, int n_h):
         x(n_x), y(n_y), w(n_w), h(n_h) {}
 
-    virtual QString toString () {return QString("plasma-block at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h);}
+    virtual QString toString () {return QString("plasma-block at %1 %2 %3 %4").arg(x).arg(y).arg(w).arg(h);}
     virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
     
     virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
@@ -67,6 +94,7 @@ struct GameHandlerFactories
 {
     KnotPlasmaCircleActionFactory *circle_factory;
     KnotPlasmaBlockActionFactory *block_factory;
+    KnotPlasmaRectActionFactory *rect_factory;
 };
 
 class DefaultGameHandler: public KnotRendererPlasma::GameHandler
@@ -76,7 +104,7 @@ public:
     DefaultGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 protected:
     virtual void genericRemoveSpace(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
@@ -91,7 +119,7 @@ public:
     BridgesGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -102,7 +130,7 @@ public:
     CubeGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -113,7 +141,7 @@ public:
     DominosaGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -124,7 +152,7 @@ public:
     FifteenGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -135,7 +163,7 @@ public:
     FillingGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -146,7 +174,7 @@ public:
     FlipGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -157,7 +185,7 @@ public:
     GalaxiesGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -168,7 +196,7 @@ public:
     InertiaGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -179,7 +207,7 @@ public:
     LoopyGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -190,7 +218,7 @@ public:
     MapGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -201,7 +229,7 @@ public:
     MinesGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -212,7 +240,7 @@ public:
     PearlGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -223,7 +251,7 @@ public:
     RangeGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -234,7 +262,7 @@ public:
     SameGameGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -245,7 +273,7 @@ public:
     SignpostGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -256,7 +284,7 @@ public:
     SinglesGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -267,7 +295,7 @@ public:
     SixteenGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -278,7 +306,7 @@ public:
     SlantGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -289,7 +317,7 @@ public:
     SlideGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -300,7 +328,7 @@ public:
     SoloGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -311,7 +339,7 @@ public:
     UndeadGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -322,7 +350,7 @@ public:
     UnequalGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -333,7 +361,7 @@ public:
     UnrulyGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
@@ -344,7 +372,7 @@ public:
     UntangleGameHandler(const GameHandlerFactories& factories);
     virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual bool contains(const QPointF& point, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 };
 
