@@ -43,10 +43,15 @@ void SixteenGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch
             auto poly = std::dynamic_pointer_cast<KnotRendererBatch::KnotBatchPolyAction>(*it);
             
             blockRect = poly->boundingBox();
-            valid = true;
             
-            it = batch.erase(it);
-            it = batch.erase(it);
+            if (poly->polygon.size() == 3)
+            {
+                valid = true;
+                it = batch.erase(it);
+                it = batch.erase(it);
+            }
+            else
+                ++ it;
         }
         else if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchRectAction))
         {
