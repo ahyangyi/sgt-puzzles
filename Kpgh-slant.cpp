@@ -14,8 +14,7 @@ void SlantGameHandler::free()
 }
 void SlantGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
-    genericRemoveSpace(batch);
-    getRealDimensionByBoundingBox(x,y,ox,oy,batch);
+    DefaultGameHandler::getRealDimension(x, y, ox, oy, batch);
 }
 void SlantGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {

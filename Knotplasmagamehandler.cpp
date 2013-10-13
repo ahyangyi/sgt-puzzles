@@ -3,6 +3,53 @@
 #include <cmath>
 #include <typeinfo>
 
+class KnotplasmaFrameThemedCircleAction : public KnotPlasmaCircleAction
+{
+public:
+    KnotplasmaFrameThemedCircleAction(int cx, int cy, int radius, int style, bool canGrow, StyleHint styleHint):
+        KnotPlasmaCircleAction(cx, cy, radius, style, canGrow, styleHint) {}
+    virtual ~KnotplasmaFrameThemedCircleAction ();
+
+    virtual QString toString () {return QString("plasma-circle-frame-themed at %1 %2 radius %3, style %4").arg(cx).arg(cy).arg(radius).arg(style);}
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+};
+
+class KnotplasmaUnthemedCircleAction : public KnotPlasmaCircleAction
+{
+};
+
+class DefaultCircleActionFactory : public KnotPlasmaCircleActionFactory
+{
+public:
+    virtual ~DefaultCircleActionFactory ();
+    virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint);
+};
+
+class KnotplasmaThemedBlockAction : public KnotPlasmaBlockAction
+{
+public:
+    KnotplasmaThemedBlockAction(int n_x, int n_y, int n_w, int n_h):
+        KnotPlasmaBlockAction(n_x, n_y, n_w, n_h) {}
+    virtual ~KnotplasmaThemedBlockAction ();
+
+    virtual QString toString () {return QString("plasma-block-themed at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h);}
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    
+    virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
+    virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
+};
+
+class KnotplasmaUnthemedBlockAction : public KnotPlasmaBlockAction
+{
+};
+
+class DefaultBlockActionFactory : public KnotPlasmaBlockActionFactory
+{
+public:
+    virtual ~DefaultBlockActionFactory ();
+    virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h);
+};
+
 DefaultGameHandler::DefaultGameHandler(const GameHandlerFactories& factories): m_factories(factories)
 {
 }
@@ -87,8 +134,8 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
     QString gameName = KnotConfig::getGameName(cg);
     GameHandlerFactories factories;
     
-    factories.block_factory = new DefaultBlockActionFactory;
-    factories.circle_factory = new DefaultCircleActionFactory;
+    factories.block_factory = new DefaultBlockActionFactory();
+    factories.circle_factory = new DefaultCircleActionFactory();
     
     if (gameName == "Bridges")
         return new BridgesGameHandler(factories);
@@ -154,11 +201,6 @@ KnotPlasmaCircleActionFactory::~KnotPlasmaCircleActionFactory()
 {
 }
 
-DefaultCircleActionFactory::DefaultCircleActionFactory()
-{
-
-}
-
 DefaultCircleActionFactory::~DefaultCircleActionFactory()
 {
 
@@ -168,10 +210,6 @@ DefaultCircleActionFactory::~DefaultCircleActionFactory()
 KnotPlasmaBlockActionFactory::~KnotPlasmaBlockActionFactory()
 {
 
-}
-
-DefaultBlockActionFactory::DefaultBlockActionFactory()
-{
 }
 
 DefaultBlockActionFactory::~DefaultBlockActionFactory()
@@ -184,9 +222,9 @@ void KnotPlasmaBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_i
 
 }
 
-KnotPlasmaBlockAction* KnotPlasmaBlockActionFactory::getAction(int x, int y, int w, int h)
+KnotPlasmaBlockAction* DefaultBlockActionFactory::getAction(int x, int y, int w, int h)
 {
-
+    return new KnotplasmaThemedBlockAction(x, y, w, h);
 }
 
 KnotPlasmaCircleAction::~KnotPlasmaCircleAction()
@@ -194,14 +232,73 @@ KnotPlasmaCircleAction::~KnotPlasmaCircleAction()
 
 }
 
-void KnotPlasmaCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+KnotplasmaThemedBlockAction::~KnotplasmaThemedBlockAction()
 {
 
 }
 
-KnotPlasmaCircleAction* KnotPlasmaCircleActionFactory::getAction(int cx, int cy, int radius, int style, KnotPlasmaCircleAction::StyleHint )
+void KnotplasmaThemedBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+{
+    Plasma::Svg *fifteen;
+    
+    fifteen = new Plasma::Svg(nullptr);
+    fifteen->setImagePath("fifteenPuzzle/blanksquare");
+    fifteen->paint(paint_interface->p, x, y, w, h);
+}
+
+KnotplasmaFrameThemedCircleAction::~KnotplasmaFrameThemedCircleAction()
 {
 
+}
+
+void KnotplasmaFrameThemedCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+{
+    Plasma::FrameSvg *round;
+    
+    round = new Plasma::FrameSvg(nullptr);
+    if (styleHint == NORMAL)
+    {
+        round->setImagePath("widgets/translucentbackground");
+    }
+    else if (styleHint == RAISED)
+    {
+        round->setImagePath("widgets/frame");
+        round->setElementPrefix("raised");
+    }
+    else
+    {
+        round->setImagePath("widgets/frame");
+        round->setElementPrefix("sunken");
+    }
+    round->setEnabledBorders(Plasma::FrameSvg::AllBorders);
+    
+    if (round->isValid())
+    {
+        qreal left, top, right, bottom;
+        
+        round->getMargins(left, top, right, bottom);
+        if (radius * 2 >= left + right && radius * 2 >= top + bottom || canGrow)
+        {
+            qreal realRadius = radius;
+            if ((left+right)/2 > realRadius)
+                realRadius = (left+right) / 2;
+            if ((top+bottom)/2 > realRadius)
+                realRadius = (top+bottom) / 2;
+            round->resizeFrame(QSizeF(realRadius * 2, realRadius * 2));
+            round->paintFrame(paint_interface->p, QPointF(cx-realRadius, cy-realRadius));
+            
+            delete round;
+
+            return;
+        }
+    }
+    
+    // Some fallback here.
+}
+
+KnotPlasmaCircleAction* DefaultCircleActionFactory::getAction(int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint)
+{
+    return new KnotplasmaFrameThemedCircleAction(cx, cy, radius, style, canGrow, styleHint);
 }
 
 #include "Knotplasmagamehandler.moc"

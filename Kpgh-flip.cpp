@@ -15,8 +15,7 @@ void FlipGameHandler::free()
 }
 void FlipGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
-    genericRemoveSpace(batch);
-    getRealDimensionByBoundingBox(x,y,ox,oy,batch);
+    DefaultGameHandler::getRealDimension(x, y, ox, oy, batch);
 }
 void FlipGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {

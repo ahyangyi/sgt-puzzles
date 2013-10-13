@@ -23,7 +23,7 @@ public:
     const bool canGrow;
     
     enum StyleHint{
-        NORMAL,
+        NORMAL, SUNKEN, RAISED, 
     } styleHint;
     
     KnotPlasmaCircleAction(int cx, int cy, int radius, int style, bool canGrow, StyleHint styleHint):
@@ -31,29 +31,14 @@ public:
     virtual ~KnotPlasmaCircleAction ();
 
     virtual QString toString () {return QString("plasma-circle at %1 %2 radius %3, style %4").arg(cx).arg(cy).arg(radius).arg(style);}
-    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
 };
 
 class KnotPlasmaCircleActionFactory
 {
 public:
     virtual ~KnotPlasmaCircleActionFactory ();
-    virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, KnotPlasmaCircleAction::StyleHint);
-};
-
-class KnotplasmaFrameThemedCircleAction : public KnotPlasmaCircleAction
-{
-};
-
-class KnotplasmaUnthemedCircleAction : public KnotPlasmaCircleAction
-{
-};
-
-class DefaultCircleActionFactory : public KnotPlasmaCircleActionFactory
-{
-public:
-    DefaultCircleActionFactory();
-    virtual ~DefaultCircleActionFactory ();
+    virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint) = 0;
 };
 
 class KnotPlasmaBlockAction  : public KnotRendererBatch::KnotBatchAction
@@ -75,22 +60,7 @@ class KnotPlasmaBlockActionFactory
 {
 public:
     virtual ~KnotPlasmaBlockActionFactory ();
-    virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h);
-};
-
-class KnotplasmaFrameThemedBlockAction : public KnotPlasmaBlockAction
-{
-};
-
-class KnotplasmaUnthemedBlockAction : public KnotPlasmaBlockAction
-{
-};
-
-class DefaultBlockActionFactory : public KnotPlasmaBlockActionFactory
-{
-public:
-    DefaultBlockActionFactory ();
-    virtual ~DefaultBlockActionFactory ();
+    virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h) = 0;
 };
 
 struct GameHandlerFactories

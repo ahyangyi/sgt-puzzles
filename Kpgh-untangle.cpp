@@ -19,8 +19,7 @@ void UntangleGameHandler::free()
 }
 void UntangleGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
-    genericRemoveSpace(batch);
-    getRealDimensionByBoundingBox(x,y,ox,oy,batch);
+    return;
 }
 void UntangleGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {

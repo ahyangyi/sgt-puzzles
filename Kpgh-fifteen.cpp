@@ -15,8 +15,7 @@ void FifteenGameHandler::free()
 }
 void FifteenGameHandler::getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
-    genericRemoveSpace(batch);
-    getRealDimensionByBoundingBox(x,y,ox,oy,batch);
+    DefaultGameHandler::getRealDimension(x, y, ox, oy, batch);
 }
 void FifteenGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
 {
@@ -56,10 +55,7 @@ void FifteenGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch
             
             if (valid)
             {
-                // FIXME: Commented for now since we do not have the "this" pointer.
-//                *it = new KnotRendererPlasma::KnotPlasmaBlockAction(blockRect.x(), blockRect.y(), blockRect.width(), blockRect.height(), this);
-//                delete rect;
-                
+                *it = std::shared_ptr<KnotRendererBatch::KnotBatchAction>(m_factories.block_factory->getAction(blockRect.x(), blockRect.y(), blockRect.width(), blockRect.height()));
                 ++ it;
                 
                 valid = false;

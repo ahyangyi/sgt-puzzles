@@ -170,22 +170,6 @@ void KnotRendererPlasma::getRealDimension(int& x, int& y, int &ox, int &oy)
         return;
     }
 
-    if (gameName == "Cube" ||
-        gameName == "Untangle"
-    )
-    {
-        return;
-    }
-    
-    if (gameName == "Undead" || gameName == "Dominosa")
-    {
-        /* For Undead and Dominosa, 
-         * the real dimension is calculated by the boundingBox just after removing the outer background */
-        genericRemoveSpace();
-        getRealDimensionByBoundingBox(x, y, ox, oy);
-        return;
-    }
-
     preprocessBatch();
     getRealDimensionByBoundingBox(x, y, ox, oy);
 }
