@@ -276,10 +276,6 @@ void KnotplasmaFrameThemedCircleAction::apply(KnotRendererBatch::PaintInterfaceD
     {
         round->setImagePath("widgets/translucentbackground");
     }
-    else if (styleHint == OPAQUE)
-    {
-        round->setImagePath("widgets/opaquebackground");
-    }
     else if (styleHint == PLAIN)
     {
         round->setImagePath("widgets/frame");
@@ -337,10 +333,6 @@ void KnotplasmaThemedRectAction::apply(KnotRendererBatch::PaintInterfaceData* pa
     else if (styleHint == TRANSLUCENT)
     {
         rect->setImagePath("widgets/translucentbackground");
-    }
-    else if (styleHint == OPAQUE)
-    {
-        rect->setImagePath("widgets/opaquebackground");
     }
     else if (styleHint == PLAIN)
     {

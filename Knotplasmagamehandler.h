@@ -23,7 +23,7 @@ public:
     const bool canGrow;
     
     enum StyleHint{
-        DEFAULT, TRANSLUCENT, OPAQUE, PLAIN, SUNKEN, RAISED, 
+        DEFAULT, TRANSLUCENT, PLAIN, SUNKEN, RAISED, 
     } styleHint;
     
     KnotPlasmaCircleAction(int cx, int cy, int radius, int style, bool canGrow, StyleHint styleHint):
@@ -48,7 +48,7 @@ public:
     const bool t, b, l, r;
 
     enum StyleHint{
-        DEFAULT, TRANSLUCENT, OPAQUE, PLAIN, SUNKEN, RAISED, 
+        DEFAULT, TRANSLUCENT, PLAIN, SUNKEN, RAISED, 
     } styleHint;
     
     KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, StyleHint n_styleHint):
