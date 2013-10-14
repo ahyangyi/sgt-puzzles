@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Extract
+xgettext --from-code=UTF-8 -C -kde -ci18n -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 -ki18ncp:1c,2,3 -ktr2i18n:1 `find . -name \*.cc -o -name \*.cpp -o -name \*.h -name \*.qml` -o Knotplasm.pot
