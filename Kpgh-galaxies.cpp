@@ -37,7 +37,7 @@ void GalaxiesGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatc
         if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchCircleAction))
         {
             auto old = std::dynamic_pointer_cast<KnotRendererBatch::KnotBatchCircleAction>(*it);
-            auto neo = std::shared_ptr<KnotRendererPlasma::KnotBatchAction>(m_factories.circle_factory->getAction(old->cx, old->cy, old->radius, 0, true, KnotPlasmaCircleAction::RAISED));
+            auto neo = std::shared_ptr<KnotRendererPlasma::KnotBatchAction>(m_factories.circle_factory->getAction(old->cx, old->cy, old->radius, 0, true, KnotPlasmaCircleAction::OPAQUE));
             
             *it = neo;
         }

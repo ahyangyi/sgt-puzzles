@@ -8,21 +8,41 @@ class KnotplasmaFrameThemedCircleAction : public KnotPlasmaCircleAction
 public:
     KnotplasmaFrameThemedCircleAction(int cx, int cy, int radius, int style, bool canGrow, StyleHint styleHint):
         KnotPlasmaCircleAction(cx, cy, radius, style, canGrow, styleHint) {}
-    virtual ~KnotplasmaFrameThemedCircleAction ();
+    virtual ~KnotplasmaFrameThemedCircleAction () {}
 
     virtual QString toString () {return QString("plasma-circle-frame-themed at %1 %2 radius %3, style %4").arg(cx).arg(cy).arg(radius).arg(style);}
     virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
 };
 
-class KnotplasmaUnthemedCircleAction : public KnotPlasmaCircleAction
-{
-};
-
 class DefaultCircleActionFactory : public KnotPlasmaCircleActionFactory
 {
 public:
-    virtual ~DefaultCircleActionFactory ();
-    virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint);
+    virtual ~DefaultCircleActionFactory () {}
+    virtual KnotPlasmaCircleAction* getAction (int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint)
+    {
+        return new KnotplasmaFrameThemedCircleAction(cx, cy, radius, style, canGrow, styleHint);
+    }
+};
+
+class KnotplasmaThemedRectAction : public KnotPlasmaRectAction
+{
+public:
+    KnotplasmaThemedRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, KnotplasmaThemedRectAction::StyleHint n_styleHint):
+        KnotplasmaThemedRectAction(n_x, n_y, n_w, n_h, n_t, n_b, n_l, n_r, n_styleHint) {}
+    virtual ~KnotplasmaThemedRectAction () {}
+
+    virtual QString toString () {return QString("plasma-rect-themed at %1 %2 %3 %4, style %5, edge %6/%7/%8/%9").arg(x).arg(y).arg(w).arg(h).arg((int)styleHint).arg(t).arg(b).arg(l).arg(r);}
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+};
+
+class DefaultRectActionFactory : public KnotPlasmaRectActionFactory
+{
+public:
+    virtual ~DefaultRectActionFactory () {}
+    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h, bool t, bool b, bool l, bool r, KnotPlasmaRectAction::StyleHint styleHint)
+    {
+        return new KnotplasmaThemedRectAction(x, y, w, h, t, b, l, r, styleHint);
+    }
 };
 
 class KnotplasmaThemedBlockAction : public KnotPlasmaBlockAction
@@ -30,23 +50,16 @@ class KnotplasmaThemedBlockAction : public KnotPlasmaBlockAction
 public:
     KnotplasmaThemedBlockAction(int n_x, int n_y, int n_w, int n_h):
         KnotPlasmaBlockAction(n_x, n_y, n_w, n_h) {}
-    virtual ~KnotplasmaThemedBlockAction ();
+    virtual ~KnotplasmaThemedBlockAction () {}
 
     virtual QString toString () {return QString("plasma-block-themed at %1 %2 %3 %4, style %5, edge %6").arg(x).arg(y).arg(w).arg(h);}
     virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
-    
-    virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
-    virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
-};
-
-class KnotplasmaUnthemedBlockAction : public KnotPlasmaBlockAction
-{
 };
 
 class DefaultBlockActionFactory : public KnotPlasmaBlockActionFactory
 {
 public:
-    virtual ~DefaultBlockActionFactory ();
+    virtual ~DefaultBlockActionFactory () {}
     virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h);
 };
 
@@ -60,6 +73,22 @@ void DefaultGameHandler::genericRemoveSpace(QList<std::shared_ptr<KnotRendererBa
     {
         batch.erase(batch.begin());
     }
+}
+
+bool DefaultGameHandler::containsByElements(const QPointF& point, const QList< std::shared_ptr< KnotRendererBatch::KnotBatchAction > >& batch, const QSizeF& size)
+{
+    for (auto it = batch.begin(); it != batch.end(); ++it)
+        if ((*it)->contains(point))
+            return true;
+    return false;
+}
+
+bool DefaultGameHandler::containsByPreprocessedElements(const QPointF& point, const QList< std::shared_ptr< KnotRendererBatch::KnotBatchAction > >& batch, const QSizeF& size)
+{
+    QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>> copy = batch;
+    
+    preprocessBatch(copy);
+    return containsByElements(point, copy, size);
 }
 
 void DefaultGameHandler::getRealDimensionByBoundingBox(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch)
@@ -136,6 +165,7 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
     
     factories.block_factory = new DefaultBlockActionFactory();
     factories.circle_factory = new DefaultCircleActionFactory();
+    factories.rect_factory = new DefaultRectActionFactory();
     
     if (gameName == "Bridges")
         return new BridgesGameHandler(factories);
@@ -201,25 +231,12 @@ KnotPlasmaCircleActionFactory::~KnotPlasmaCircleActionFactory()
 {
 }
 
-DefaultCircleActionFactory::~DefaultCircleActionFactory()
+KnotPlasmaRectActionFactory::~KnotPlasmaRectActionFactory()
 {
-
 }
-
 
 KnotPlasmaBlockActionFactory::~KnotPlasmaBlockActionFactory()
 {
-
-}
-
-DefaultBlockActionFactory::~DefaultBlockActionFactory()
-{
-
-}
-
-void KnotPlasmaBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
-{
-
 }
 
 KnotPlasmaBlockAction* DefaultBlockActionFactory::getAction(int x, int y, int w, int h)
@@ -232,11 +249,6 @@ KnotPlasmaCircleAction::~KnotPlasmaCircleAction()
 
 }
 
-KnotplasmaThemedBlockAction::~KnotplasmaThemedBlockAction()
-{
-
-}
-
 void KnotplasmaThemedBlockAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
     Plasma::Svg *fifteen;
@@ -244,11 +256,6 @@ void KnotplasmaThemedBlockAction::apply(KnotRendererBatch::PaintInterfaceData* p
     fifteen = new Plasma::Svg(nullptr);
     fifteen->setImagePath("fifteenPuzzle/blanksquare");
     fifteen->paint(paint_interface->p, x, y, w, h);
-}
-
-KnotplasmaFrameThemedCircleAction::~KnotplasmaFrameThemedCircleAction()
-{
-
 }
 
 void KnotplasmaFrameThemedCircleAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
@@ -310,13 +317,69 @@ void KnotplasmaFrameThemedCircleAction::apply(KnotRendererBatch::PaintInterfaceD
             return;
         }
     }
+    else
+    {
+        delete round;
+    }
     
     // Some fallback here.
 }
 
-KnotPlasmaCircleAction* DefaultCircleActionFactory::getAction(int cx, int cy, int radius, int style, bool canGrow, KnotPlasmaCircleAction::StyleHint styleHint)
+void KnotplasmaThemedRectAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
 {
-    return new KnotplasmaFrameThemedCircleAction(cx, cy, radius, style, canGrow, styleHint);
+    Plasma::FrameSvg *rect;
+
+    rect = new Plasma::FrameSvg(nullptr);
+    if (styleHint == DEFAULT)
+    {
+        rect->setImagePath("widgets/background");
+    }
+    else if (styleHint == TRANSLUCENT)
+    {
+        rect->setImagePath("widgets/translucentbackground");
+    }
+    else if (styleHint == OPAQUE)
+    {
+        rect->setImagePath("widgets/opaquebackground");
+    }
+    else if (styleHint == PLAIN)
+    {
+        rect->setImagePath("widgets/frame");
+        rect->setElementPrefix("plain");
+    }
+    else if (styleHint == RAISED)
+    {
+        rect->setImagePath("widgets/frame");
+        rect->setElementPrefix("raised");
+    }
+    else
+    {
+        rect->setImagePath("widgets/frame");
+        rect->setElementPrefix("sunken");
+    }
+    
+    rect->setEnabledBorders(
+        (t? Plasma::FrameSvg::TopBorder: Plasma::FrameSvg::NoBorder) |
+        (b? Plasma::FrameSvg::BottomBorder: Plasma::FrameSvg::NoBorder) |
+        (l? Plasma::FrameSvg::LeftBorder: Plasma::FrameSvg::NoBorder) |
+        (r? Plasma::FrameSvg::RightBorder: Plasma::FrameSvg::NoBorder)
+        );
+    
+    if (rect->isValid())
+    {
+        rect->resizeFrame(QSizeF(w, h));
+        rect->paintFrame(paint_interface->p, QPointF(x, y));
+            
+        delete rect;
+
+        return;
+    }
+    else
+    {
+        delete rect;
+    }
+    
+    // Some fallback here.
 }
 
 #include "Knotplasmagamehandler.moc"

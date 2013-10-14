@@ -52,10 +52,10 @@ public:
     } styleHint;
     
     KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, StyleHint n_styleHint):
-        x(n_x), y(n_y), w(n_w), h(n_h), t(n_t), b(n_b), l(n_l), r(n_l), styleHint(n_StyleHint) {}
+        x(n_x), y(n_y), w(n_w), h(n_h), t(n_t), b(n_b), l(n_l), r(n_l), styleHint(n_styleHint) {}
 
     virtual QString toString () {return QString("plasma-rect at %1 %2 %3 %4, style %5, edge %6/%7/%8/%9").arg(x).arg(y).arg(w).arg(h).arg((int)styleHint).arg(t).arg(b).arg(l).arg(r);}
-    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
     
     virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
     virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
@@ -65,7 +65,7 @@ class KnotPlasmaRectActionFactory
 {
 public:
     virtual ~KnotPlasmaRectActionFactory ();
-    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h) = 0;
+    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h, bool t, bool b, bool l, bool r, KnotPlasmaRectAction::StyleHint styleHint) = 0;
 };
 
 class KnotPlasmaBlockAction  : public KnotRendererBatch::KnotBatchAction
@@ -77,7 +77,7 @@ public:
         x(n_x), y(n_y), w(n_w), h(n_h) {}
 
     virtual QString toString () {return QString("plasma-block at %1 %2 %3 %4").arg(x).arg(y).arg(w).arg(h);}
-    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
     
     virtual QRectF boundingBox() {return QRectF(x, y, w, h);}
     virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
@@ -107,8 +107,10 @@ public:
     virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
     virtual void free();
 protected:
-    virtual void genericRemoveSpace(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
-    virtual void getRealDimensionByBoundingBox (int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
+    bool containsByElements(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    bool containsByPreprocessedElements(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    void genericRemoveSpace(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
+    void getRealDimensionByBoundingBox (int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
     const GameHandlerFactories m_factories;
 };
 

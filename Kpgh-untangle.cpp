@@ -7,13 +7,7 @@ UntangleGameHandler::UntangleGameHandler(const GameHandlerFactories& factories):
 
 bool UntangleGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
-    QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>> copy = batch;
-    
-    preprocessBatch(copy);
-    for (auto it = copy.begin(); it != copy.end(); ++it)
-        if ((*it)->contains(point))
-            return true;
-    return false;
+    return containsByPreprocessedElements(point, batch, size);
 }
 void UntangleGameHandler::free()
 {

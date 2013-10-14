@@ -20,8 +20,10 @@ void LoopyGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::
 {
     /*
      * Step 1: throw away the big background rectangle.
+     * 
+     * Note that GenericRemoveBackground does not work here.
      */
-    genericRemoveSpace(batch);
+    batch.erase(batch.begin());
 
     /*
      * Step 2: throw away the big background rectangle, again.
