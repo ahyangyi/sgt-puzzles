@@ -167,6 +167,8 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
     factories.circle_factory = new DefaultCircleActionFactory();
     factories.rect_factory = new DefaultRectActionFactory();
     
+    if (gameName == "Black Box")
+        return new BlackBoxGameHandler(factories);
     if (gameName == "Bridges")
         return new BridgesGameHandler(factories);
     if (gameName == "Cube")

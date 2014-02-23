@@ -114,6 +114,17 @@ protected:
     const GameHandlerFactories m_factories;
 };
 
+class BlackBoxGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~BlackBoxGameHandler ();
+    BlackBoxGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual void free();
+};
+
 class BridgesGameHandler: public DefaultGameHandler
 {
 public:

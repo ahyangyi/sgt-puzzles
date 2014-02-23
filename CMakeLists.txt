@@ -22,6 +22,7 @@ set(
     Knotwrap.cpp
     Knotrenderer-primitive.cpp Knotrenderer-batch.cpp Knotrenderer-plasma.cpp
     Knotbatchaction.cpp Knotplasmagamehandler.cpp
+    Kpgh-blackbox.cpp
     Kpgh-bridges.cpp
     Kpgh-cube.cpp
     Kpgh-cube.cpp
