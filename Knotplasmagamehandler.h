@@ -16,6 +16,12 @@ private:
     Private* d;
 };
 
+struct Colorizer
+{
+    QColor color;
+    qreal strength;
+};
+
 class KnotPlasmaCircleAction : public KnotRendererBatch::KnotBatchAction
 {
 public:
@@ -51,8 +57,10 @@ public:
         DEFAULT, TRANSLUCENT, PLAIN, SUNKEN, RAISED, 
     } styleHint;
     
-    KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, StyleHint n_styleHint):
-        x(n_x), y(n_y), w(n_w), h(n_h), t(n_t), b(n_b), l(n_l), r(n_l), styleHint(n_styleHint) {}
+    Colorizer* colorizer;
+    
+    KnotPlasmaRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, StyleHint n_styleHint, Colorizer* n_colorizer):
+        x(n_x), y(n_y), w(n_w), h(n_h), t(n_t), b(n_b), l(n_l), r(n_l), styleHint(n_styleHint), colorizer(n_colorizer) {}
 
     virtual QString toString () {return QString("plasma-rect at %1 %2 %3 %4, style %5, edge %6/%7/%8/%9").arg(x).arg(y).arg(w).arg(h).arg((int)styleHint).arg(t).arg(b).arg(l).arg(r);}
     virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
@@ -65,7 +73,9 @@ class KnotPlasmaRectActionFactory
 {
 public:
     virtual ~KnotPlasmaRectActionFactory ();
-    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h, bool t, bool b, bool l, bool r, KnotPlasmaRectAction::StyleHint styleHint) = 0;
+    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h, 
+                                             bool t = true, bool b = true, bool l = true, bool r = true, 
+                                             KnotPlasmaRectAction::StyleHint styleHint = KnotPlasmaRectAction::DEFAULT, Colorizer* colorizer = nullptr) = 0;
 };
 
 class KnotPlasmaBlockAction  : public KnotRendererBatch::KnotBatchAction

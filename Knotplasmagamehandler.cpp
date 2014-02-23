@@ -2,6 +2,8 @@
 #include "Knotconfig.h"
 #include <cmath>
 #include <typeinfo>
+#include "QPainter"
+#include "KIconEffect"
 
 class KnotplasmaFrameThemedCircleAction : public KnotPlasmaCircleAction
 {
@@ -27,8 +29,8 @@ public:
 class KnotplasmaThemedRectAction : public KnotPlasmaRectAction
 {
 public:
-    KnotplasmaThemedRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, KnotplasmaThemedRectAction::StyleHint n_styleHint):
-        KnotplasmaThemedRectAction(n_x, n_y, n_w, n_h, n_t, n_b, n_l, n_r, n_styleHint) {}
+    KnotplasmaThemedRectAction(int n_x, int n_y, int n_w, int n_h, bool n_t, bool n_b, bool n_l, bool n_r, KnotplasmaThemedRectAction::StyleHint n_styleHint, Colorizer* n_colorizer):
+        KnotPlasmaRectAction(n_x, n_y, n_w, n_h, n_t, n_b, n_l, n_r, n_styleHint, n_colorizer) {}
     virtual ~KnotplasmaThemedRectAction () {}
 
     virtual QString toString () {return QString("plasma-rect-themed at %1 %2 %3 %4, style %5, edge %6/%7/%8/%9").arg(x).arg(y).arg(w).arg(h).arg((int)styleHint).arg(t).arg(b).arg(l).arg(r);}
@@ -39,9 +41,11 @@ class DefaultRectActionFactory : public KnotPlasmaRectActionFactory
 {
 public:
     virtual ~DefaultRectActionFactory () {}
-    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h, bool t, bool b, bool l, bool r, KnotPlasmaRectAction::StyleHint styleHint)
+    virtual KnotPlasmaRectAction* getAction (int x, int y, int w, int h, 
+                                             bool t = true, bool b = true, bool l = true, bool r = true, 
+                                             KnotPlasmaRectAction::StyleHint styleHint = KnotPlasmaRectAction::DEFAULT, Colorizer* colorizer = nullptr)
     {
-        return new KnotplasmaThemedRectAction(x, y, w, h, t, b, l, r, styleHint);
+        return new KnotplasmaThemedRectAction(x, y, w, h, t, b, l, r, styleHint, colorizer);
     }
 };
 
@@ -362,10 +366,22 @@ void KnotplasmaThemedRectAction::apply(KnotRendererBatch::PaintInterfaceData* pa
     if (rect->isValid())
     {
         rect->resizeFrame(QSizeF(w, h));
-        rect->paintFrame(paint_interface->p, QPointF(x, y));
+        
+        if (colorizer)
+        {
+            QPixmap p = rect->framePixmap();
+            QImage itmp = p.toImage();
+            KIconEffect::colorize(itmp, colorizer->color, colorizer->strength);
+            p = p.fromImage(itmp);
+            
+            paint_interface->p->drawPixmap(QPointF(x,y), p);
+        }
+        else
+        {
+            rect->paintFrame(paint_interface->p, QPointF(x, y));
+        }
             
         delete rect;
-
         return;
     }
     else
