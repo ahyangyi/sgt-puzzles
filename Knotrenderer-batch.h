@@ -139,7 +139,7 @@ public:
             int n_fillcolour, int n_outlinecolour):
             cx(n_cx), cy(n_cy), radius(n_radius), fillColour(n_fillcolour), outlineColour(n_outlinecolour){}
 
-        virtual QString toString () {return QString("circle at %1 %2 radius %3").arg(cx).arg(cy).arg(radius);}
+        virtual QString toString () {return QString("circle at %1 %2 radius %3 color %4 %5").arg(cx).arg(cy).arg(radius).arg(fillColour).arg(outlineColour);}
         virtual void apply (PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
         virtual QRectF boundingBox () {return QRectF(cx - radius, cy - radius, radius * 2, radius * 2);}
         virtual bool contains (const QPointF& point) {return QLineF(QPointF(cx, cy), point).length() <= radius;}
