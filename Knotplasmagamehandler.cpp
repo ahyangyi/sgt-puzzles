@@ -365,6 +365,16 @@ void KnotplasmaThemedRectAction::apply(KnotRendererBatch::PaintInterfaceData* pa
     
     if (rect->isValid())
     {
+        qreal left, top, right, bottom;
+        
+        rect->getMargins(left, top, right, bottom);
+        
+        //QPointF location(x - left, y - top);
+
+        //rect->resizeFrame(QSizeF(w + left + right, h + top + bottom));
+        
+        QPointF location(x, y);
+
         rect->resizeFrame(QSizeF(w, h));
         
         if (colorizer)
@@ -374,11 +384,11 @@ void KnotplasmaThemedRectAction::apply(KnotRendererBatch::PaintInterfaceData* pa
             KIconEffect::colorize(itmp, colorizer->color, colorizer->strength);
             p = p.fromImage(itmp);
             
-            paint_interface->p->drawPixmap(QPointF(x,y), p);
+            paint_interface->p->drawPixmap(location, p);
         }
         else
         {
-            rect->paintFrame(paint_interface->p, QPointF(x, y));
+            rect->paintFrame(paint_interface->p, location);
         }
             
         delete rect;

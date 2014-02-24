@@ -51,7 +51,8 @@ public:
     
 protected:
 private:
-    KConfigGroup m_cg;
+    struct Private;
+    Private *d;
 };
 
 class KnotGameStateTracker : public QObject

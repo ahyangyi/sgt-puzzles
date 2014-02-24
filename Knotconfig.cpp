@@ -26,6 +26,14 @@ struct KnotGameConfig::Private
     int m_preset_custom_id;
 };
 
+struct KnotDisplayConfig::Private
+{
+    KConfigGroup m_cg;
+
+    QGridLayout *m_mainLayout;
+    KComboBox* m_engine;
+};
+
 struct KnotGameStateTracker::Private
 {
     KConfigGroup m_cg;
@@ -407,9 +415,27 @@ KnotGameConfig::~KnotGameConfig()
 {
 }
 
-KnotDisplayConfig::KnotDisplayConfig(QWidget* parent, KConfigGroup cg): QWidget(parent), m_cg(cg)
+KnotDisplayConfig::KnotDisplayConfig(QWidget* parent, KConfigGroup cg): QWidget(parent)
 {
+    d = new Private();
+
+    d->m_cg = cg;
+    QVBoxLayout* layout = new QVBoxLayout(this);
     
+    d->m_mainLayout = new QGridLayout();
+    
+    d->m_engine = new KComboBox(this);
+    d->m_engine->setEditable(false);
+    d->m_engine->addItem(i18n("Traditional"));
+    d->m_engine->addItem(i18n("Plasma"));
+    d->m_engine->setCurrentIndex(0);
+    d->m_engine->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+//    connect (d->m_engine, SIGNAL(currentIndexChanged(int)), this, SLOT(gameChanged(int)));
+
+    layout->addLayout(d->m_mainLayout);
+    layout->addStretch();
+    
+    setLayout(layout);
 }
 
 KnotDisplayConfig::~KnotDisplayConfig()
