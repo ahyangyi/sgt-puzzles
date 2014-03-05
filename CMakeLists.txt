@@ -44,6 +44,7 @@ set(
     Kpgh-slant.cpp
     Kpgh-slide.cpp
     Kpgh-solo.cpp
+    Kpgh-towers.cpp
     Kpgh-undead.cpp
     Kpgh-unequal.cpp
     Kpgh-unruly.cpp

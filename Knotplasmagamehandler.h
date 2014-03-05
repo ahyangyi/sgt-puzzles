@@ -355,6 +355,17 @@ public:
     virtual void free();
 };
 
+class TowersGameHandler: public DefaultGameHandler
+{
+public:
+    virtual ~TowersGameHandler ();
+    TowersGameHandler(const GameHandlerFactories& factories);
+    virtual void preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
+    virtual void getRealDimension(int& x, int& y, int& ox, int& oy, QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch);
+    virtual bool contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size);
+    virtual void free();
+};
+
 class UndeadGameHandler: public DefaultGameHandler
 {
 public:

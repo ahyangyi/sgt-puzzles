@@ -213,6 +213,8 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
         return new SlideGameHandler(factories);
     if (gameName == "Solo")
         return new SoloGameHandler(factories);
+    if (gameName == "Towers")
+        return new TowersGameHandler(factories);
     if (gameName == "Undead")
         return new UndeadGameHandler(factories);
     if (gameName == "Unequal")
