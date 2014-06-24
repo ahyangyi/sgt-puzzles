@@ -22,6 +22,31 @@ void SlantGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch::
      * Step 1: throw away the big background rectangle.
      */
     genericRemoveSpace(batch);
+
+    /*
+     * Step 2: remove the outer shadow
+     */
+    batch.erase(batch.begin());
+    
+    /*
+     * Step 3: throw away all the smaller background rectangle with color 0.
+     */
+    
+    for (auto it = batch.begin(); it != batch.end();)
+    {
+        if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchRectAction))
+        {
+            auto rect = std::dynamic_pointer_cast<KnotRendererBatch::KnotBatchRectAction>(*it);
+            
+            if (rect->colour != 1)
+            {
+                
+                it = batch.erase(it);
+                continue;
+            }
+        }
+        ++ it;
+    }
 }
 SlantGameHandler::~SlantGameHandler()
 {
