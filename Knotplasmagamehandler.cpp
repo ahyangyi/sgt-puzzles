@@ -64,7 +64,30 @@ class DefaultBlockActionFactory : public KnotPlasmaBlockActionFactory
 {
 public:
     virtual ~DefaultBlockActionFactory () {}
-    virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h);
+    virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h)
+    {
+        return new KnotplasmaThemedBlockAction(x, y, w, h);
+    }
+};
+
+class KnotplasmaThemedArrowAction : public KnotPlasmaArrowAction
+{
+public:
+    KnotplasmaThemedArrowAction(int n_cx, int n_cy, int n_radius, Type n_type):
+        KnotPlasmaArrowAction(n_cx, n_cy, n_radius, n_type) {}
+
+    virtual QString toString () {return QString("plasma-arrow-themed at %1 %2 %3").arg(cx).arg(cy).arg(radius);}
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list);
+};
+
+class DefaultArrowActionFactory : public KnotPlasmaArrowActionFactory
+{
+public:
+    virtual ~DefaultArrowActionFactory () {}
+    virtual KnotPlasmaArrowAction* getAction (int cx, int cy, int radius, KnotPlasmaArrowAction::Type type)
+    {
+        return new KnotplasmaThemedArrowAction(cx, cy, radius, type);
+    }
 };
 
 DefaultGameHandler::DefaultGameHandler(const GameHandlerFactories& factories): m_factories(factories)
@@ -170,6 +193,7 @@ KnotRendererPlasma::GameHandler* GameHandlerFactoryImpl::getGameHandler(const KC
     factories.block_factory = new DefaultBlockActionFactory();
     factories.circle_factory = new DefaultCircleActionFactory();
     factories.rect_factory = new DefaultRectActionFactory();
+    factories.arrow_factory = new DefaultArrowActionFactory();
     
     if (gameName == "Black Box")
         return new BlackBoxGameHandler(factories);
@@ -247,9 +271,8 @@ KnotPlasmaBlockActionFactory::~KnotPlasmaBlockActionFactory()
 {
 }
 
-KnotPlasmaBlockAction* DefaultBlockActionFactory::getAction(int x, int y, int w, int h)
+KnotPlasmaArrowActionFactory::~KnotPlasmaArrowActionFactory()
 {
-    return new KnotplasmaThemedBlockAction(x, y, w, h);
 }
 
 KnotPlasmaCircleAction::~KnotPlasmaCircleAction()
@@ -403,5 +426,39 @@ void KnotplasmaThemedRectAction::apply(KnotRendererBatch::PaintInterfaceData* pa
     
     // Some fallback here.
 }
+
+void KnotplasmaThemedArrowAction::apply(KnotRendererBatch::PaintInterfaceData* paint_interface, const QList< QColor >& color_list)
+{
+    Plasma::Svg *arrow;
+    QString element;
+
+    switch (type)
+    {
+        case UP:
+            element = "up-arrow";
+            break;
+        case DOWN:
+            element = "down-arrow";
+            break;
+        case LEFT:
+            element = "left-arrow";
+            break;
+        case RIGHT:
+            element = "right-arrow";
+            break;
+    }
+    
+    arrow = new Plasma::Svg(nullptr);
+    arrow->setImagePath("widgets/arrows");
+
+    QSize oldSize = arrow->elementSize(element);
+    qreal multiplier = sqrt(radius*radius*4 / oldSize.height() / oldSize.width());
+
+ //   arrow->resize(multiplier, multiplier);
+    arrow->resize(arrow->size() * multiplier);
+    QSize newSize = arrow->elementSize(element);
+    arrow->paint(paint_interface->p, cx - newSize.width() / 2, cy - newSize.height() / 2, element);
+}
+
 
 #include "Knotplasmagamehandler.moc"

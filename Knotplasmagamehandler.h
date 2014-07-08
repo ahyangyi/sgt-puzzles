@@ -100,11 +100,37 @@ public:
     virtual KnotPlasmaBlockAction* getAction (int x, int y, int w, int h) = 0;
 };
 
+class KnotPlasmaArrowAction : public KnotRendererBatch::KnotBatchAction
+{
+public:
+    const int cx, cy, radius;
+    enum Type{
+        UP, DOWN, LEFT, RIGHT
+    } type;
+
+    KnotPlasmaArrowAction(int n_cx, int n_cy, int n_radius, Type n_type):
+        cx(n_cx), cy(n_cy), radius(n_radius), type(n_type) {}
+
+    virtual QString toString () {return QString("plasma-arrow at %1 %2 %3").arg(cx).arg(cy).arg(radius);}
+    virtual void apply (KnotRendererBatch::PaintInterfaceData* paint_interface, const QList<QColor>& color_list) = 0;
+    
+    virtual QRectF boundingBox() {return QRectF(cx-radius, cy-radius, radius*2, radius*2);}
+    virtual bool contains (const QPointF& point) {return boundingBox().contains(point);}
+};
+
+class KnotPlasmaArrowActionFactory
+{
+public:
+    virtual ~KnotPlasmaArrowActionFactory ();
+    virtual KnotPlasmaArrowAction* getAction (int cx, int cy, int radius, KnotPlasmaArrowAction::Type type) = 0;
+};
+
 struct GameHandlerFactories
 {
     KnotPlasmaCircleActionFactory *circle_factory;
     KnotPlasmaBlockActionFactory *block_factory;
     KnotPlasmaRectActionFactory *rect_factory;
+    KnotPlasmaArrowActionFactory *arrow_factory;
 };
 
 class DefaultGameHandler: public KnotRendererPlasma::GameHandler
