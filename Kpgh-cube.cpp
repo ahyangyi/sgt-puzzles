@@ -7,7 +7,7 @@ CubeGameHandler::CubeGameHandler(const GameHandlerFactories& factories): Default
 
 bool CubeGameHandler::contains(const QPointF& point, const QList<std::shared_ptr<KnotRendererBatch::KnotBatchAction>>& batch, const QSizeF& size)
 {
-    return DefaultGameHandler::contains(point, batch, size);
+    return containsByPreprocessedElements(point, batch, size);
 }
 void CubeGameHandler::free()
 {
