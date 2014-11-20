@@ -44,8 +44,8 @@ void UnequalGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatch
                 {
                     if (it->x() < x1) x1 = it->x();
                     if (it->y() < y1) y1 = it->y();
-                    if (it->x() > x1) x2 = it->x();
-                    if (it->y() > y1) y2 = it->y();
+                    if (it->x() > x2) x2 = it->x();
+                    if (it->y() > y2) y2 = it->y();
                 }
                 auto neo = std::shared_ptr<KnotRendererPlasma::KnotBatchAction>(m_factories.rect_factory->getAction(
                     x1, y1, x2 - x1, y2 - y1, true, true, true, true, KnotPlasmaRectAction::SUNKEN));
