@@ -32,14 +32,19 @@ void GalaxiesGameHandler::preprocessBatch(QList<std::shared_ptr<KnotRendererBatc
     /*  
      * Step 3: change any KnotPlasmaCircleAction 
      */
-    for (auto it = batch.begin(); it != batch.end(); ++it)
+    for (auto it = batch.begin(); it != batch.end();)
     {
         if (typeid(**it) == typeid(KnotRendererBatch::KnotBatchCircleAction))
         {
             auto old = std::dynamic_pointer_cast<KnotRendererBatch::KnotBatchCircleAction>(*it);
             auto neo = std::shared_ptr<KnotRendererPlasma::KnotBatchAction>(m_factories.circle_factory->getAction(old->cx, old->cy, old->radius, 0, true, KnotPlasmaCircleAction::DEFAULT));
             
-            *it = neo;
+            it = batch.erase(it);
+            batch.push_back(neo);
+        }
+        else
+        {
+            ++it;
         }
     }
     
