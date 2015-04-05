@@ -1,7 +1,7 @@
 This is a port of Simon Tatham's puzzle collection, to the KDE 4 
 Plasma Shell.
 
-This port is currently being developed by Yi Yang
-<ahyangyi@gmail.com>
-
 You can find the original README as README-Simon.
+
+This branch is deprecated: it was based on Simon Tatham's SVN repo, which is no longer maintained.
+Please use the new branch based on Simon Tatham's Git repo.
