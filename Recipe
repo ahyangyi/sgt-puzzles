@@ -16,6 +16,7 @@
 !makefile osx Makefile.osx
 !makefile gnustep Makefile.gnustep
 !makefile nestedvm Makefile.nestedvm
+!makefile Knotplasm Knotplasm.dep
 !makefile emcc Makefile.emcc
 
 !srcdir icons/

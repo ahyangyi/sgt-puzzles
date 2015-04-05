@@ -319,7 +319,7 @@ sub mfval($) {
     # Returns true if the argument is a known makefile type. Otherwise,
     # prints a warning and returns false;
     if (grep { $type eq $_ }
-	("vc","vcproj","cygwin","borland","lcc","gtk","am","mpw","nestedvm","osx","wce","gnustep","emcc")) {
+	("vc","vcproj","cygwin","borland","lcc","gtk","am","mpw","nestedvm","osx","wce","gnustep","emcc","Knotplasm")) {
 	    return 1;
 	}
     warn "$.:unknown makefile type '$type'\n";
@@ -502,6 +502,17 @@ sub manpages {
 $orig_dir = cwd;
 
 # Now we're ready to output the actual Makefiles.
+
+if (defined $makefiles{'Knotplasm'}) {
+    $mftyp = 'Knotplasm';
+    $dirpfx = &dirpfx($makefiles{'Knotplasm'}, "/");
+
+    ##-- CygWin makefile
+    open OUT, ">$makefiles{'Knotplasm'}"; select OUT;
+    print "LIST(APPEND Knotplasm_SRCS " . (join "", map { " $_.c" } &progrealnames("X")) . ")";
+    select STDOUT; close OUT;
+}
+
 
 if (defined $makefiles{'cygwin'}) {
     $mftyp = 'cygwin';

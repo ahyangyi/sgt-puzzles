@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Knotplasm
+Comment=The plasmoid frontend for Simon Tatham's Portable Puzzle Collection
+Type=Service
+ServiceTypes=Plasma/Applet
+Icon=fifteenPuzzle
+ 
+X-KDE-Library=Knotplasm
+X-KDE-PluginInfo-Name=Knotplasm
+X-KDE-PluginInfo-Category=Games
+X-KDE-PluginInfo-Author=Yi Yang
+X-KDE-PluginInfo-Email=ahyangyi@gmail.com
+X-KDE-PluginInfo-Version=0.001
+X-KDE-PluginInfo-Website=
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true
+
