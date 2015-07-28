@@ -2637,6 +2637,9 @@ mode in which you can enter or remove pencil marks.
 Pressing M will fill in a full set of pencil marks in every square
 that does not have a main digit in it.
 
+Left-clicking a clue will mark it as done (grey it out), or unmark it
+if it is already marked.
+
 (All the actions described in \k{common-actions} are also available.)
 
 \H{towers-parameters} \I{parameters, for Towers}Towers parameters
@@ -2747,6 +2750,9 @@ Right-clicking on an empty square places a blank domino there.
 Right-clicking again places two question marks on the domino, signifying
 \q{this cannot be blank} (which can be useful to note deductions while
 solving), and right-clicking again empties the domino. 
+
+Left-clicking a clue will mark it as done (grey it out), or unmark it if
+it is already marked.
 
 You can also use the cursor keys to move a cursor around the grid. 
 Pressing the return key will lay a domino with a positive pole at that
@@ -3050,6 +3056,9 @@ mode in which you can enter or remove pencil marks.
 If you prefer plain letters of the alphabet to cute monster pictures,
 you can press \q{A} to toggle between showing the monsters as monsters or
 showing them as letters.
+
+Left-clicking a clue will mark it as done (grey it out), or unmark it
+if it is already marked.
 
 (All the actions described in \k{common-actions} are also available.)
 
